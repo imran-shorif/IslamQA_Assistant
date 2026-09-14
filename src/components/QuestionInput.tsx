@@ -1,0 +1,107 @@
+import React, { useRef, useEffect } from "react";
+import { Search, Sparkles, CornerDownLeft, Loader2, X } from "lucide-react";
+
+interface QuestionInputProps {
+  question: string;
+  onChange: (value: string) => void;
+  onSubmit: (e?: React.FormEvent) => void;
+  isLoading: boolean;
+  onClear: () => void;
+}
+
+export const QuestionInput: React.FC<QuestionInputProps> = ({
+  question,
+  onChange,
+  onSubmit,
+  isLoading,
+  onClear,
+}) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea based on input content
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
+    }
+  }, [question]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (question.trim() && !isLoading) {
+        onSubmit();
+      }
+    }
+  };
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="bg-white rounded-2xl shadow-sm border border-stone-300/80 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all p-2 sm:p-3"
+    >
+      <div className="flex items-start gap-2.5">
+        <div className="pt-2 pl-2 text-stone-400">
+          <Search className="w-5 h-5 text-emerald-700/80" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <textarea
+            ref={textareaRef}
+            id="islamic-question-input"
+            value={question}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="আপনার ইসলামিক প্রশ্নটি লিখুন (যেমন: রোজা রাখা অবস্থায় ইনজেকশন নিলে কি রোজা ভাঙ্গে?)..."
+            rows={1}
+            disabled={isLoading}
+            className="w-full bg-transparent border-0 resize-none text-stone-900 placeholder:text-stone-400 text-sm sm:text-base focus:ring-0 focus:outline-none p-1.5 min-h-[44px]"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 pt-1 pr-1 shrink-0">
+          {question.length > 0 && !isLoading && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="p-2 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+              title="Clear text"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+
+          <button
+            type="submit"
+            id="submit-question-btn"
+            disabled={!question.trim() || isLoading}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-medium text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span className="hidden sm:inline">অনুসন্ধান হচ্ছে...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-emerald-200" />
+                <span>উত্তর খুঁজুন</span>
+                <CornerDownLeft className="w-3.5 h-3.5 text-emerald-200/80 hidden sm:inline ml-0.5" />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="px-2 pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
+        <span className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+          <span>শুধুমাত্র islamqa.info এর ফতোয়া থেকে উত্তর ও রেফারেন্স দেওয়া হবে</span>
+        </span>
+        <span className="hidden sm:inline font-mono">
+          [Shift + Enter] নতুন লাইন • [Enter] পাঠান
+        </span>
+      </div>
+    </form>
+  );
+};

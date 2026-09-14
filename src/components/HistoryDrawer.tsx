@@ -1,0 +1,140 @@
+import React from "react";
+import { X, History, Trash2, ChevronRight, BookOpen, Clock } from "lucide-react";
+import { ChatHistoryItem } from "../types";
+
+interface HistoryDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  history: ChatHistoryItem[];
+  onSelectHistoryItem: (item: ChatHistoryItem) => void;
+  onClearHistory: () => void;
+  onDeleteItem: (id: string) => void;
+}
+
+export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
+  isOpen,
+  onClose,
+  history,
+  onSelectHistoryItem,
+  onClearHistory,
+  onDeleteItem,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs transition-opacity"
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+        <div className="w-screen max-w-md bg-white border-l border-stone-200 shadow-2xl flex flex-col">
+          {/* Header */}
+          <div className="px-5 py-4 bg-stone-900 text-stone-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-base font-semibold text-white">
+                পূর্ববর্তী জিজ্ঞাসিত প্রশ্ন
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+              title="Close drawer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {history.length === 0 ? (
+              <div className="text-center py-16 px-4 text-stone-400">
+                <Clock className="w-10 h-10 mx-auto mb-2 text-stone-300 stroke-1" />
+                <p className="text-sm font-medium text-stone-600">
+                  এখনো কোনো প্রশ্ন জিজ্ঞাসা করেননি
+                </p>
+                <p className="text-xs text-stone-400 mt-1">
+                  আপনার অনুসন্ধানকৃত প্রশ্ন ও ফতোয়া এখানে সংরক্ষিত থাকবে।
+                </p>
+              </div>
+            ) : (
+              history.map((item) => (
+                <div
+                  key={item.id}
+                  className="group bg-stone-50 hover:bg-emerald-50/50 border border-stone-200 hover:border-emerald-300 rounded-xl p-3.5 transition-all flex flex-col justify-between"
+                >
+                  <div
+                    onClick={() => {
+                      onSelectHistoryItem(item);
+                      onClose();
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between text-[11px] text-stone-400 mb-1">
+                      <span>
+                        {new Date(item.timestamp).toLocaleDateString([], {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        •{" "}
+                        {new Date(item.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {item.sources.length > 0 && (
+                        <span className="text-emerald-700 font-medium">
+                          {item.sources.length} টি রেফারেন্স
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-sm font-semibold text-stone-800 group-hover:text-emerald-950 line-clamp-2">
+                      {item.question}
+                    </h4>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-stone-200/60 flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        onSelectHistoryItem(item);
+                        onClose();
+                      }}
+                      className="text-xs text-emerald-700 font-medium flex items-center gap-1 hover:underline"
+                    >
+                      <span>উত্তর দেখুন</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => onDeleteItem(item.id)}
+                      className="p-1 text-stone-400 hover:text-red-600 rounded transition-colors"
+                      title="মুছে ফেলুন"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer actions */}
+          {history.length > 0 && (
+            <div className="p-4 border-t border-stone-200 bg-stone-50">
+              <button
+                onClick={onClearHistory}
+                className="w-full py-2 px-3 rounded-lg border border-stone-300 text-stone-600 hover:text-red-600 hover:border-red-300 hover:bg-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>সব ইতিহাস মুছে ফেলুন (Clear All)</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
