@@ -205,7 +205,7 @@ export default function App() {
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
             ইসলামিক জিজ্ঞাসা ও ফতোয়া <br className="hidden sm:inline" />
-            <span className="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-400 decoration-wavy underline-offset-4">
+            <span className="text-emerald-700 dark:text-emerald-400">
               যাচাইকৃত সমাধান
             </span>
           </h1>
@@ -336,7 +336,18 @@ export default function App() {
               <span>IslamQA Assistant</span>
             </a>
             <span>—</span>
-            <span className="text-stone-400 dark:text-stone-500">Grounded exclusively in islamqa.info</span>
+            <span className="text-stone-400 dark:text-stone-500">
+              Developed by{" "}
+              <a
+                href="https://www.facebook.com/imran.shorif.shuvo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-stone-300 dark:text-stone-300 hover:text-emerald-400 dark:hover:text-emerald-400 transition-colors font-medium underline sm:no-underline hover:underline"
+              >
+                Imran Shorif Shuvo
+              </a>{" "}
+              & Sabbir Ahmed
+            </span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 dark:text-stone-500 text-[11px]">

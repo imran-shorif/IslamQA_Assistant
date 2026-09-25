@@ -64,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
               </a>
             </div>
             <p className="text-[11px] text-stone-400 hidden md:block truncate">
-              বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান (Shaykh Muhammad Saalih al-Munajjid)
+              বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান
             </p>
           </div>
         </div>
