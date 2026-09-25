@@ -8,12 +8,12 @@ import { HistoryDrawer } from "./components/HistoryDrawer";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import {
   ShieldCheck,
-  Sparkles,
   BookOpen,
   Search,
-  CheckCircle2,
   AlertCircle,
   Loader2,
+  ArrowUp,
+  MessageSquarePlus,
 } from "lucide-react";
 
 const STORAGE_KEY = "islamqa_ai_history_v1";
@@ -27,6 +27,7 @@ export default function App() {
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Load history from localStorage
   useEffect(() => {
@@ -38,6 +39,19 @@ export default function App() {
     } catch (e) {
       console.warn("Could not load history from localStorage:", e);
     }
+  }, []);
+
+  // Track scroll position for mobile "scroll to top" / "ask new question" button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 350) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Save history to localStorage
@@ -130,7 +144,7 @@ export default function App() {
         timestamp: responseObj.timestamp,
       });
 
-      // Scroll to answer
+      // Scroll to answer smoothly
       setTimeout(() => {
         const el = document.getElementById(`answer-${responseObj.id}`);
         if (el) {
@@ -155,6 +169,16 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const scrollToInput = () => {
+    const inputElement = document.getElementById("islamic-question-input");
+    if (inputElement) {
+      inputElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      inputElement.focus();
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const loadingMessages = [
     "১. ইসলামকিউএ (islamqa.info) ডাটাবেজ থেকে সংশ্লিষ্ট ফতোয়া অনুসন্ধান করা হচ্ছে...",
     "২. প্রশ্নটির প্রাসঙ্গিকতা ও শর্তাবলী কুরআন-সুন্নাহর দলিলের সাথে মেলানো হচ্ছে...",
@@ -173,11 +197,11 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col">
         {/* Hero Section */}
-        <section className="text-center max-w-3xl mx-auto mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
           </div>
 
@@ -188,7 +212,7 @@ export default function App() {
             </span>
           </h1>
 
-          <p className="mt-2.5 text-sm sm:text-base text-stone-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="mt-2 text-xs sm:text-base text-stone-600 leading-relaxed max-w-2xl mx-auto">
             আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি{" "}
             <strong className="text-stone-800 font-semibold">islamqa.info</strong>{" "}
             এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।
@@ -198,8 +222,8 @@ export default function App() {
         {/* Comparison Feature Banner */}
         <ComparisonBanner />
 
-        {/* Sticky/Prominent Input Area */}
-        <div className="sticky top-18 z-20 mb-6 drop-shadow-sm">
+        {/* Question Input Area */}
+        <div className="mb-5 sm:mb-6">
           <QuestionInput
             question={question}
             onChange={setQuestion}
@@ -214,15 +238,15 @@ export default function App() {
 
         {/* Loading State with scholarly steps */}
         {isLoading && (
-          <div className="bg-white border border-emerald-200/90 rounded-2xl p-6 sm:p-8 mb-8 text-center shadow-xs">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white border border-emerald-200/90 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-3.5">
               <Loader2 className="w-6 h-6 text-emerald-700 animate-spin" />
             </div>
 
             <h3 className="text-base sm:text-lg font-bold text-stone-800 mb-2">
               বিশুদ্ধ সমাধান প্রস্তুত হচ্ছে...
             </h3>
-            <p className="text-xs sm:text-sm text-emerald-800 font-medium max-w-md mx-auto min-h-[22px] transition-all">
+            <p className="text-xs sm:text-sm text-emerald-800 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
               {loadingMessages[loadingStep]}
             </p>
 
@@ -245,14 +269,14 @@ export default function App() {
 
         {/* Error Notification */}
         {errorMessage && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5 mb-6 text-red-900 flex items-start gap-3">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
             <div className="flex-1 text-sm">
               <h4 className="font-semibold text-red-800">দুঃখিত, সমস্যা হয়েছে</h4>
-              <p className="mt-0.5 text-red-700">{errorMessage}</p>
+              <p className="mt-0.5 text-red-700 leading-relaxed">{errorMessage}</p>
               <button
                 onClick={() => handleAskQuestion()}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 transition-colors"
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 transition-colors cursor-pointer"
               >
                 আবার চেষ্টা করুন
               </button>
@@ -262,7 +286,7 @@ export default function App() {
 
         {/* Active Answer Card */}
         {currentResponse && !isLoading && (
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <AnswerCard data={currentResponse} />
           </div>
         )}
@@ -277,10 +301,33 @@ export default function App() {
         />
       </main>
 
+      {/* Floating Action Button for Mobile Users when scrolled */}
+      {showScrollTop && (
+        <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2">
+          <button
+            onClick={scrollToInput}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-emerald-600/40 cursor-pointer"
+            title="নতুন প্রশ্ন লিখুন"
+          >
+            <MessageSquarePlus className="w-4 h-4" />
+            <span>নতুন প্রশ্ন</span>
+          </button>
+
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="w-10 h-10 rounded-full bg-stone-900/90 hover:bg-stone-900 active:scale-95 text-stone-200 hover:text-white flex items-center justify-center shadow-lg transition-all border border-stone-700 cursor-pointer"
+            title="পৃষ্ঠার শীর্ষে যান"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Footer */}
-      <footer className="bg-stone-900 text-stone-400 border-t border-stone-800 py-6 mt-12 text-xs">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-stone-300">
+      <footer className="bg-stone-900 text-stone-400 border-t border-stone-800 py-6 mt-10 sm:mt-12 text-xs pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-stone-300">
             <a
               href="/"
               onClick={handleResetHome}
@@ -291,15 +338,15 @@ export default function App() {
               <span>IslamQA Assistant</span>
             </a>
             <span>—</span>
-            <span>Grounded exclusively in islamqa.info</span>
+            <span className="text-stone-400">Grounded exclusively in islamqa.info</span>
           </div>
 
-          <div className="flex items-center gap-4 text-stone-400 text-[11px]">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 text-[11px]">
             <a
               href="https://islamqa.info"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-emerald-400 transition-colors"
+              className="hover:text-emerald-400 transition-colors underline sm:no-underline"
             >
               Visit islamqa.info ↗
             </a>

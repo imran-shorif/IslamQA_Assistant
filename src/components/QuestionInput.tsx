@@ -22,7 +22,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 180)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
   }, [question]);
 
@@ -38,10 +38,11 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="bg-white rounded-2xl shadow-sm border border-stone-300/80 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all p-2 sm:p-3"
+      className="bg-white rounded-2xl shadow-sm border border-stone-300/80 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all p-3 sm:p-4"
     >
+      {/* Input Row */}
       <div className="flex items-start gap-2.5">
-        <div className="pt-2 pl-2 text-stone-400">
+        <div className="pt-2 text-stone-400 shrink-0">
           <Search className="w-5 h-5 text-emerald-700/80" />
         </div>
 
@@ -53,21 +54,32 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="আপনার ইসলামিক প্রশ্নটি লিখুন (যেমন: রোজা রাখা অবস্থায় ইনজেকশন নিলে কি রোজা ভাঙ্গে?)..."
-            rows={1}
+            rows={2}
             disabled={isLoading}
-            className="w-full bg-transparent border-0 resize-none text-stone-900 placeholder:text-stone-400 text-sm sm:text-base focus:ring-0 focus:outline-none p-1.5 min-h-[44px]"
+            className="w-full bg-transparent border-0 resize-none text-stone-900 placeholder:text-stone-400 text-base leading-relaxed focus:ring-0 focus:outline-none p-0 min-h-[52px]"
           />
         </div>
+      </div>
 
-        <div className="flex items-center gap-1.5 pt-1 pr-1 shrink-0">
+      {/* Action / Toolbar Footer */}
+      <div className="mt-2 pt-2.5 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-1.5 text-[11px] text-stone-500">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block"></span>
+          <span className="truncate">
+            শুধুমাত্র <strong className="text-stone-700 font-semibold">islamqa.info</strong> এর ফতোয়া থেকে উত্তর ও রেফারেন্স দেওয়া হবে
+          </span>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 shrink-0">
           {question.length > 0 && !isLoading && (
             <button
               type="button"
               onClick={onClear}
-              className="p-2 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
-              title="Clear text"
+              className="min-h-[42px] px-3 rounded-xl text-stone-500 hover:text-stone-800 hover:bg-stone-100 active:bg-stone-200 transition-colors text-xs font-medium flex items-center gap-1 cursor-pointer"
+              title="প্রশ্ন মুছুন (Clear)"
             >
               <X className="w-4 h-4" />
+              <span>মুছুন</span>
             </button>
           )}
 
@@ -75,12 +87,12 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             type="submit"
             id="submit-question-btn"
             disabled={!question.trim() || isLoading}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-medium text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 active:scale-[0.98] text-white font-medium text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span className="hidden sm:inline">অনুসন্ধান হচ্ছে...</span>
+                <span>অনুসন্ধান হচ্ছে...</span>
               </>
             ) : (
               <>
@@ -91,16 +103,6 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             )}
           </button>
         </div>
-      </div>
-
-      <div className="px-2 pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
-        <span className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-          <span>শুধুমাত্র islamqa.info এর ফতোয়া থেকে উত্তর ও রেফারেন্স দেওয়া হবে</span>
-        </span>
-        <span className="hidden sm:inline font-mono">
-          [Shift + Enter] নতুন লাইন • [Enter] পাঠান
-        </span>
       </div>
     </form>
   );
