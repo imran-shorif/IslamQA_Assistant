@@ -244,20 +244,21 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
           )}
         </div>
 
-        {/* Scholarly Disclaimer */}
-        <div className="mt-5 pt-3.5 border-t border-stone-100 dark:border-stone-800 flex items-start gap-2 text-xs text-stone-500 dark:text-stone-400 bg-stone-50/70 dark:bg-stone-850/60 p-3 rounded-xl leading-relaxed">
-          <AlertCircle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
+        {/* Scholarly / AI Disclaimer */}
+        <div className="mt-5 pt-3.5 border-t border-stone-100 dark:border-stone-800 flex items-start gap-2.5 text-xs text-stone-600 dark:text-stone-300 bg-stone-50/80 dark:bg-stone-850/60 p-3 sm:p-3.5 rounded-xl leading-relaxed">
+          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
           <p>
-            <strong className="text-stone-700 dark:text-stone-300">সতর্কতা ও দায়মুক্তি:</strong> এই উত্তরটি সম্পূর্ণভাবে{" "}
+            <strong className="text-stone-800 dark:text-stone-200 font-semibold">AI Disclaimer:</strong>{" "}
+            This tool is intended for educational and informational purposes only. Its responses are based on content from{" "}
             <a
               href="https://islamqa.info"
               target="_blank"
               rel="noopener noreferrer"
               className="text-emerald-700 dark:text-emerald-400 hover:underline font-medium"
             >
-              islamqa.info
+              IslamQA.info
             </a>{" "}
-            ওয়েবসাইটে প্রকাশিত ফতোয়ার সুনির্দিষ্ট রেফারেন্স ও তথ্যের ভিত্তিতে প্রস্তুত করা হয়েছে। জটিল পারিবারিক, ব্যক্তিগত বা বিচারিক বিষয়ে প্রয়োজনে বিজ্ঞ স্থানীয় আলেমের পরামর্শ নিন।
+            and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
           </p>
         </div>
       </div>

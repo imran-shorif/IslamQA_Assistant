@@ -14,6 +14,7 @@ import {
   Loader2,
   ArrowUp,
   MessageSquarePlus,
+  Info,
 } from "lucide-react";
 
 const STORAGE_KEY = "islamqa_ai_history_v1";
@@ -297,6 +298,16 @@ export default function App() {
           }}
           isLoading={isLoading}
         />
+
+        {/* AI Disclaimer Banner - Displayed on all pages/states at the bottom of content right before footer */}
+        <section aria-label="AI Disclaimer" className="mt-8 sm:mt-12 pt-5 border-t border-stone-200/80 dark:border-stone-800">
+          <div className="bg-stone-100/70 dark:bg-stone-900/70 border border-stone-200 dark:border-stone-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 flex items-start gap-2.5 sm:gap-3 leading-relaxed shadow-xs">
+            <Info className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+            <p>
+              <strong className="font-semibold text-stone-900 dark:text-stone-100">AI Disclaimer:</strong> This tool is intended for educational and informational purposes only. Its responses are based on content from IslamQA.info and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
+            </p>
+          </div>
+        </section>
       </main>
 
       {/* Floating Action Button for Mobile Users when scrolled */}
