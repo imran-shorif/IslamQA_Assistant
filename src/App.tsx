@@ -6,10 +6,10 @@ import { AnswerCard } from "./components/AnswerCard";
 import { SampleTopics } from "./components/SampleTopics";
 import { HistoryDrawer } from "./components/HistoryDrawer";
 import { QnAResponse, ChatHistoryItem } from "./types";
+import { useTheme } from "./hooks/useTheme";
 import {
   ShieldCheck,
   BookOpen,
-  Search,
   AlertCircle,
   Loader2,
   ArrowUp,
@@ -19,6 +19,7 @@ import {
 const STORAGE_KEY = "islamqa_ai_history_v1";
 
 export default function App() {
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [question, setQuestion] = useState("");
   const [language, setLanguage] = useState<"auto" | "bn" | "en" | "ar">("auto");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,31 +42,25 @@ export default function App() {
     }
   }, []);
 
-  // Track scroll position for mobile "scroll to top" / "ask new question" button
+  // Listen to window scroll to show/hide FAB
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 350) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
+      setShowScrollTop(window.scrollY > 300);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Save history to localStorage
   const saveToHistory = (item: ChatHistoryItem) => {
-    setHistory((prev) => {
-      const filtered = prev.filter((h) => h.id !== item.id && h.question !== item.question);
-      const updated = [item, ...filtered].slice(0, 30);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch (e) {
-        console.warn("Failed to persist history:", e);
-      }
-      return updated;
-    });
+    try {
+      const updated = [item, ...history.filter((h) => h.question !== item.question)].slice(0, 30);
+      setHistory(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn("Could not save to history:", e);
+    }
   };
 
   const handleClearHistory = () => {
@@ -73,49 +68,49 @@ export default function App() {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
-      console.warn("Failed to clear history:", e);
+      console.warn("Could not clear history:", e);
     }
   };
 
   const handleDeleteItem = (id: string) => {
-    setHistory((prev) => {
-      const updated = prev.filter((item) => item.id !== id);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch (e) {
-        console.warn("Failed to delete item:", e);
-      }
-      return updated;
-    });
+    const updated = history.filter((h) => h.id !== id);
+    setHistory(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn("Could not delete history item:", e);
+    }
   };
 
-  // Cycling loading steps for transparent user feedback
+  // Rotating loading status messages
   useEffect(() => {
     let interval: any;
     if (isLoading) {
       setLoadingStep(0);
       interval = setInterval(() => {
-        setLoadingStep((prev) => (prev < 2 ? prev + 1 : prev));
+        setLoadingStep((prev) => (prev + 1) % 3);
       }, 2500);
     }
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  const handleAskQuestion = async (explicitQuestion?: string) => {
-    const q = (explicitQuestion || question).trim();
+  const handleAskQuestion = async (customQuestion?: string) => {
+    const q = (customQuestion || question).trim();
     if (!q || isLoading) return;
 
     setIsLoading(true);
     setErrorMessage(null);
-    if (explicitQuestion) {
-      setQuestion(explicitQuestion);
-    }
 
     try {
       const res = await fetch("/api/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, language }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: q,
+          language,
+        }),
       });
 
       const data = await res.json();
@@ -186,7 +181,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-100 text-stone-900 flex flex-col font-sans selection:bg-emerald-100 selection:text-emerald-900">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-emerald-100 dark:selection:bg-emerald-950 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200">
       {/* Top Header */}
       <Header
         language={language}
@@ -194,27 +189,30 @@ export default function App() {
         historyCount={history.length}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onHomeClick={handleResetHome}
+        theme={theme}
+        resolvedTheme={resolvedTheme}
+        onThemeChange={setTheme}
       />
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col">
         {/* Hero Section */}
         <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight sm:leading-snug">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
             ইসলামিক জিজ্ঞাসা ও ফতোয়া <br className="hidden sm:inline" />
-            <span className="text-emerald-700 underline decoration-emerald-400 decoration-wavy underline-offset-4">
+            <span className="text-emerald-700 dark:text-emerald-400 underline decoration-emerald-400 decoration-wavy underline-offset-4">
               যাচাইকৃত সমাধান
             </span>
           </h1>
 
-          <p className="mt-2 text-xs sm:text-base text-stone-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
             আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি{" "}
-            <strong className="text-stone-800 font-semibold">islamqa.info</strong>{" "}
+            <strong className="text-stone-800 dark:text-stone-100 font-semibold">islamqa.info</strong>{" "}
             এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।
           </p>
         </section>
@@ -238,15 +236,15 @@ export default function App() {
 
         {/* Loading State with scholarly steps */}
         {isLoading && (
-          <div className="bg-white border border-emerald-200/90 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-3.5">
-              <Loader2 className="w-6 h-6 text-emerald-700 animate-spin" />
+          <div className="bg-white dark:bg-stone-900 border border-emerald-200/90 dark:border-emerald-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center mx-auto mb-3.5">
+              <Loader2 className="w-6 h-6 text-emerald-700 dark:text-emerald-400 animate-spin" />
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-stone-800 mb-2">
+            <h3 className="text-base sm:text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">
               বিশুদ্ধ সমাধান প্রস্তুত হচ্ছে...
             </h3>
-            <p className="text-xs sm:text-sm text-emerald-800 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
+            <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
               {loadingMessages[loadingStep]}
             </p>
 
@@ -256,10 +254,10 @@ export default function App() {
                   key={idx}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     idx === loadingStep
-                      ? "w-8 bg-emerald-600"
+                      ? "w-8 bg-emerald-600 dark:bg-emerald-500"
                       : idx < loadingStep
-                      ? "w-4 bg-emerald-300"
-                      : "w-2 bg-stone-200"
+                      ? "w-4 bg-emerald-300 dark:bg-emerald-800"
+                      : "w-2 bg-stone-200 dark:bg-stone-800"
                   }`}
                 />
               ))}
@@ -269,14 +267,14 @@ export default function App() {
 
         {/* Error Notification */}
         {errorMessage && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <div className="bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 dark:text-red-200 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
             <div className="flex-1 text-sm">
-              <h4 className="font-semibold text-red-800">দুঃখিত, সমস্যা হয়েছে</h4>
-              <p className="mt-0.5 text-red-700 leading-relaxed">{errorMessage}</p>
+              <h4 className="font-semibold text-red-800 dark:text-red-300">দুঃখিত, সমস্যা হয়েছে</h4>
+              <p className="mt-0.5 text-red-700 dark:text-red-300/90 leading-relaxed">{errorMessage}</p>
               <button
                 onClick={() => handleAskQuestion()}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-800 transition-colors cursor-pointer"
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/60 hover:bg-red-200 dark:hover:bg-red-800 text-red-800 dark:text-red-200 transition-colors cursor-pointer"
               >
                 আবার চেষ্টা করুন
               </button>
@@ -306,7 +304,7 @@ export default function App() {
         <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2">
           <button
             onClick={scrollToInput}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-emerald-600/40 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-emerald-600/40 cursor-pointer"
             title="নতুন প্রশ্ন লিখুন"
           >
             <MessageSquarePlus className="w-4 h-4" />
@@ -315,7 +313,7 @@ export default function App() {
 
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="w-10 h-10 rounded-full bg-stone-900/90 hover:bg-stone-900 active:scale-95 text-stone-200 hover:text-white flex items-center justify-center shadow-lg transition-all border border-stone-700 cursor-pointer"
+            className="w-10 h-10 rounded-full bg-stone-900/90 dark:bg-stone-800/95 hover:bg-stone-900 dark:hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white flex items-center justify-center shadow-lg transition-all border border-stone-700 cursor-pointer"
             title="পৃষ্ঠার শীর্ষে যান"
             aria-label="Scroll to top"
           >
@@ -325,9 +323,9 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="bg-stone-900 text-stone-400 border-t border-stone-800 py-6 mt-10 sm:mt-12 text-xs pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
+      <footer className="bg-stone-900 dark:bg-black text-stone-400 dark:text-stone-500 border-t border-stone-800 dark:border-stone-850 py-6 mt-10 sm:mt-12 text-xs pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] transition-colors">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-stone-300">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-stone-300 dark:text-stone-400">
             <a
               href="/"
               onClick={handleResetHome}
@@ -338,10 +336,10 @@ export default function App() {
               <span>IslamQA Assistant</span>
             </a>
             <span>—</span>
-            <span className="text-stone-400">Grounded exclusively in islamqa.info</span>
+            <span className="text-stone-400 dark:text-stone-500">Grounded exclusively in islamqa.info</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 text-[11px]">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 dark:text-stone-500 text-[11px]">
             <a
               href="https://islamqa.info"
               target="_blank"
