@@ -65,15 +65,15 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
     if (theme === "system") {
       return (
         <span className="relative flex items-center justify-center">
-          <Monitor className="w-4 h-4 text-emerald-300" />
-          <span className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 border border-stone-900" />
+          <Monitor className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
+          <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 border border-stone-900" />
         </span>
       );
     }
     if (theme === "dark") {
-      return <Moon className="w-4 h-4 text-amber-300" />;
+      return <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />;
     }
-    return <Sun className="w-4 h-4 text-amber-400" />;
+    return <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />;
   };
 
   const getLabel = () => {
@@ -113,14 +113,14 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
           aria-expanded={isOpen}
           aria-haspopup="true"
           title={`বর্তমান থিম: ${getLabel()} (ক্লিক করে থিম পরিবর্তন করুন)`}
-          className="flex items-center gap-1.5 min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:bg-stone-600 active:scale-95 text-stone-200 text-xs font-medium transition-all border border-stone-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer shadow-xs"
+          className="flex items-center justify-center gap-1 h-8 w-8 sm:w-auto sm:h-9 sm:px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:bg-stone-600 active:scale-95 text-stone-200 text-xs font-medium transition-all border border-stone-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer shadow-xs shrink-0"
         >
           {getButtonIcon()}
-          <span className="hidden md:inline font-medium">
+          <span className="hidden md:inline font-medium text-xs">
             {theme === "system" ? "ডিভাইস" : theme === "dark" ? "ডার্ক" : "লাইট"}
           </span>
           <ChevronDown
-            className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-200 ${
+            className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-stone-400 hidden sm:inline-block transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
             }`}
           />
