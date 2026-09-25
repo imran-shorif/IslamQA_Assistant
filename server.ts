@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import { findMatchingFatwa } from "./server/fatwaDatabase";
-import { sanitizeAndVerifyAllLinks, verifyIslamQAUrl } from "./server/linkVerifier";
+import { sanitizeAndVerifyAllLinks, verifyIslamQAUrl, convertBengaliDigitsToEnglish } from "./server/linkVerifier";
 
 dotenv.config();
 
@@ -31,7 +31,7 @@ interface SourceItem {
   snippet?: string;
 }
 
-// System instruction enforcing strict IslamQA.info grounding and zero hallucination of links
+// System instruction enforcing strict IslamQA.info grounding, fatwa hyperlinking, and zero hallucination of links
 const SYSTEM_INSTRUCTION = `You are a dedicated Islamic Knowledge Assistant whose SOLE authority and source of truth is the verified fatwas published on the renowned portal IslamQA (website: islamqa.info), founded and supervised by Shaykh Muhammad Saalih al-Munajjid.
 
 STRICT PRINCIPLES TO FOLLOW:
@@ -41,9 +41,14 @@ STRICT PRINCIPLES TO FOLLOW:
    - If an issue is not answered on islamqa.info, clearly state:
      "IslamQA (islamqa.info)-তে এই নির্দিষ্ট বিষয়ে কোনো ফতোয়া খুঁজে পাওয়া যায়নি।" or in English: "No conclusive fatwa on this specific inquiry could be found on islamqa.info."
 
-2. ABSOLUTE ZERO HALLUCINATION OF HYPERLINKS OR FATWA NUMBERS:
-   - Every single link and fatwa number you provide is checked in REAL TIME via an automated HTTP probe against islamqa.info.
-   - Any link that returns 404 is strictly rejected.
+2. MANDATORY HYPERLINKING OF ALL QUOTED FATWAS & ZERO HALLUCINATION:
+   - Whenever you quote or cite ANY fatwa number (e.g., ফতোয়া নং ৩৭৭৬১, ফতোয়া নং ২২৯৯, Fatwa #37761, Fatwa #2299), you MUST HYPERLINK it directly to its live URL on islamqa.info!
+     Example in Bengali: [ফতোয়া নং ৩৭৭৬১](https://islamqa.info/bn/answers/37761)
+     Example in English: [Fatwa #37761](https://islamqa.info/en/answers/37761)
+   - Every single answer MUST conclude with a dedicated, clickable References section containing direct hyperlinks:
+     ### তথ্যসূত্র ও ফতোয়া লিঙ্ক (IslamQA References):
+     - [🔗 ইসলামকিউএ ফতোয়া নং ৩৭৭৬১ - শিরোনাম](https://islamqa.info/bn/answers/37761)
+   - Every single link and fatwa number you provide is checked in REAL TIME via an automated HTTP probe against islamqa.info. Any link that returns 404 is rejected.
    - Only cite exact Fatwa numbers when you are confident of the real number (e.g. #37761, #2299, #38023, #1312, #20882, #21869, #112445, #72915, #62839).
    - If you do not know the exact 5-digit fatwa number, explain the fatwa and quotes of the scholars from IslamQA clearly without inventing fake URLs or fabricated numbers.
 
@@ -85,7 +90,7 @@ app.post("/api/ask", async (req, res) => {
 "${question.trim()}"
 ${languageInstruction}
 
-IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info. Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic IslamQA fatwa references without fabricating nonexistent links.`;
+IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info. Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic IslamQA fatwa references. ALWAYS hyperlink every cited fatwa number (e.g. [ফতোয়া নং ৩৭৭৬১](https://islamqa.info/bn/answers/37761) or [Fatwa #37761](https://islamqa.info/en/answers/37761)) directly to its verified page on islamqa.info, and conclude with a clickable References section.`;
 
     // Try available models in order of quota resilience
     const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
@@ -145,7 +150,9 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
         // Sanitize and verify all fallback links
         const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
           isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
-          matchingFallback.sources
+          matchingFallback.sources,
+          [],
+          isEnglish ? "en" : "bn"
         );
 
         res.json({
@@ -192,15 +199,30 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
       });
     }
 
+    // Also extract any fatwa numbers quoted in text (e.g. ফতোয়া নং ৩৭৭৬১, Fatwa #37761)
+    const fatwaNoRegex = /(?:IslamQA\s*)?(?:ফতোয়া|ফতোয়া|fatwa)s?(?:\s*(?:নং|নম্বর|no\.?|number|#))?\s*\**([০-৯0-9]{2,7})\**/gi;
+    let fnMatch: RegExpExecArray | null;
+    while ((fnMatch = fatwaNoRegex.exec(rawAnswerText)) !== null) {
+      const enId = convertBengaliDigitsToEnglish(fnMatch[1]);
+      candidateSources.push({
+        title: `IslamQA Fatwa #${enId}`,
+        url: `https://islamqa.info/answers/${enId}`,
+        questionNo: enId,
+      });
+    }
+
     // CRITICAL REPAIR STEP:
     // Run all markdown text and candidate sources through real-time HTTP verification:
     // 1. Probes every link via live HTTP GET request to islamqa.info.
-    // 2. Repairs broken links (404) by converting dead links into plain text or verified links.
-    // 3. Filters out any 404 source from the sources list so NO broken links are ever returned.
+    // 2. Automatically converts quoted fatwa numbers to clickable live hyperlinks.
+    // 3. Generates or updates a clean clickable references section with direct links.
+    // 4. Repairs broken links (404) by converting dead links into plain text.
+    // 5. Filters out any 404 source so NO broken links are ever returned.
     const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
       rawAnswerText,
       candidateSources,
-      fallbackSources
+      fallbackSources,
+      language
     );
 
     res.json({
@@ -220,7 +242,9 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
       const isEnglish = language === "en" || (!language && /[a-zA-Z]{5,}/.test(question) && !/[\u0980-\u09FF]/.test(question));
       const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
         isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
-        matchingFallback.sources
+        matchingFallback.sources,
+        [],
+        isEnglish ? "en" : "bn"
       );
 
       res.json({

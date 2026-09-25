@@ -205,15 +205,19 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
 
         {/* References Section */}
         <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-stone-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
             <h4 className="text-sm font-bold text-stone-900 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>সরাসরি ইসলামকিউএ রেফারেন্স ও তথ্যসূত্র (IslamQA Sources)</span>
+              <span>সরাসরি ইসলামকিউএ রেফারেন্স ও মূল লিঙ্ক (IslamQA Sources)</span>
             </h4>
             <span className="text-[11px] sm:text-xs text-stone-500 font-medium">
-              {data.sources.length > 0 ? `${data.sources.length} টি ফতোয়া লিঙ্ক` : "ইসলামকিউএ ডাটাবেজ"}
+              {data.sources.length > 0 ? `${data.sources.length} টি লাইভ ফতোয়া লিঙ্ক` : "ইসলামকিউএ ডাটাবেজ"}
             </span>
           </div>
+
+          <p className="text-[11px] sm:text-xs text-stone-600 mb-3">
+            নিচের যেকোনো কার্ডে ক্লিক করলে সরাসরি <strong className="text-emerald-700 font-medium">islamqa.info</strong> মূল ওয়েবসাইটে গিয়ে সম্পূর্ণ ফতোয়া, মূল আরবী ইবারত ও বিস্তারিত দলিল দেখা যাবে:
+          </p>
 
           {data.sources.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
