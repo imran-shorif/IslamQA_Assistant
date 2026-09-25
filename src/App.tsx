@@ -147,6 +147,14 @@ export default function App() {
     }
   };
 
+  const handleResetHome = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setCurrentResponse(null);
+    setQuestion("");
+    setErrorMessage(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const loadingMessages = [
     "১. ইসলামকিউএ (islamqa.info) ডাটাবেজ থেকে সংশ্লিষ্ট ফতোয়া অনুসন্ধান করা হচ্ছে...",
     "২. প্রশ্নটির প্রাসঙ্গিকতা ও শর্তাবলী কুরআন-সুন্নাহর দলিলের সাথে মেলানো হচ্ছে...",
@@ -161,6 +169,7 @@ export default function App() {
         onLanguageChange={setLanguage}
         historyCount={history.length}
         onOpenHistory={() => setIsHistoryOpen(true)}
+        onHomeClick={handleResetHome}
       />
 
       {/* Main Container */}
@@ -272,8 +281,15 @@ export default function App() {
       <footer className="bg-stone-900 text-stone-400 border-t border-stone-800 py-6 mt-12 text-xs">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-stone-300">
-            <BookOpen className="w-4 h-4 text-emerald-400" />
-            <span className="font-semibold text-white">IslamQA Assistant</span>
+            <a
+              href="/"
+              onClick={handleResetHome}
+              className="inline-flex items-center gap-2 text-white hover:text-emerald-400 transition-colors font-semibold group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded px-1 -mx-1"
+              title="মূল পাতায় ফিরে যান (Go to Home)"
+            >
+              <BookOpen className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>IslamQA Assistant</span>
+            </a>
             <span>—</span>
             <span>Grounded exclusively in islamqa.info</span>
           </div>

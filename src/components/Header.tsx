@@ -6,6 +6,7 @@ interface HeaderProps {
   onLanguageChange: (lang: "auto" | "bn" | "en" | "ar") => void;
   historyCount: number;
   onOpenHistory: () => void;
+  onHomeClick?: (e: React.MouseEvent) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -13,29 +14,37 @@ export const Header: React.FC<HeaderProps> = ({
   onLanguageChange,
   historyCount,
   onOpenHistory,
+  onHomeClick,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-stone-900 text-stone-100 border-b border-stone-800 shadow-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo and Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-700/80 border border-emerald-500/30 flex items-center justify-center text-emerald-100 shadow-inner">
-            <BookOpen className="w-5 h-5 text-emerald-300" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight text-white">
-                IslamQA <span className="text-emerald-400 font-semibold">Assistant</span>
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/50">
-                <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                Source: islamqa.info
-              </span>
+          <a
+            href="/"
+            onClick={onHomeClick}
+            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl transition-transform hover:scale-[1.01]"
+            title="মূল পাতায় ফিরে যান (Go to Home)"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-700/80 border border-emerald-500/30 flex items-center justify-center text-emerald-100 shadow-inner group-hover:bg-emerald-600 transition-colors">
+              <BookOpen className="w-5 h-5 text-emerald-300 group-hover:scale-105 transition-transform" />
             </div>
-            <p className="text-xs text-stone-400 hidden sm:block">
-              বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান (Shaykh Muhammad Saalih al-Munajjid)
-            </p>
-          </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg tracking-tight text-white group-hover:text-emerald-300 transition-colors">
+                  IslamQA <span className="text-emerald-400 font-semibold">Assistant</span>
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/50">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                  Source: islamqa.info
+                </span>
+              </div>
+              <p className="text-xs text-stone-400 hidden sm:block">
+                বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান (Shaykh Muhammad Saalih al-Munajjid)
+              </p>
+            </div>
+          </a>
         </div>
 
         {/* Action Controls */}
