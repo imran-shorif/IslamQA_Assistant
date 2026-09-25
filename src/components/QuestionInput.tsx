@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
-import { Search, Sparkles, CornerDownLeft, Loader2, X } from "lucide-react";
+import { Search, Sparkles, CornerDownLeft, Loader2, X, Shuffle } from "lucide-react";
+import { getRandomIslamicQuestion } from "../data/sampleQuestions";
 
 interface QuestionInputProps {
   question: string;
@@ -33,6 +34,16 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
         onSubmit();
       }
     }
+  };
+
+  const handleGenerateRandom = () => {
+    const randomQ = getRandomIslamicQuestion(question);
+    onChange(randomQ);
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, 50);
   };
 
   return (
@@ -70,12 +81,12 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center justify-end gap-2 shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-end gap-2 w-full sm:w-auto shrink-0">
           {question.length > 0 && !isLoading && (
             <button
               type="button"
               onClick={onClear}
-              className="min-h-[42px] px-3 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 transition-colors text-xs font-medium flex items-center gap-1 cursor-pointer"
+              className="min-h-[42px] px-3 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 transition-colors text-xs font-medium flex items-center gap-1 cursor-pointer shrink-0"
               title="প্রশ্ন মুছুন (Clear)"
             >
               <X className="w-4 h-4" />
@@ -83,11 +94,24 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             </button>
           )}
 
+          {/* Random Question Generator Button */}
+          <button
+            type="button"
+            id="random-question-btn"
+            onClick={handleGenerateRandom}
+            disabled={isLoading}
+            title="যেকোনো একটি ইসলামিক প্রশ্ন নির্বাচন করুন"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 sm:px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-emerald-50 dark:bg-stone-800 dark:hover:bg-stone-750 active:bg-stone-200 dark:active:bg-stone-700 active:scale-[0.98] text-stone-700 dark:text-stone-200 hover:text-emerald-800 dark:hover:text-emerald-300 border border-stone-250 dark:border-stone-700 font-medium text-xs sm:text-sm transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Shuffle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>র‍্যান্ডম প্রশ্ন</span>
+          </button>
+
           <button
             type="submit"
             id="submit-question-btn"
             disabled={!question.trim() || isLoading}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:bg-emerald-900 active:scale-[0.98] text-white font-medium text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:bg-emerald-900 active:scale-[0.98] text-white font-medium text-xs sm:text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -107,3 +131,4 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
     </form>
   );
 };
+
