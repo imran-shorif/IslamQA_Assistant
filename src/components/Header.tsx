@@ -29,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/50">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                Sole Source: islamqa.info
+                Source: islamqa.info
               </span>
             </div>
             <p className="text-xs text-stone-400 hidden sm:block">
