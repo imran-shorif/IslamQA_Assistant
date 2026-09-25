@@ -152,7 +152,8 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
           isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
           matchingFallback.sources,
           [],
-          isEnglish ? "en" : "bn"
+          isEnglish ? "en" : "bn",
+          question.trim()
         );
 
         res.json({
@@ -222,7 +223,8 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
       rawAnswerText,
       candidateSources,
       fallbackSources,
-      language
+      language,
+      question.trim()
     );
 
     res.json({
@@ -244,7 +246,8 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
         isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
         matchingFallback.sources,
         [],
-        isEnglish ? "en" : "bn"
+        isEnglish ? "en" : "bn",
+        question.trim()
       );
 
       res.json({

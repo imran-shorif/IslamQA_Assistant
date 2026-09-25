@@ -187,10 +187,10 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 text-emerald-700 hover:text-emerald-900 underline font-medium hover:underline decoration-emerald-400 break-words"
+                    className="inline-flex items-center gap-0.5 text-emerald-700 hover:text-emerald-950 font-semibold underline decoration-emerald-400 hover:decoration-emerald-700 decoration-1.5 underline-offset-2 break-all"
                   >
                     <span>{children}</span>
-                    <ExternalLink className="w-3 h-3 inline-block ml-0.5 shrink-0" />
+                    <ExternalLink className="w-3 h-3 inline-block ml-0.5 shrink-0 opacity-80" />
                   </a>
                 );
               },
