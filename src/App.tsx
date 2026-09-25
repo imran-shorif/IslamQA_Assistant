@@ -169,7 +169,7 @@ export default function App() {
         <section className="text-center max-w-3xl mx-auto mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold mb-3">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>১০০% ইসলামকিউএ (islamqa.info) তথ্যের ওপর প্রতিষ্ঠিত</span>
+            <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 tracking-tight leading-tight sm:leading-snug">
