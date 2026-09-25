@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, ShieldCheck, History, Globe } from "lucide-react";
+import { BookOpen, ShieldCheck, History, Globe, ExternalLink } from "lucide-react";
 
 interface HeaderProps {
   language: "auto" | "bn" | "en" | "ar";
@@ -20,31 +20,46 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-30 bg-stone-900 text-stone-100 border-b border-stone-800 shadow-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo and Brand */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Logo icon (Home redirect) */}
           <a
             href="/"
             onClick={onHomeClick}
-            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl transition-transform hover:scale-[1.01]"
+            className="w-10 h-10 rounded-xl bg-emerald-700/80 border border-emerald-500/30 flex items-center justify-center text-emerald-100 shadow-inner hover:bg-emerald-600 transition-all hover:scale-105 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
             title="মূল পাতায় ফিরে যান (Go to Home)"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-700/80 border border-emerald-500/30 flex items-center justify-center text-emerald-100 shadow-inner group-hover:bg-emerald-600 transition-colors">
-              <BookOpen className="w-5 h-5 text-emerald-300 group-hover:scale-105 transition-transform" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-white group-hover:text-emerald-300 transition-colors">
-                  IslamQA <span className="text-emerald-400 font-semibold">Assistant</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/50">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  Source: islamqa.info
-                </span>
-              </div>
-              <p className="text-xs text-stone-400 hidden sm:block">
-                বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান (Shaykh Muhammad Saalih al-Munajjid)
-              </p>
-            </div>
+            <BookOpen className="w-5 h-5 text-emerald-300" />
           </a>
+
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Brand title (Home redirect) */}
+              <a
+                href="/"
+                onClick={onHomeClick}
+                className="font-bold text-lg tracking-tight text-white hover:text-emerald-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded"
+                title="মূল পাতায় ফিরে যান (Go to Home)"
+              >
+                IslamQA <span className="text-emerald-400 font-semibold">Assistant</span>
+              </a>
+
+              {/* Source Link (redirects to islamqa.info) */}
+              <a
+                href="https://islamqa.info"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/50 hover:bg-emerald-900 hover:border-emerald-600 hover:text-emerald-100 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
+                title="ইসলামকিউএ ওয়েবসাইট ভিজিট করুন (islamqa.info)"
+              >
+                <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+                <span>Source: islamqa.info</span>
+                <ExternalLink className="w-2.5 h-2.5 text-emerald-400/80" />
+              </a>
+            </div>
+            <p className="text-xs text-stone-400 hidden sm:block">
+              বিশুদ্ধ ইসলামিক ফতোয়া ও গবেষণালব্ধ সমাধান (Shaykh Muhammad Saalih al-Munajjid)
+            </p>
+          </div>
         </div>
 
         {/* Action Controls */}
