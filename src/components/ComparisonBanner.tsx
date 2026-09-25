@@ -13,7 +13,7 @@ export const ComparisonBanner: React.FC = () => {
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-semibold text-stone-100 flex items-center gap-2">
-              সাধারণ সার্চ বারের চেয়ে কেন এটি শ্রেষ্ঠ?
+              সাধারণ সার্চ বারের চেয়ে কেন এটি উত্তম?
               <span className="text-[11px] font-normal px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
                 Context-Aware & Hallucination-Free
               </span>
