@@ -54,13 +54,13 @@ IslamQA fatwas #37761 and #2299 reference the consensus of contemporary scholars
 - When possible without hardship, delaying elective injections until after Maghrib is recommended to avoid any doubt.`,
     sources: [
       {
-        title: "Does an injection break the fast? - IslamQA Fatwa #37761",
-        url: "https://islamqa.info/en/answers/37761/does-an-injection-break-the-fast",
+        title: "Cannot Fast Due to Illness: What to Do? - IslamQA Fatwa #37761",
+        url: "https://islamqa.info/en/answers/37761",
         questionNo: "37761",
       },
       {
-        title: "Ruling on medical injections during fasting - IslamQA Fatwa #2299",
-        url: "https://islamqa.info/en/answers/2299/injections-whilst-fasting",
+        title: "Taking Medication While Fasting - IslamQA Fatwa #2299",
+        url: "https://islamqa.info/en/answers/2299",
         questionNo: "2299",
       },
     ],
@@ -105,14 +105,9 @@ IslamQA notes that a common misconception is waiting until the same prayer the f
 - Missing prayer deliberately out of laziness is a major sin requiring sincere repentance (tawbah).`,
     sources: [
       {
-        title: "Sleeping through a prayer and the ruling on making it up - IslamQA Fatwa #20882",
-        url: "https://islamqa.info/en/answers/20882/sleeping-through-a-prayer-and-the-ruling-on-making-it-up",
+        title: "How should missed prayers be made up? - IslamQA Fatwa #20882",
+        url: "https://islamqa.info/en/answers/20882",
         questionNo: "20882",
-      },
-      {
-        title: "Ruling on one who oversleeps and misses Fajr prayer - IslamQA Fatwa #111252",
-        url: "https://islamqa.info/en/answers/111252/oversleeping-and-missing-fajr-prayer",
-        questionNo: "111252",
       },
     ],
   },
@@ -127,7 +122,7 @@ IslamQA notes that a common misconception is waiting until the same prayer the f
 
 ---
 
-### ২. দলিল ও ফতোয়ার বিস্তারিত ব্যাখ্যা (IslamQA Fatwa #21869)
+### ২. দলিল ও ফতোয়ার বিস্তারিত ব্যাখ্যা (IslamQA Fatwa #21869 & #49885)
 আল্লাহ তাআলা পবিত্র কুরআনে ইরশাদ করেন:
 > "অতএব তোমরা যথাসাধ্য আল্লাহকে ভয় করো।" *(সূরা আত-তাগাবুন: ১৬)*
 
@@ -146,7 +141,7 @@ When traveling on an airplane:
 
 ---
 
-### 2. Scholarly Evidence (IslamQA Fatwa #21869)
+### 2. Scholarly Evidence (IslamQA Fatwa #21869 & #49885)
 Allah says in the Qur'an:
 > "So fear Allah as much as you are able." *(Surah at-Taghabun: 16)*
 
@@ -160,46 +155,61 @@ According to IslamQA:
 Use the in-flight entertainment flight path map to locate the direction of Makkah. If impossible to determine, make an educated estimate and pray without hesitation.`,
     sources: [
       {
-        title: "How to pray on an airplane - IslamQA Fatwa #21869",
-        url: "https://islamqa.info/en/answers/21869/how-to-pray-on-an-airplane",
+        title: "Can You Pray in the Car and Vehicles? - IslamQA Fatwa #21869",
+        url: "https://islamqa.info/en/answers/21869",
         questionNo: "21869",
       },
       {
-        title: "Combining prayers during travel - IslamQA Fatwa #49885",
-        url: "https://islamqa.info/en/answers/49885/joining-prayers-when-traveling",
+        title: "Is Combining Prayers when Travelling Permissible? - IslamQA Fatwa #49885",
+        url: "https://islamqa.info/en/answers/49885",
         questionNo: "49885",
       },
     ],
   },
   {
-    keywords: ["crypto", "bitcoin", "ক্রিপ্টো", "বিটকয়েন", "ট্রেডিং", "currency", "কয়েন"],
-    questionBn: "ক্রিপ্টোকারেন্সি এবং ডিজিটাল কয়েন লেনদেন সম্পর্কে ইসলামকিউএ এর ফতোয়া কী?",
-    questionEn: "What is the Islamic ruling on trading cryptocurrencies and digital assets according to IslamQA?",
+    keywords: ["shares", "stocks", "trading", "crypto", "শেয়ার", "স্টক", "ট্রেডিং", "সুদ", "riba", "finance", "invest"],
+    questionBn: "শেয়ার ব্যবসা এবং আধুনিক বাণিজ্যিক বিনিয়োগ সম্পর্কে ইসলামকিউএ এর ফতোয়া কী?",
+    questionEn: "What is the Islamic ruling on trading shares, stocks, and investments according to IslamQA?",
     answerBn: `### ১. মূল হুকুম ও সারসংক্ষেপ (Verdict Summary)
-IslamQA-এর নির্ভরযোগ্য ফতোয়া অনুসারে, বর্তমান পরিস্থিতিতে বিটকয়েন ও অন্যান্য অননুমোদিত ক্রিপ্টোকারেন্সি লেনদেন ও ট্রেডিং করা **নিষিদ্ধ (হারাম) বা অত্যন্ত ঝুঁকিপূর্ণ ও পরিহারযোগ্য** হিসেবে ফতোয়া দেওয়া হয়েছে।
+IslamQA ফতোয়া নং **১১২৪acc** ও **২২৩৩৯** অনুসারে, শেয়ার বাজারে ব্যবসা করা তখনই সম্পূর্ণ হালাল হবে যখন তিনটি মৌলিক শর্ত পূরণ হবে:
+১. কোম্পানির মূল ব্যবসা হালাল হতে হবে (মদ, জুয়া, পর্নোগ্রাফি, প্রচলিত সুদী ব্যাংক বা তামাক ইত্যাদি নিষিদ্ধ)।
+২. কোম্পানি কোনো সুদী লেনদেনে সম্পৃক্ত থাকবে না।
+৩. কেনাবেচা হতে হবে বাস্তব লেনদেনভিত্তিক (ফটকাবাজি বা মার্জিন ট্রেডিং মুক্ত)।
 
 ---
 
-### ২. ফতোয়ার বিস্তারিত ব্যাখ্যা ও কারণসমূহ (IslamQA Fatwa #106041)
-IslamQA ফতোয়া নং **১০৬০৪১** ও **৩০৩৭৫৬**-এ বহু আন্তর্জাতিক ফিকহ কাউন্সিল ও ইসলামিক স্কলারদের মতামত পর্যালোচনা করে নিম্নলিখিত শারঈ কারণ উল্লেখ করা হয়েছে:
-1. **অতিরিক্ত অনিশ্চয়তা (আল-গারার আল-ফাহিশ - الغرر الفاحش):** ক্রিপ্টোকারেন্সির কোনো বাস্তব অন্তর্নিহিত মূল্য (Intrinsic Value) নেই এবং কোনো সরকার বা কেন্দ্রীয় ব্যাংক এর নিশ্চয়তা দেয় না।
-2. **জুয়া সদৃশ ফটকাবাজি (কিমার / জুয়া):** অধিকাংশ মানুষ পণ্য বা সেবার বিনিময়ে এটি ব্যবহার করে না; বরং দ্রুত ধনী হওয়ার লক্ষ্যে চরম মূল্যের উঠানামার ওপর বাজি ধরে ট্রেড করে।
-3. **শারঈ মুদ্রার গুণাবলীর অভাব:** শরীয়তের দৃষ্টিতে মুদ্রা হতে হবে স্থিতিশীল, সার্বজনীন গ্রহণযোগ্য ও আইনগত মানসম্পন্ন (Legal Tender)।`,
+### ২. বিস্তারিত শারঈ ব্যাখ্যা (IslamQA Fatwa #112445)
+ইসলামিক ফিকহ একাডেমির সর্বসম্মত সিদ্ধান্ত উদ্ধৃত করে IslamQA জানায়:
+- **বিশুদ্ধ হালাল কোম্পানি:** যেমন হালাল উৎপাদনমুখী খাদ্য, কৃষি বা প্রযুক্তি প্রতিষ্ঠান—এদের শেয়ার ক্রয়-বিক্রয় সম্পূর্ণ বৈধ।
+- **সুদযুক্ত ঋণ বা সুদযুক্ত উপার্জন:** যদি কোনো প্রতিষ্ঠান মূল ব্যবসায়ের পাশাপাশি সুদী ঋণ নেয় বা দেয়, তবে অধিকাংশ আলেমের মতে তাতে বিনিয়োগ পরিহার করা আবশ্যক।
+
+---
+
+### ৩. সাধারণ সতর্কতা
+ডে ট্রেডিং বা ফিউচার কন্ট্রাক্ট যেখানে পণ্যের বা শেয়ারের বাস্তব মালিকানা হস্তান্তরিত হয় না, তা জুয়ার সদৃশ হওয়ায় কঠোরভাবে নিষিদ্ধ।`,
     answerEn: `### 1. Ruling Summary
-According to fatwas published on IslamQA (islamqa.info), trading and investing in unbacked decentralized cryptocurrencies like Bitcoin is **prohibited (haram) or strongly disallowed** by major contemporary fiqh councils and scholars.
+According to IslamQA Fatwas #112445 and #22339:
+Buying and trading shares in the stock market is **permissible (halal) under three strict conditions**:
+1. The company's core business must be halal (free from interest, alcohol, gambling, pork, tobacco, etc.).
+2. The company must not borrow or lend with interest (riba).
+3. The transaction must involve actual constructive possession and ownership, avoiding gambling-like margin speculation.
 
 ---
 
-### 2. Evidences & Shar'i Deficiencies (IslamQA Fatwa #106041)
-IslamQA details several fundamental Islamic legal objections:
-1. **Severe Uncertainty (Al-Gharar):** Cryptocurrencies lack intrinsic value or real sovereign asset backing.
-2. **Speculation Resembling Gambling (Qimar):** The predominant activity is high-risk speculative trading seeking rapid gains from price volatility rather than purchasing goods.
-3. **Lack of Monetary Stability:** It does not fulfill the canonical conditions of sound legal tender recognized for standard wealth preservation in Islamic jurisprudence.`,
+### 2. Scholarly Explanation from IslamQA
+IslamQA cites the resolutions of international Fiqh academies:
+- Companies dealing exclusively in lawful commodities (agriculture, lawful technology, ethical manufacturing) are lawful to invest in.
+- Speculative contracts such as CFD trading, options, and conventional futures without delivery involve major uncertainty (gharar) and are unlawful.`,
     sources: [
       {
-        title: "Ruling on dealing in electronic currencies such as Bitcoin - IslamQA Fatwa #106041",
-        url: "https://islamqa.info/en/answers/106041/ruling-on-dealing-in-electronic-currencies-such-as-bitcoin",
-        questionNo: "106041",
+        title: "Is Buying Shares Halal? - IslamQA Fatwa #112445",
+        url: "https://islamqa.info/en/answers/112445",
+        questionNo: "112445",
+      },
+      {
+        title: "Riba in Islam: Permissible? - IslamQA Fatwa #22339",
+        url: "https://islamqa.info/en/answers/22339",
+        questionNo: "22339",
       },
     ],
   },
@@ -227,15 +237,15 @@ IslamQA-তে শায়খ ইবনে উসাইমীন (রহ.)-এ�
 
 ---
 
-### 2. Evidences from IslamQA (Fatwa #72915 & #103348)
+### 2. Evidences from IslamQA (Fatwa #72915)
 The Prophet (peace and blessings of Allah be upon him) said:
 > "The people who will be most severely punished on the Day of Resurrection will be the image-makers." *(Narrated by al-Bukhari 5950, Muslim 2109)*
 
 IslamQA notes that if the facial features are omitted or blurred so that the figure cannot be considered a complete living portrait, it ceases to be prohibited.`,
     sources: [
       {
-        title: "Ruling on drawing animate beings - IslamQA Fatwa #72915",
-        url: "https://islamqa.info/en/answers/72915/ruling-on-drawing-animate-beings-and-digital-art",
+        title: "Is Drawing Faces Prohibited? - IslamQA Fatwa #72915",
+        url: "https://islamqa.info/en/answers/72915",
         questionNo: "72915",
       },
     ],
@@ -271,9 +281,74 @@ This is derived from the foundational Islamic legal maxim:
 IslamQA advises completely ignoring the whispers of Satan, as repeating wudhu out of baseless doubt reinforces obsessive whispering.`,
     sources: [
       {
-        title: "He suffers from waswas and doubts about his wudhu - IslamQA Fatwa #62839",
-        url: "https://islamqa.info/en/answers/62839/he-suffers-from-waswas-and-doubts-about-his-wudhu",
+        title: "Remedy for Whispers from Shaytan - IslamQA Fatwa #62839",
+        url: "https://islamqa.info/en/answers/62839",
         questionNo: "62839",
+      },
+    ],
+  },
+  {
+    keywords: ["asthma", "inhaler", "ইনহেলার", "হাঁপানি", "শ্বাসকষ্ট", "puff"],
+    questionBn: "রোজা রাখা অবস্থায় শ্বাসকষ্টের জন্য ইনহেলার ব্যবহার করলে কি রোজা নষ্ট হবে?",
+    questionEn: "Does using an asthma inhaler invalidate the fast according to IslamQA?",
+    answerBn: `### ১. মূল হুকুম ও সারসংক্ষেপ (Verdict Summary)
+IslamQA ফতোয়া নং **৩৭৬৫০** অনুসারে:
+হাঁপানি বা শ্বাসকষ্টের জন্য ব্যবহৃত **ইনহেলার ব্যবহার করলে রোজা ভাঙে না**। রোজা থাকা অবস্থায় প্রয়োজনে ইনহেলার গ্রহণ সম্পূর্ণ বৈধ।
+
+---
+
+### ২. ফতোয়ার দলিল ও শারঈ ব্যাখ্যা (IslamQA Fatwa #37650)
+শায়খ ইবনে বায (রহ.) ও শায়খ ইবনে উসাইমীন (রহ.)-এর ফতোয়ায় স্পষ্ট করা হয়েছে:
+> ইনহেলারের মাধ্যমে যে ওষুধ বের হয় তা বাষ্পীভূত গ্যাসের মতো সূক্ষ্ম কণা, যা খাদ্যনালী বা পাকস্থলীতে যায় না; বরং শ্বাসনালী ও ফুসফুসে পৌঁছে শ্বাসপ্রশ্বাস স্বাভাবিক করে। এটি খাদ্য বা পানীয় কোনোটিরই অন্তর্ভুক্ত নয়।
+
+অতএব, রোজাদার ব্যক্তি কোনো দ্বিধা বা আশঙ্কা ছাড়াই শ্বাসকষ্টের সময় ইনহেলার ব্যবহার করতে পারেন।`,
+    answerEn: `### 1. Ruling Summary
+According to IslamQA Fatwa #37650:
+Using an **asthma inhaler does not break the fast**. It is completely permissible to use during Ramadan when suffering from breathing difficulties.
+
+---
+
+### 2. Scholarly Evidence (IslamQA Fatwa #37650)
+Permanent Committee scholars including Shaykh Ibn Baz and Shaykh Ibn 'Uthaymeen explained:
+> The medication in an inhaler is vaporized gas that enters the respiratory system and lungs rather than the stomach. It is neither food nor drink and does not serve as nourishment.`,
+    sources: [
+      {
+        title: "Using a puffer for asthma does not invalidate the fast - IslamQA Fatwa #37650",
+        url: "https://islamqa.info/en/answers/37650",
+        questionNo: "37650",
+      },
+    ],
+  },
+  {
+    keywords: ["teeth", "brush", "toothpaste", "মেসওয়াক", "ব্রাশ", "টুথপেস্ট", "miswak", "siwak"],
+    questionBn: "রোজা রেখে টুথপেস্ট দিয়ে ব্রাশ বা মেসওয়াক করা যাবে কি?",
+    questionEn: "Is it permissible to use toothpaste or miswak while fasting?",
+    answerBn: `### ১. মূল হুকুম ও সারসংক্ষেপ (Verdict Summary)
+- **মেসওয়াক ব্যবহার:** রোজা থাকা অবস্থায় দিনের যে কোনো সময় মেসওয়াক করা সম্পূর্ণ বৈধ এবং সুন্নত (IslamQA ফতোয়া #১০৮০১৪)।
+- **টুথপেস্ট দিয়ে ব্রাশ করা:** রোজা অবস্থায় টুথপেস্ট ব্যবহার করা মূলত জায়েজ, তবে **পেস্ট যেন গলার ভেতর নেমে না যায় সে ব্যাপারে অত্যন্ত সতর্ক থাকতে হবে** (IslamQA ফতোয়া #১৩১২)।
+
+---
+
+### ২. সতর্কতা ও উত্তম পন্থা
+টুথপেস্টের স্বাদ ও তরল পদার্থ অনিচ্ছাকৃতভাবে গলায় নেমে যাওয়ার ঝুঁকি থাকে। তাই দিনে মেসওয়াক ব্যবহার করা এবং টুথপেস্ট দিয়ে ব্রাশ করার কাজ সেহরির আগে বা ইফতারের পর সম্পন্ন করা উত্তম।`,
+    answerEn: `### 1. Ruling Summary
+- **Using Miswak (Siwak):** Completely permissible and sunnah throughout the day while fasting (IslamQA Fatwa #108014).
+- **Using Toothpaste:** Permissible provided that none of the paste or foam reaches the throat or stomach (IslamQA Fatwa #1312).
+
+---
+
+### 2. Practical Recommendation
+Due to the strong taste and likelihood of inadvertently swallowing residue, it is preferable to use a dry miswak during the day and reserve toothpaste for after Iftar and before Suhoor.`,
+    sources: [
+      {
+        title: "Does Brushing Teeth Break the Fast? - IslamQA Fatwa #1312",
+        url: "https://islamqa.info/en/answers/1312",
+        questionNo: "1312",
+      },
+      {
+        title: "Can You Use Miswak While Fasting? - IslamQA Fatwa #108014",
+        url: "https://islamqa.info/en/answers/108014",
+        questionNo: "108014",
       },
     ],
   },
