@@ -10,7 +10,6 @@ import {
   Share2,
   ZoomIn,
   ZoomOut,
-  AlertCircle,
 } from "lucide-react";
 import { QnAResponse } from "../types";
 import { SourceCard } from "./SourceCard";
@@ -242,24 +241,6 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               </a>
             </div>
           )}
-        </div>
-
-        {/* Scholarly / AI Disclaimer */}
-        <div className="mt-5 pt-3.5 border-t border-stone-100 dark:border-stone-800 flex items-start gap-2.5 text-xs text-stone-600 dark:text-stone-300 bg-stone-50/80 dark:bg-stone-850/60 p-3 sm:p-3.5 rounded-xl leading-relaxed">
-          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-          <p>
-            <strong className="text-stone-800 dark:text-stone-200 font-semibold">AI Disclaimer:</strong>{" "}
-            This tool is intended for educational and informational purposes only. Its responses are based on content from{" "}
-            <a
-              href="https://islamqa.info"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-700 dark:text-emerald-400 hover:underline font-medium"
-            >
-              IslamQA.info
-            </a>{" "}
-            and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
-          </p>
         </div>
       </div>
     </article>
