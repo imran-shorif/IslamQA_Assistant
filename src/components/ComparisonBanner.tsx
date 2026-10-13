@@ -45,7 +45,7 @@ export const ComparisonBanner: React.FC = () => {
             <div className="bg-stone-950/60 border border-rose-950/50 rounded-xl p-3.5 text-stone-300">
               <div className="flex items-center gap-2 text-rose-400 font-semibold mb-2.5">
                 <XCircle className="w-4 h-4 shrink-0 text-rose-400" />
-                <span>সাধারণ সার্চ ইঞ্জিন (Traditional Search)</span>
+                <span>ট্রেডিশনাল সার্চ বার (Traditional Search Bar)</span>
               </div>
               <ul className="space-y-2 text-stone-400 leading-relaxed text-[11px] sm:text-xs">
                 <li className="flex items-start gap-1.5">

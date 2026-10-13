@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -10,7 +10,15 @@ import {
   Share2,
   ZoomIn,
   ZoomOut,
+  ChevronDown,
+  Smartphone,
 } from "lucide-react";
+import {
+  WhatsAppIcon,
+  FacebookIcon,
+  XTwitterIcon,
+  TelegramIcon,
+} from "./SocialIcons";
 import { QnAResponse } from "../types";
 import { SourceCard } from "./SourceCard";
 
@@ -20,31 +28,88 @@ interface AnswerCardProps {
 
 export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [fontSize, setFontSize] = useState<"normal" | "large">("normal");
+  const shareMenuRef = useRef<HTMLDivElement>(null);
 
-  const formattedShareText = `প্রশ্ন: ${data.question}\n\nউত্তর (সূত্র: islamqa.info):\n${data.answer}\n\nতথ্যসূত্র:\n${data.sources.map((s) => s.url).join("\n")}`;
+  // Close share popover menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(e.target as Node)) {
+        setIsShareMenuOpen(false);
+      }
+    };
+    if (isShareMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isShareMenuOpen]);
+
+  // Clean text preparation
+  const cleanSummary = data.answer
+    .replace(/###?\s+/g, "")
+    .replace(/\*\*/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/_{1,2}/g, "")
+    .trim();
+
+  const shortSummary = cleanSummary.length > 260
+    ? cleanSummary.slice(0, 257) + "..."
+    : cleanSummary;
+
+  const sourceUrl = data.sources[0]?.url || "https://islamqa.info";
+  const appUrl = typeof window !== "undefined" ? window.location.href : "https://islamqa.info";
+
+  const formattedShareText = `প্রশ্ন: ${data.question}\n\nউত্তর (ইসলামকিউএ সারসংক্ষেপ):\n${cleanSummary}\n\nসরাসরি ফতোয়া রেফারেন্স:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(formattedShareText);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
+      setIsShareMenuOpen(false);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
+  const handleShareWhatsApp = () => {
+    const waText = `*প্রশ্ন:* ${data.question}\n\n*উত্তর:* ${shortSummary}\n\n*সরাসরি ইসলামকিউএ ফতোয়া:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
+    setIsShareMenuOpen(false);
+  };
+
+  const handleShareFacebook = () => {
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sourceUrl)}&quote=${encodeURIComponent(`প্রশ্ন: ${data.question}\n\n${shortSummary}`)}`;
+    window.open(fbUrl, "_blank", "noopener,noreferrer");
+    setIsShareMenuOpen(false);
+  };
+
+  const handleShareTelegram = () => {
+    const tgText = `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary}`;
+    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(sourceUrl)}&text=${encodeURIComponent(tgText)}`;
+    window.open(tgUrl, "_blank", "noopener,noreferrer");
+    setIsShareMenuOpen(false);
+  };
+
+  const handleShareX = () => {
+    const tweetText = `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary.slice(0, 130)}...`;
+    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(sourceUrl)}`;
+    window.open(xUrl, "_blank", "noopener,noreferrer");
+    setIsShareMenuOpen(false);
+  };
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `IslamQA Ruling: ${data.question}`,
+          title: `ইসলামিক ফতোয়া: ${data.question}`,
           text: formattedShareText,
-          url: data.sources[0]?.url || "https://islamqa.info",
+          url: sourceUrl,
         });
-        setShared(true);
-        setTimeout(() => setShared(false), 2000);
+        setIsShareMenuOpen(false);
       } catch (err: any) {
         if (err.name !== "AbortError") {
           handleCopy();
@@ -54,6 +119,8 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
       handleCopy();
     }
   };
+
+  const hasNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
   return (
     <article
@@ -106,17 +173,107 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
             </span>
           </button>
 
-          {/* Share Button (Native Mobile Share) */}
-          <button
-            onClick={handleShare}
-            className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium transition-colors border border-stone-200 dark:border-stone-700 flex items-center gap-1 cursor-pointer"
-            title="উত্তর শেয়ার করুন"
-          >
-            <Share2 className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400" />
-            <span className="text-[11px] sm:text-xs">শেয়ার</span>
-          </button>
+          {/* Share Button with Social Popover Menu */}
+          <div className="relative inline-block" ref={shareMenuRef}>
+            <button
+              onClick={() => setIsShareMenuOpen(!isShareMenuOpen)}
+              aria-expanded={isShareMenuOpen}
+              aria-haspopup="true"
+              className={`min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-lg transition-all border flex items-center gap-1.5 cursor-pointer ${
+                isShareMenuOpen
+                  ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                  : "hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium border-stone-200 dark:border-stone-700"
+              }`}
+              title="সোশ্যাল মিডিয়ায় শেয়ার করুন"
+              aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="text-[11px] sm:text-xs">শেয়ার</span>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isShareMenuOpen ? "rotate-180" : ""}`} />
+            </button>
 
-          {/* Copy Button */}
+            {/* Social Share Popover Dropdown */}
+            {isShareMenuOpen && (
+              <div
+                role="menu"
+                aria-orientation="vertical"
+                className="absolute right-0 mt-1.5 w-60 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-750 shadow-xl z-40 p-2 text-stone-800 dark:text-stone-100 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-md"
+              >
+                <div className="px-2.5 py-1.5 border-b border-stone-100 dark:border-stone-800 text-[11px] font-semibold text-stone-500 dark:text-stone-400">
+                  সোশ্যাল মিডিয়ায় শেয়ার করুন
+                </div>
+
+                <div className="py-1 space-y-0.5 text-xs">
+                  {/* WhatsApp */}
+                  <button
+                    onClick={handleShareWhatsApp}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-stone-700 dark:text-stone-200 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer text-left"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 text-[#25D366] shrink-0" />
+                    <span className="font-medium">WhatsApp</span>
+                  </button>
+
+                  {/* Facebook */}
+                  <button
+                    onClick={handleShareFacebook}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950/40 text-stone-700 dark:text-stone-200 hover:text-blue-700 dark:hover:text-blue-400 transition-colors cursor-pointer text-left"
+                  >
+                    <FacebookIcon className="w-4 h-4 text-[#1877F2] shrink-0" />
+                    <span className="font-medium">Facebook</span>
+                  </button>
+
+                  {/* Telegram */}
+                  <button
+                    onClick={handleShareTelegram}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-950/40 text-stone-700 dark:text-stone-200 hover:text-sky-700 dark:hover:text-sky-400 transition-colors cursor-pointer text-left"
+                  >
+                    <TelegramIcon className="w-4 h-4 text-[#229ED9] shrink-0" />
+                    <span className="font-medium">Telegram</span>
+                  </button>
+
+                  {/* X / Twitter */}
+                  <button
+                    onClick={handleShareX}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 hover:text-stone-950 dark:hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <XTwitterIcon className="w-3.5 h-3.5 shrink-0" />
+                    <span className="font-medium">X (Twitter)</span>
+                  </button>
+
+                  {/* Native Device Share Sheet */}
+                  {hasNativeShare && (
+                    <button
+                      onClick={handleNativeShare}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 transition-colors cursor-pointer text-left border-t border-stone-100 dark:border-stone-800 mt-1 pt-1.5"
+                    >
+                      <Smartphone className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                      <span className="font-medium">ডিভাইস শেয়ার মেনু</span>
+                    </button>
+                  )}
+
+                  {/* Copy Link / Text */}
+                  <button
+                    onClick={handleCopy}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 transition-colors cursor-pointer text-left border-t border-stone-100 dark:border-stone-800 mt-1 pt-1.5"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold">কপি সম্পন্ন হয়েছে!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                        <span>সম্পূর্ণ উত্তর কপি করুন</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Copy Button */}
           <button
             onClick={handleCopy}
             className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium transition-colors border border-stone-200 dark:border-stone-700 flex items-center gap-1 cursor-pointer"
@@ -201,6 +358,107 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
             {data.answer}
           </Markdown>
         </div>
+
+        {/* In-Card Social Sharing Section */}
+        <section aria-label="Social Share" className="mt-6 pt-5 pb-1 border-t border-stone-200/90 dark:border-stone-800">
+          <div className="bg-stone-50/80 dark:bg-stone-850/60 border border-stone-200/80 dark:border-stone-800 rounded-2xl p-3.5 sm:p-4.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3.5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <Share2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                    <span>এই ফতোয়াটি শেয়ার করুন</span>
+                    <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full">
+                      সদকায়ে জারিয়া
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
+                    দ্বীনি জ্ঞান ও সঠিক তথ্য মানুষের কাছে পৌঁছে দিতে পরিচিতদের সাথে শেয়ার করুন
+                  </p>
+                </div>
+              </div>
+
+              {hasNativeShare && (
+                <button
+                  onClick={handleNativeShare}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs self-start sm:self-auto shrink-0"
+                  title="ডিভাইসের শেয়ার শিটে পাঠান"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>ডিভাইস শেয়ার</span>
+                </button>
+              )}
+            </div>
+
+            {/* Quick 1-Click Platform Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              {/* WhatsApp */}
+              <button
+                onClick={handleShareWhatsApp}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 active:scale-95 text-[#128C7E] dark:text-[#25D366] border border-[#25D366]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="হোয়াটসঅ্যাপে শেয়ার করুন"
+              >
+                <WhatsAppIcon className="w-4 h-4 fill-[#25D366] shrink-0" />
+                <span>WhatsApp</span>
+              </button>
+
+              {/* Facebook */}
+              <button
+                onClick={handleShareFacebook}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 active:scale-95 text-[#1877F2] dark:text-blue-400 border border-[#1877F2]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="ফেসবুকে শেয়ার করুন"
+              >
+                <FacebookIcon className="w-4 h-4 fill-[#1877F2] shrink-0" />
+                <span>Facebook</span>
+              </button>
+
+              {/* Telegram */}
+              <button
+                onClick={handleShareTelegram}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#229ED9]/10 hover:bg-[#229ED9]/20 active:scale-95 text-[#229ED9] dark:text-sky-400 border border-[#229ED9]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="টেলিগ্রামে শেয়ার করুন"
+              >
+                <TelegramIcon className="w-4 h-4 fill-[#229ED9] shrink-0" />
+                <span>Telegram</span>
+              </button>
+
+              {/* X / Twitter */}
+              <button
+                onClick={handleShareX}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-stone-200/70 hover:bg-stone-300/80 active:scale-95 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-900 dark:text-stone-100 border border-stone-300 dark:border-stone-700 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="এক্স (টুইটার)-এ শেয়ার করুন"
+              >
+                <XTwitterIcon className="w-3.5 h-3.5 fill-current shrink-0" />
+                <span>X / Twitter</span>
+              </button>
+
+              {/* Copy Button in Grid */}
+              <button
+                onClick={handleCopy}
+                className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 border ${
+                  copied
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-750 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-700"
+                }`}
+                title="সম্পূর্ণ উত্তর ও রেফারেন্স কপি করুন"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                    <span>কপি হয়েছে!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+                    <span>কপি করুন</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </section>
 
         {/* References Section */}
         <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-stone-200 dark:border-stone-800">
