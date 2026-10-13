@@ -34,18 +34,18 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           handleCardClick();
         }
       }}
-      className="group bg-white dark:bg-stone-900 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/40 active:bg-emerald-50/70 dark:active:bg-emerald-950/70 border-2 border-stone-200 dark:border-stone-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl p-4 transition-all shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between"
+      className="group bg-white dark:bg-stone-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/40 active:bg-blue-50/70 dark:active:bg-blue-950/70 border-2 border-stone-200 dark:border-stone-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl p-4 transition-all shadow-xs hover:shadow-md cursor-pointer flex flex-col justify-between"
       title={`ক্লিক করে ইসলামকিউএ (islamqa.info) মূল পেজ খুলুন: ${source.title || source.url}`}
     >
       <div>
         {/* Card Header */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="w-6 h-6 rounded-full bg-emerald-700 dark:bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
+            <span className="w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-500 text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
               {index + 1}
             </span>
             {source.questionNo ? (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/90 dark:border-emerald-800/80 shrink-0">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/90 dark:border-blue-800/80 shrink-0">
                 ফতোয়া নং #{source.questionNo}
               </span>
             ) : (
@@ -56,15 +56,15 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
           </div>
 
           {isIslamQADomain && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-800 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/80 px-2 py-0.5 rounded-full shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>যাচাইকৃত মূল লিংক</span>
             </span>
           )}
         </div>
 
         {/* Fatwa Title */}
-        <h4 className="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100 group-hover:text-emerald-900 dark:group-hover:text-emerald-300 transition-colors line-clamp-2 leading-snug mb-3">
+        <h4 className="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors line-clamp-2 leading-snug mb-3">
           {source.title || `IslamQA Fatwa Article ${source.questionNo || ""}`}
         </h4>
       </div>
@@ -78,10 +78,10 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 min-w-0 text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 hover:underline font-mono text-[11px] sm:text-xs font-medium truncate"
+            className="flex items-center gap-1.5 min-w-0 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline font-mono text-[11px] sm:text-xs font-medium truncate"
             title={source.url}
           >
-            <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <Globe className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
             <span className="truncate">{source.url}</span>
           </a>
 
@@ -93,8 +93,8 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
             title="লিঙ্ক কপি করুন"
           >
             {copied ? (
-              <span className="flex items-center gap-1 text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold px-1">
-                <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+              <span className="flex items-center gap-1 text-[10px] text-blue-600 dark:text-blue-400 font-semibold px-1">
+                <Check className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                 <span>কপি</span>
               </span>
             ) : (
@@ -114,7 +114,7 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index }) => {
               e.stopPropagation();
               handleCardClick();
             }}
-            className="w-full xs:w-auto ml-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-98 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer"
+            className="w-full xs:w-auto ml-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 active:scale-98 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer"
           >
             <span>মূল ফতোয়া পড়ুন</span>
             <ExternalLink className="w-3.5 h-3.5" />

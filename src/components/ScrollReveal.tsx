@@ -7,7 +7,7 @@ interface ScrollRevealProps {
   delay?: number;
   duration?: number;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: "div" | "section" | "article" | "main" | "header" | "footer" | "span" | "p";
   threshold?: number;
 }
 

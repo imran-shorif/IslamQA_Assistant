@@ -65,8 +65,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
     if (theme === "system") {
       return (
         <span className="relative flex items-center justify-center">
-          <Monitor className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
-          <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 border border-stone-900" />
+          <Monitor className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-300" />
+          <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400 border border-stone-900" />
         </span>
       );
     }
@@ -87,7 +87,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       id: "system",
       label: "ডিভাইস থিম (Default)",
       sub: "ডিভাইস সেটিংসের সাথে স্বয়ংক্রিয় সমন্বয়",
-      icon: <Monitor className="w-4 h-4 text-emerald-400" />,
+      icon: <Monitor className="w-4 h-4 text-blue-400" />,
     },
     {
       id: "light",
@@ -113,7 +113,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
           aria-expanded={isOpen}
           aria-haspopup="true"
           title={`বর্তমান থিম: ${getLabel()} (ক্লিক করে থিম পরিবর্তন করুন)`}
-          className="flex items-center justify-center gap-1 h-8 w-8 sm:w-auto sm:h-9 sm:px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:bg-stone-600 active:scale-95 text-stone-200 text-xs font-medium transition-all border border-stone-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer shadow-xs shrink-0"
+          className="flex items-center justify-center gap-1 h-8 w-8 sm:w-auto sm:h-9 sm:px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:bg-stone-600 active:scale-95 text-stone-200 text-xs font-medium transition-all border border-stone-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 cursor-pointer shadow-xs shrink-0"
         >
           {getButtonIcon()}
           <span className="hidden md:inline font-medium text-xs">
@@ -138,7 +138,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
             <span className="font-semibold text-stone-300 uppercase tracking-wider text-[10px]">
               থিম নির্বাচন (Theme)
             </span>
-            <span className="text-[10px] text-emerald-400">
+            <span className="text-[10px] text-blue-400">
               কার্যকর: {resolvedTheme === "dark" ? "ডার্ক" : "লাইট"}
             </span>
           </div>
@@ -157,7 +157,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
                   }}
                   className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
                     isSelected
-                      ? "bg-emerald-950/80 text-white border border-emerald-700/60 shadow-xs"
+                      ? "bg-blue-950/80 text-white border border-blue-700/60 shadow-xs"
                       : "hover:bg-stone-800/90 text-stone-300 hover:text-white"
                   }`}
                 >
@@ -168,7 +168,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
                         {opt.label}
                       </span>
                       {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <Check className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                       )}
                     </div>
                     <p className="text-[10px] text-stone-400 mt-1 leading-snug">
@@ -188,7 +188,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
               onClick={() => {
                 cycleTheme();
               }}
-              className="text-emerald-400 hover:underline font-medium cursor-pointer"
+              className="text-blue-400 hover:underline font-medium cursor-pointer"
             >
               টগল করুন ↻
             </button>

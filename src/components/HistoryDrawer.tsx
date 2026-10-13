@@ -35,7 +35,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
           {/* Header */}
           <div className="px-4 sm:px-5 py-3.5 sm:py-4 bg-stone-900 dark:bg-black text-stone-100 flex items-center justify-between border-b border-stone-800">
             <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-emerald-400 shrink-0" />
+              <History className="w-5 h-5 text-blue-400 shrink-0" />
               <h2 className="text-base font-semibold text-white">
                 পূর্ববর্তী জিজ্ঞাসিত প্রশ্ন
               </h2>
@@ -66,7 +66,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
               history.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-stone-50 dark:bg-stone-850 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40 border border-stone-200 dark:border-stone-800 hover:border-emerald-300 dark:hover:border-emerald-700 rounded-xl p-3 sm:p-3.5 transition-all flex flex-col justify-between"
+                  className="bg-stone-50 dark:bg-stone-850 hover:bg-blue-50/50 dark:hover:bg-blue-950/40 border border-stone-200 dark:border-stone-800 hover:border-blue-300 dark:hover:border-blue-700 rounded-xl p-3 sm:p-3.5 transition-all flex flex-col justify-between"
                 >
                   <div
                     onClick={() => {
@@ -88,12 +88,12 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                         })}
                       </span>
                       {item.sources.length > 0 && (
-                        <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                        <span className="text-blue-600 dark:text-blue-400 font-medium">
                           {item.sources.length} টি রেফারেন্স
                         </span>
                       )}
                     </div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-stone-800 dark:text-stone-100 hover:text-emerald-950 dark:hover:text-emerald-300 line-clamp-2 leading-snug">
+                    <h4 className="text-xs sm:text-sm font-semibold text-stone-800 dark:text-stone-100 hover:text-blue-950 dark:hover:text-blue-300 line-clamp-2 leading-snug">
                       {item.question}
                     </h4>
                   </div>
@@ -104,7 +104,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                         onSelectHistoryItem(item);
                         onClose();
                       }}
-                      className="min-h-[36px] py-1 text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1 hover:underline active:opacity-75 cursor-pointer"
+                      className="min-h-[36px] py-1 text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 hover:underline active:opacity-75 cursor-pointer"
                     >
                       <span>উত্তর দেখুন</span>
                       <ChevronRight className="w-3.5 h-3.5" />

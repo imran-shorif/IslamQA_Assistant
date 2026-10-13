@@ -5,6 +5,7 @@ import { QuestionInput } from "./components/QuestionInput";
 import { AnswerCard } from "./components/AnswerCard";
 import { SampleTopics } from "./components/SampleTopics";
 import { HistoryDrawer } from "./components/HistoryDrawer";
+import { SupportPage } from "./components/SupportPage";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import {
@@ -15,12 +16,21 @@ import {
   ArrowUp,
   MessageSquarePlus,
   Info,
+  Heart,
 } from "lucide-react";
 
 const STORAGE_KEY = "islamqa_ai_history_v1";
 
 export default function App() {
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const [currentView, setCurrentView] = useState<"home" | "support">(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      if (hash === "#support" || path === "/support") return "support";
+    }
+    return "home";
+  });
   const [question, setQuestion] = useState("");
   const [language, setLanguage] = useState<"auto" | "bn" | "en" | "ar">("auto");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +40,26 @@ export default function App() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Sync hash/URL with currentView
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      if (hash === "#support" || path === "/support") {
+        setCurrentView("support");
+      } else {
+        setCurrentView("home");
+      }
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("hashchange", handleLocationChange);
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("hashchange", handleLocationChange);
+    };
+  }, []);
 
   // Load history from localStorage
   useEffect(() => {
@@ -159,9 +189,17 @@ export default function App() {
 
   const handleResetHome = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
+    setCurrentView("home");
+    window.history.pushState(null, "", "/");
     setCurrentResponse(null);
     setQuestion("");
     setErrorMessage(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleNavigateToSupport = () => {
+    setCurrentView("support");
+    window.history.pushState(null, "", "#support");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -182,7 +220,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-emerald-100 dark:selection:bg-emerald-950 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-blue-100 dark:selection:bg-blue-950 selection:text-blue-900 dark:selection:text-blue-200 transition-colors duration-200">
       {/* Top Header */}
       <Header
         language={language}
@@ -193,30 +231,36 @@ export default function App() {
         theme={theme}
         resolvedTheme={resolvedTheme}
         onThemeChange={setTheme}
+        currentView={currentView}
+        onSupportClick={handleNavigateToSupport}
       />
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col">
-        {/* Hero Section */}
-        <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
-          </div>
+        {currentView === "support" ? (
+          <SupportPage onBackToHome={handleResetHome} />
+        ) : (
+          <>
+            {/* Hero Section */}
+            <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
+              </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
-            ইসলামিক জিজ্ঞাসা ও ফতোয়া <br className="hidden sm:inline" />
-            <span className="text-emerald-700 dark:text-emerald-400">
-              যাচাইকৃত সমাধান
-            </span>
-          </h1>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
+                ইসলামিক জিজ্ঞাসা ও ফতোয়া <br className="hidden sm:inline" />
+                <span className="text-blue-600 dark:text-blue-400">
+                  যাচাইকৃত সমাধান
+                </span>
+              </h1>
 
-          <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
-            আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি{" "}
-            <strong className="text-stone-800 dark:text-stone-100 font-semibold">islamqa.info</strong>{" "}
-            এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।
-          </p>
-        </section>
+              <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
+                আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি{" "}
+                <strong className="text-stone-800 dark:text-stone-100 font-semibold">islamqa.info</strong>{" "}
+                এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।
+              </p>
+            </section>
 
         {/* Comparison Feature Banner */}
         <ComparisonBanner />
@@ -237,15 +281,15 @@ export default function App() {
 
         {/* Loading State with scholarly steps */}
         {isLoading && (
-          <div className="bg-white dark:bg-stone-900 border border-emerald-200/90 dark:border-emerald-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center mx-auto mb-3.5">
-              <Loader2 className="w-6 h-6 text-emerald-700 dark:text-emerald-400 animate-spin" />
+          <div className="bg-white dark:bg-stone-900 border border-blue-200/90 dark:border-blue-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 flex items-center justify-center mx-auto mb-3.5">
+              <Loader2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" />
             </div>
 
             <h3 className="text-base sm:text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">
               বিশুদ্ধ সমাধান প্রস্তুত হচ্ছে...
             </h3>
-            <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
+            <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
               {loadingMessages[loadingStep]}
             </p>
 
@@ -255,9 +299,9 @@ export default function App() {
                   key={idx}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     idx === loadingStep
-                      ? "w-8 bg-emerald-600 dark:bg-emerald-500"
+                      ? "w-8 bg-blue-600 dark:bg-blue-500"
                       : idx < loadingStep
-                      ? "w-4 bg-emerald-300 dark:bg-emerald-800"
+                      ? "w-4 bg-blue-300 dark:bg-blue-800"
                       : "w-2 bg-stone-200 dark:bg-stone-800"
                   }`}
                 />
@@ -299,15 +343,37 @@ export default function App() {
           isLoading={isLoading}
         />
 
-        {/* AI Disclaimer Banner - Displayed on all pages/states at the bottom of content right before footer */}
-        <section aria-label="AI Disclaimer" className="mt-8 sm:mt-12 pt-5 border-t border-stone-200/80 dark:border-stone-800">
-          <div className="bg-stone-100/70 dark:bg-stone-900/70 border border-stone-200 dark:border-stone-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 flex items-start gap-2.5 sm:gap-3 leading-relaxed shadow-xs">
-            <Info className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-            <p>
-              <strong className="font-semibold text-stone-900 dark:text-stone-100">AI Disclaimer:</strong> This tool is intended for educational and informational purposes only. Its responses are based on content from IslamQA.info and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
-            </p>
-          </div>
-        </section>
+            {/* Support Project Callout on Home */}
+            <section aria-label="Support Us Callout" className="mt-6 p-4 rounded-2xl bg-pink-50/70 dark:bg-pink-950/20 border border-pink-200/80 dark:border-pink-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
+              <div className="flex items-center gap-2.5 text-stone-700 dark:text-stone-300">
+                <div className="w-8 h-8 rounded-xl bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0">
+                  <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
+                </div>
+                <div>
+                  <span className="font-bold text-stone-900 dark:text-stone-100 block sm:inline mr-1">আমাদের কার্যক্রমকে এগিয়ে নিতে সহায়তা করুন:</span>
+                  <span className="text-stone-600 dark:text-stone-300">সার্ভার ও এআই খরচ পরিচালনায় বিকাশে ডোনেট করতে পারেন।</span>
+                </div>
+              </div>
+              <button
+                onClick={handleNavigateToSupport}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#E2136E] hover:bg-[#c2105e] text-white font-semibold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 self-start sm:self-center"
+              >
+                <span>ডোনেট করুন (bKash)</span>
+                <span>→</span>
+              </button>
+            </section>
+
+            {/* AI Disclaimer Banner - Displayed on home at the bottom of content right before footer */}
+            <section aria-label="AI Disclaimer" className="mt-8 sm:mt-12 pt-5 border-t border-stone-200/80 dark:border-stone-800">
+              <div className="bg-stone-100/70 dark:bg-stone-900/70 border border-stone-200 dark:border-stone-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 flex items-start gap-2.5 sm:gap-3 leading-relaxed shadow-xs">
+                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+                <p>
+                  <strong className="font-semibold text-stone-900 dark:text-stone-100">AI Disclaimer:</strong> This tool is intended for educational and informational purposes only. Its responses are based on content from IslamQA.info and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
+                </p>
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
       {/* Floating Action Button for Mobile Users when scrolled */}
@@ -315,7 +381,7 @@ export default function App() {
         <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2">
           <button
             onClick={scrollToInput}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-emerald-600/40 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-blue-500/40 cursor-pointer"
             title="নতুন প্রশ্ন লিখুন"
           >
             <MessageSquarePlus className="w-4 h-4" />
@@ -340,10 +406,10 @@ export default function App() {
             <a
               href="/"
               onClick={handleResetHome}
-              className="inline-flex items-center gap-2 text-white hover:text-emerald-400 transition-colors font-semibold group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded px-1 -mx-1"
+              className="inline-flex items-center gap-2 text-white hover:text-blue-400 transition-colors font-semibold group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded px-1 -mx-1"
               title="মূল পাতায় ফিরে যান (Go to Home)"
             >
-              <BookOpen className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <BookOpen className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
               <span>IslamQA Assistant</span>
             </a>
             <span>—</span>
@@ -353,7 +419,7 @@ export default function App() {
                 href="https://www.facebook.com/imran.shorif.shuvo"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-stone-300 dark:text-stone-300 hover:text-emerald-400 dark:hover:text-emerald-400 transition-colors font-medium underline sm:no-underline hover:underline"
+                className="text-stone-300 dark:text-stone-300 hover:text-blue-400 dark:hover:text-blue-400 transition-colors font-medium underline sm:no-underline hover:underline"
               >
                 Imran Shorif Shuvo
               </a>{" "}
@@ -362,11 +428,20 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 dark:text-stone-500 text-[11px]">
+            <button
+              onClick={handleNavigateToSupport}
+              className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-semibold cursor-pointer"
+              title="আমাদের সাপোর্ট করুন (Support Us)"
+            >
+              <Heart className="w-3.5 h-3.5 fill-pink-400 text-pink-400" />
+              <span>Support Us (ডোনেট করুন)</span>
+            </button>
+            <span>•</span>
             <a
               href="https://islamqa.info"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-emerald-400 transition-colors underline sm:no-underline"
+              className="hover:text-blue-400 transition-colors underline sm:no-underline"
             >
               Visit islamqa.info ↗
             </a>

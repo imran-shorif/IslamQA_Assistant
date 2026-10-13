@@ -63,7 +63,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
       {/* Question Header */}
       <div className="bg-stone-50 dark:bg-stone-850 border-b border-stone-200/80 dark:border-stone-800 px-4 sm:px-6 py-3.5 sm:py-4 transition-colors">
         <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-xs font-semibold tracking-wide text-emerald-800 dark:text-emerald-400 uppercase flex items-center gap-1.5">
+          <span className="text-xs font-semibold tracking-wide text-blue-700 dark:text-blue-400 uppercase flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span>অনুসন্ধানকৃত প্রশ্ন</span>
           </span>
@@ -82,8 +82,8 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
       {/* Answer Body Header Controls */}
       <div className="px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400 transition-colors">
         <div className="flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-emerald-200/70 dark:border-emerald-800/70">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-blue-200/70 dark:border-blue-800/70">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
             <span>islamqa.info ভিত্তিক সমাধান</span>
           </span>
         </div>
@@ -124,8 +124,8 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-emerald-700 dark:text-emerald-400 font-semibold text-[11px] sm:text-xs">কপি হয়েছে!</span>
+                <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-700 dark:text-blue-400 font-semibold text-[11px] sm:text-xs">কপি হয়েছে!</span>
               </>
             ) : (
               <>
@@ -155,7 +155,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 </h2>
               ),
               h2: ({ children }) => (
-                <h3 className="text-base sm:text-lg font-bold text-emerald-900 dark:text-emerald-400 mt-4 sm:mt-5 mb-2 flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-blue-900 dark:text-blue-400 mt-4 sm:mt-5 mb-2 flex items-center gap-2">
                   {children}
                 </h3>
               ),
@@ -176,7 +176,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 </ol>
               ),
               blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-emerald-600 dark:border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 rounded-r-xl p-3 sm:p-4 my-3 sm:my-4 text-stone-900 dark:text-stone-100 italic font-serif text-sm sm:text-base">
+                <blockquote className="border-l-4 border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 rounded-r-xl p-3 sm:p-4 my-3 sm:my-4 text-stone-900 dark:text-stone-100 italic font-serif text-sm sm:text-base">
                   {children}
                 </blockquote>
               ),
@@ -186,7 +186,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 text-emerald-700 dark:text-emerald-400 hover:text-emerald-950 dark:hover:text-emerald-200 font-semibold underline decoration-emerald-400 hover:decoration-emerald-700 decoration-1.5 underline-offset-2 break-all"
+                    className="inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-semibold underline decoration-blue-400 hover:decoration-blue-700 decoration-1.5 underline-offset-2 break-all"
                   >
                     <span>{children}</span>
                     <ExternalLink className="w-3 h-3 inline-block ml-0.5 shrink-0 opacity-80" />
@@ -206,7 +206,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
         <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-stone-200 dark:border-stone-800">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
             <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
               <span>সরাসরি ইসলামকিউএ রেফারেন্স ও মূল লিঙ্ক (IslamQA Sources)</span>
             </h4>
             <span className="text-[11px] sm:text-xs text-stone-500 dark:text-stone-400 font-medium">
@@ -215,7 +215,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
           </div>
 
           <p className="text-[11px] sm:text-xs text-stone-600 dark:text-stone-300 mb-3">
-            নিচের যেকোনো কার্ডে ক্লিক করলে সরাসরি <strong className="text-emerald-700 dark:text-emerald-400 font-medium">islamqa.info</strong> মূল ওয়েবসাইটে গিয়ে সম্পূর্ণ ফতোয়া, মূল আরবী ইবারত ও বিস্তারিত দলিল দেখা যাবে:
+            নিচের যেকোনো কার্ডে ক্লিক করলে সরাসরি <strong className="text-blue-600 dark:text-blue-400 font-medium">islamqa.info</strong> মূল ওয়েবসাইটে গিয়ে সম্পূর্ণ ফতোয়া, মূল আরবী ইবারত ও বিস্তারিত দলিল দেখা যাবে:
           </p>
 
           {data.sources.length > 0 ? (
@@ -234,7 +234,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 href="https://islamqa.info"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-emerald-700 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1 shrink-0"
+                className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1 shrink-0"
               >
                 <span>islamqa.info</span>
                 <ExternalLink className="w-3 h-3" />

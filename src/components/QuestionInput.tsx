@@ -49,12 +49,12 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-300/80 dark:border-stone-800 focus-within:border-emerald-600 dark:focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all p-3 sm:p-4"
+      className="bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-300/80 dark:border-stone-800 focus-within:border-blue-500 dark:focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all p-3 sm:p-4"
     >
       {/* Input Row */}
       <div className="flex items-start gap-2.5">
         <div className="pt-2 text-stone-400 dark:text-stone-500 shrink-0">
-          <Search className="w-5 h-5 text-emerald-700/80 dark:text-emerald-400" />
+          <Search className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -75,7 +75,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
       {/* Action / Toolbar Footer */}
       <div className="mt-2 pt-2.5 border-t border-stone-100 dark:border-stone-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-1.5 text-[11px] text-stone-500 dark:text-stone-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0 inline-block"></span>
           <span className="truncate">
             শুধুমাত্র <strong className="text-stone-700 dark:text-stone-200 font-semibold">islamqa.info</strong> এর ফতোয়া থেকে উত্তর ও রেফারেন্স দেওয়া হবে
           </span>
@@ -101,9 +101,9 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             onClick={handleGenerateRandom}
             disabled={isLoading}
             title="যেকোনো একটি ইসলামিক প্রশ্ন নির্বাচন করুন"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 sm:px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-emerald-50 dark:bg-stone-800 dark:hover:bg-stone-750 active:bg-stone-200 dark:active:bg-stone-700 active:scale-[0.98] text-stone-700 dark:text-stone-200 hover:text-emerald-800 dark:hover:text-emerald-300 border border-stone-250 dark:border-stone-700 font-medium text-xs sm:text-sm transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 min-h-[44px] px-3 sm:px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-blue-50 dark:bg-stone-800 dark:hover:bg-stone-750 active:bg-stone-200 dark:active:bg-stone-700 active:scale-[0.98] text-stone-700 dark:text-stone-200 hover:text-blue-700 dark:hover:text-blue-300 border border-stone-250 dark:border-stone-700 font-medium text-xs sm:text-sm transition-all shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <Shuffle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <Shuffle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 shrink-0" />
             <span>র‍্যান্ডম প্রশ্ন</span>
           </button>
 
@@ -111,7 +111,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
             type="submit"
             id="submit-question-btn"
             disabled={!question.trim() || isLoading}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 active:bg-emerald-900 active:scale-[0.98] text-white font-medium text-xs sm:text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 active:bg-blue-800 active:scale-[0.98] text-white font-medium text-xs sm:text-sm transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -120,9 +120,9 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-emerald-200" />
+                <Sparkles className="w-4 h-4 text-blue-200" />
                 <span>উত্তর খুঁজুন</span>
-                <CornerDownLeft className="w-3.5 h-3.5 text-emerald-200/80 hidden sm:inline ml-0.5" />
+                <CornerDownLeft className="w-3.5 h-3.5 text-blue-200/80 hidden sm:inline ml-0.5" />
               </>
             )}
           </button>
