@@ -6,6 +6,7 @@ import { AnswerCard } from "./components/AnswerCard";
 import { SampleTopics } from "./components/SampleTopics";
 import { HistoryDrawer } from "./components/HistoryDrawer";
 import { SupportPage } from "./components/SupportPage";
+import { AboutPage } from "./components/AboutPage";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import {
@@ -23,10 +24,11 @@ const STORAGE_KEY = "islamqa_ai_history_v1";
 
 export default function App() {
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const [currentView, setCurrentView] = useState<"home" | "support">(() => {
+  const [currentView, setCurrentView] = useState<"home" | "support" | "about">(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
+      if (hash === "#about" || path === "/about") return "about";
       if (hash === "#support" || path === "/support") return "support";
     }
     return "home";
@@ -46,7 +48,9 @@ export default function App() {
     const handleLocationChange = () => {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
-      if (hash === "#support" || path === "/support") {
+      if (hash === "#about" || path === "/about") {
+        setCurrentView("about");
+      } else if (hash === "#support" || path === "/support") {
         setCurrentView("support");
       } else {
         setCurrentView("home");
@@ -203,6 +207,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleNavigateToAbout = () => {
+    setCurrentView("about");
+    window.history.pushState(null, "", "#about");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const scrollToInput = () => {
     const inputElement = document.getElementById("islamic-question-input");
     if (inputElement) {
@@ -233,11 +243,17 @@ export default function App() {
         onThemeChange={setTheme}
         currentView={currentView}
         onSupportClick={handleNavigateToSupport}
+        onAboutClick={handleNavigateToAbout}
       />
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col">
-        {currentView === "support" ? (
+        {currentView === "about" ? (
+          <AboutPage
+            onBackToHome={handleResetHome}
+            onNavigateToSupport={handleNavigateToSupport}
+          />
+        ) : currentView === "support" ? (
           <SupportPage onBackToHome={handleResetHome} />
         ) : (
           <>
@@ -428,6 +444,15 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 dark:text-stone-500 text-[11px]">
+            <button
+              onClick={handleNavigateToAbout}
+              className="inline-flex items-center gap-1.5 text-stone-300 dark:text-stone-300 hover:text-blue-400 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
+              title="আমাদের সম্পর্কে জানুন (About Us)"
+            >
+              <Info className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span>About Us (পরিচিতি)</span>
+            </button>
+            <span>•</span>
             <button
               onClick={handleNavigateToSupport}
               className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-semibold cursor-pointer"

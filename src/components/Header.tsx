@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, ShieldCheck, History, Globe, ExternalLink, Heart } from "lucide-react";
+import { BookOpen, ShieldCheck, History, Globe, ExternalLink, Heart, Info } from "lucide-react";
 import { ThemeToggle, ThemeMode } from "./ThemeToggle";
 
 interface HeaderProps {
@@ -11,8 +11,9 @@ interface HeaderProps {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   onThemeChange: (theme: ThemeMode) => void;
-  currentView?: "home" | "support";
+  currentView?: "home" | "support" | "about";
   onSupportClick?: () => void;
+  onAboutClick?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   onThemeChange,
   currentView = "home",
   onSupportClick,
+  onAboutClick,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-stone-900/95 dark:bg-black/95 backdrop-blur-md text-stone-100 border-b border-stone-800 dark:border-stone-850 shadow-md transition-colors duration-200">
@@ -119,6 +121,23 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             )}
           </button>
+
+          {/* About Us Button */}
+          {onAboutClick && (
+            <button
+              onClick={onAboutClick}
+              className={`flex items-center justify-center gap-1.5 h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs border ${
+                currentView === "about"
+                  ? "bg-blue-600 text-white border-blue-500 shadow-sm"
+                  : "bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white border-stone-700/60"
+              }`}
+              title="আমাদের সম্পর্কে জানুন (About Us)"
+              aria-label="About Us"
+            >
+              <Info className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${currentView === "about" ? "text-white" : "text-blue-400"}`} />
+              <span className="hidden sm:inline">পরিচিতি</span>
+            </button>
+          )}
 
           {/* Support Us Button */}
           {onSupportClick && (
