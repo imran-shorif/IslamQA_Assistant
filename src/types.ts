@@ -7,7 +7,7 @@ export interface IslamQASource {
 
 export interface QnARequest {
   question: string;
-  language?: 'auto' | 'en' | 'bn' | 'ar';
+  language?: 'auto' | 'en' | 'bn';
 }
 
 export interface QnAResponse {

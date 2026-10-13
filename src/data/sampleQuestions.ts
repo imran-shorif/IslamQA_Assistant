@@ -4,6 +4,7 @@ export interface SampleQuestion {
   question: string;
   questionBn: string;
   tag: string;
+  tagEn: string;
 }
 
 export const SAMPLE_QUESTIONS: SampleQuestion[] = [
@@ -13,6 +14,7 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "Does receiving an injection or IV drip invalidate the fast in Ramadan?",
     questionBn: "রোজা রাখা অবস্থায় ইনজেকশন বা স্যালাইন নিলে কি রোজা ভেঙ্গে যাবে?",
     tag: "রোজা ও ইনজেকশন",
+    tagEn: "Fasting & Injections",
   },
   {
     id: "q2",
@@ -20,6 +22,7 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "What is the ruling on missed prayers due to oversleeping or forgetfulness?",
     questionBn: "ঘুম বা অনিচ্ছাকৃত ভুলে নামাজ ছুটে গেলে কীভাবে তা আদায় করতে হবে?",
     tag: "কাজা নামাজ",
+    tagEn: "Missed Prayers",
   },
   {
     id: "q3",
@@ -27,6 +30,7 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "How to pray while traveling on an airplane or moving train if the prayer time is expiring?",
     questionBn: "চলন্ত বিমান, ট্রেন বা গাড়িতে নামাজের ওয়াক্ত চলে যাওয়ার উপক্রম হলে কীভাবে সালাত আদায় করবে?",
     tag: "সফরে সালাত",
+    tagEn: "Prayer during Travel",
   },
   {
     id: "q4",
@@ -34,6 +38,7 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "What is the Islamic ruling on trading cryptocurrencies and digital assets according to IslamQA?",
     questionBn: "ক্রিপ্টোকারেন্সি এবং ডিজিটাল কয়েন লেনদেন সম্পর্কে ইসলামকিউএ এর ফতোয়া কী?",
     tag: "ক্রিপ্টোকারেন্সি",
+    tagEn: "Cryptocurrency",
   },
   {
     id: "q5",
@@ -41,6 +46,7 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "What is the ruling on digital drawing, 2D illustration, and anime characters without realistic facial features?",
     questionBn: "ডিজিটাল ড্রয়িং এবং প্রাণীর মুখাবয়ব আঁকার ব্যাপারে শরীয়তের সুনির্দিষ্ট বিধান কী?",
     tag: "ডিজিটাল ড্রয়িং",
+    tagEn: "Digital Drawing",
   },
   {
     id: "q6",
@@ -48,19 +54,20 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     question: "What should a person do if they doubt whether wudhu is broken or if gas has passed?",
     questionBn: "অজু ভেঙেছে কি না এ বিষয়ে মনে সন্দেহ বা ওয়াসওয়াসা সৃষ্টি হলে করণীয় কী?",
     tag: "অজু ও ওয়াসওয়াসা",
+    tagEn: "Wudu & Whispers",
   },
 ];
 
 export const CATEGORIES = [
   { id: "all", labelEn: "All Topics", labelBn: "সকল বিষয়" },
-  { id: "salah", labelEn: "Salah / Prayer", labelBn: "সালাত ও নামাজ" },
-  { id: "sawm", labelEn: "Fasting / Sawm", labelBn: "সাওম ও রোজা" },
+  { id: "salah", labelEn: "Salah & Prayer", labelBn: "সালাত ও নামাজ" },
+  { id: "sawm", labelEn: "Fasting & Sawm", labelBn: "সাওম ও রোজা" },
   { id: "finance", labelEn: "Finance & Trade", labelBn: "ব্যবসা ও অর্থনীতি" },
   { id: "family", labelEn: "Family & Marriage", labelBn: "পরিবার ও বিবাহ" },
-  { id: "taharah", labelEn: "Taharah / Purity", labelBn: "পবিত্রতা ও অজু" },
+  { id: "taharah", labelEn: "Taharah & Purity", labelBn: "পবিত্রতা ও অজু" },
 ];
 
-export const RANDOM_ISLAMIC_QUESTIONS: string[] = [
+export const RANDOM_ISLAMIC_QUESTIONS_BN: string[] = [
   "রোজা রাখা অবস্থায় টুথপেস্ট বা টুথপাউডার দিয়ে দাঁত ব্রাশ করলে কি রোজা ভেঙ্গে যায়?",
   "শেয়ার বাজারে বিনিয়োগ বা শেয়ার কেনাবেচা করা কি ইসলামে হালাল?",
   "রোজা রাখা অবস্থায় ইনজেকশন বা স্যালাইন নিলে কি রোজা ভেঙ্গে যাবে?",
@@ -91,12 +98,40 @@ export const RANDOM_ISLAMIC_QUESTIONS: string[] = [
   "ফটোগ্রাফি বা সাধারণ ক্যামেরা দিয়ে ছবি তোলার ব্যাপারে শরীয়তের অভিমত কী?"
 ];
 
-export function getRandomIslamicQuestion(currentQuestion?: string): string {
-  const available = RANDOM_ISLAMIC_QUESTIONS.filter(
+export const RANDOM_ISLAMIC_QUESTIONS_EN: string[] = [
+  "Does brushing teeth with toothpaste invalidate the fast while fasting?",
+  "Is investing and trading in the stock market Halal in Islam?",
+  "Does receiving an injection or IV drip invalidate the fast in Ramadan?",
+  "What is the ruling on missed prayers due to oversleeping or forgetfulness?",
+  "How to pray while traveling on an airplane or train if the prayer time is expiring?",
+  "What is the Islamic ruling on trading cryptocurrencies and digital assets according to IslamQA?",
+  "What is the ruling on digital drawing and 2D character illustration in Islam?",
+  "What should a person do if they doubt whether their wudu is broken?",
+  "Can interest money received from conventional banks be given away in charity?",
+  "Is it permissible to make up missed Fajr prayer right as the sun is rising?",
+  "What is the Islamic ruling on listening to music and musical instruments?",
+  "Is it permissible for a woman to travel for Umrah without a Mahram?",
+  "How is Zakat calculated on gold, silver, and accumulated cash savings?",
+  "What is the correct procedure for Sujud as-Sahw (prostration of forgetfulness)?",
+  "How should prayers be shortened (Qasr) while traveling?",
+  "What is the Islamic ruling on e-commerce dropshipping?",
+  "Does using an asthma inhaler or eye drops break the fast?",
+  "Does swallowing bits of food stuck between teeth break the fast?",
+  "What is the difference between Tahajjud and Witr prayer?",
+  "Is it permissible to defer payment of the wife's Mahr (dowry)?",
+  "How should a Muslim interact with non-Muslim parents according to Islamic ethics?",
+  "What should one do if they miss the first Rak'ah of Friday Jumu'ah prayer?",
+  "What is the Islamic ruling on smoking cigarettes or using e-cigarettes (vaping)?",
+  "How should an ill person pray if they are unable to stand up?",
+  "What is the ruling on taking photographs with digital cameras and smartphones?"
+];
+
+export function getRandomIslamicQuestion(currentQuestion?: string, language: "bn" | "en" = "bn"): string {
+  const poolList = language === "en" ? RANDOM_ISLAMIC_QUESTIONS_EN : RANDOM_ISLAMIC_QUESTIONS_BN;
+  const available = poolList.filter(
     (q) => q.trim() !== (currentQuestion || "").trim()
   );
-  const pool = available.length > 0 ? available : RANDOM_ISLAMIC_QUESTIONS;
+  const pool = available.length > 0 ? available : poolList;
   const randomIndex = Math.floor(Math.random() * pool.length);
   return pool[randomIndex];
 }
-

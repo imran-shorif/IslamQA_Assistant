@@ -9,6 +9,7 @@ import { SupportPage } from "./components/SupportPage";
 import { AboutPage } from "./components/AboutPage";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import { useTheme } from "./hooks/useTheme";
+import { translations, Language } from "./data/translations";
 import {
   ShieldCheck,
   BookOpen,
@@ -21,6 +22,8 @@ import {
 } from "lucide-react";
 
 const STORAGE_KEY = "islamqa_ai_history_v1";
+const LANG_STORAGE_KEY = "islamqa_language_pref";
+const PREV_LANG_STORAGE_KEY = "islamqa_prev_resolved_language";
 
 export default function App() {
   const { theme, resolvedTheme, setTheme } = useTheme();
@@ -34,7 +37,49 @@ export default function App() {
     return "home";
   });
   const [question, setQuestion] = useState("");
-  const [language, setLanguage] = useState<"auto" | "bn" | "en" | "ar">("auto");
+
+  // Language setting: auto | bn | en
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(LANG_STORAGE_KEY) as Language;
+      if (saved === "auto" || saved === "bn" || saved === "en") {
+        return saved;
+      }
+    }
+    return "auto";
+  });
+
+  // Keep track of previously active language so that when "auto" is chosen,
+  // it retains the previous language state as requested:
+  // "ar auto thakle previous language e thakbe, no change"
+  const [lastResolvedLanguage, setLastResolvedLanguage] = useState<"bn" | "en">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(PREV_LANG_STORAGE_KEY);
+      if (saved === "en" || saved === "bn") return saved;
+    }
+    return "bn"; // Default base language is Bengali
+  });
+
+  // Calculate the currently active language for UI rendering:
+  // If 'bn' -> 'bn', if 'en' -> 'en', if 'auto' -> stays in previous language!
+  const resolvedLanguage: "bn" | "en" =
+    language === "auto" ? lastResolvedLanguage : language;
+
+  const handleLanguageChange = (newLang: Language) => {
+    setLanguage(newLang);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, newLang);
+      if (newLang === "bn" || newLang === "en") {
+        setLastResolvedLanguage(newLang);
+        localStorage.setItem(PREV_LANG_STORAGE_KEY, newLang);
+      }
+    } catch (e) {
+      console.warn("Could not save language to localStorage:", e);
+    }
+  };
+
+  const t = translations[resolvedLanguage];
+
   const [isLoading, setIsLoading] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<QnAResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -144,20 +189,20 @@ export default function App() {
         },
         body: JSON.stringify({
           question: q,
-          language,
+          language: resolvedLanguage,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।");
+        throw new Error(data.error || (resolvedLanguage === "en" ? "Failed to process query." : "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।"));
       }
 
       const responseObj: QnAResponse = {
         id: data.id || "ans-" + Date.now(),
         question: data.question || q,
-        answer: data.answer || "কোনো উত্তর পাওয়া যায়নি।",
+        answer: data.answer || (resolvedLanguage === "en" ? "No answer found." : "কোনো উত্তর পাওয়া যায়নি।"),
         sources: data.sources || [],
         timestamp: data.timestamp || Date.now(),
         model: data.model || "gemini-3.8-flash (grounded in islamqa.info)",
@@ -184,7 +229,7 @@ export default function App() {
     } catch (err: any) {
       console.error("Ask question error:", err);
       setErrorMessage(
-        err.message || "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।"
+        err.message || (resolvedLanguage === "en" ? "Sorry, connection error occurred. Please try again later." : "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।")
       );
     } finally {
       setIsLoading(false);
@@ -223,18 +268,13 @@ export default function App() {
     }
   };
 
-  const loadingMessages = [
-    "১. ইসলামকিউএ (islamqa.info) ডাটাবেজ থেকে সংশ্লিষ্ট ফতোয়া অনুসন্ধান করা হচ্ছে...",
-    "২. প্রশ্নটির প্রাসঙ্গিকতা ও শর্তাবলী কুরআন-সুন্নাহর দলিলের সাথে মেলানো হচ্ছে...",
-    "৩. আপনার পরিস্থিতির সাথে সামঞ্জস্য রেখে সুনির্দিষ্ট সমাধান সাজানো হচ্ছে...",
-  ];
-
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-blue-100 dark:selection:bg-blue-950 selection:text-blue-900 dark:selection:text-blue-200 transition-colors duration-200">
       {/* Top Header */}
       <Header
         language={language}
-        onLanguageChange={setLanguage}
+        resolvedLanguage={resolvedLanguage}
+        onLanguageChange={handleLanguageChange}
         historyCount={history.length}
         onOpenHistory={() => setIsHistoryOpen(true)}
         onHomeClick={handleResetHome}
@@ -252,112 +292,118 @@ export default function App() {
           <AboutPage
             onBackToHome={handleResetHome}
             onNavigateToSupport={handleNavigateToSupport}
+            language={resolvedLanguage}
           />
         ) : currentView === "support" ? (
-          <SupportPage onBackToHome={handleResetHome} />
+          <SupportPage
+            onBackToHome={handleResetHome}
+            language={resolvedLanguage}
+          />
         ) : (
           <>
             {/* Hero Section */}
             <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                <span>১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত</span>
+                <span>{t.heroBadge}</span>
               </div>
 
               <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
-                ইসলামিক জিজ্ঞাসা ও ফতোয়া <br className="hidden sm:inline" />
+                {t.heroHeading1} <br className="hidden sm:inline" />
                 <span className="text-blue-600 dark:text-blue-400">
-                  যাচাইকৃত সমাধান
+                  {t.heroHeadingHighlight}
                 </span>
               </h1>
 
               <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
-                আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি{" "}
-                <strong className="text-stone-800 dark:text-stone-100 font-semibold">islamqa.info</strong>{" "}
-                এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।
+                {t.heroDescPre}
+                <strong className="text-stone-800 dark:text-stone-100 font-semibold">{t.heroDescBold}</strong>
+                {t.heroDescPost}
               </p>
             </section>
 
-        {/* Comparison Feature Banner */}
-        <ComparisonBanner />
+            {/* Comparison Feature Banner */}
+            <ComparisonBanner language={resolvedLanguage} />
 
-        {/* Question Input Area */}
-        <div className="mb-5 sm:mb-6">
-          <QuestionInput
-            question={question}
-            onChange={setQuestion}
-            onSubmit={(e) => {
-              if (e) e.preventDefault();
-              handleAskQuestion();
-            }}
-            isLoading={isLoading}
-            onClear={() => setQuestion("")}
-          />
-        </div>
-
-        {/* Loading State with scholarly steps */}
-        {isLoading && (
-          <div className="bg-white dark:bg-stone-900 border border-blue-200/90 dark:border-blue-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
-            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 flex items-center justify-center mx-auto mb-3.5">
-              <Loader2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" />
+            {/* Question Input Area */}
+            <div className="mb-5 sm:mb-6">
+              <QuestionInput
+                question={question}
+                onChange={setQuestion}
+                onSubmit={(e) => {
+                  if (e) e.preventDefault();
+                  handleAskQuestion();
+                }}
+                isLoading={isLoading}
+                onClear={() => setQuestion("")}
+                language={resolvedLanguage}
+              />
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">
-              বিশুদ্ধ সমাধান প্রস্তুত হচ্ছে...
-            </h3>
-            <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
-              {loadingMessages[loadingStep]}
-            </p>
+            {/* Loading State with scholarly steps */}
+            {isLoading && (
+              <div className="bg-white dark:bg-stone-900 border border-blue-200/90 dark:border-blue-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 flex items-center justify-center mx-auto mb-3.5">
+                  <Loader2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" />
+                </div>
 
-            <div className="flex items-center justify-center gap-1.5 mt-4">
-              {[0, 1, 2].map((idx) => (
-                <div
-                  key={idx}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === loadingStep
-                      ? "w-8 bg-blue-600 dark:bg-blue-500"
-                      : idx < loadingStep
-                      ? "w-4 bg-blue-300 dark:bg-blue-800"
-                      : "w-2 bg-stone-200 dark:bg-stone-800"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+                <h3 className="text-base sm:text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">
+                  {t.loadingTitle}
+                </h3>
+                <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
+                  {t.loadingSteps[loadingStep]}
+                </p>
 
-        {/* Error Notification */}
-        {errorMessage && (
-          <div className="bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 dark:text-red-200 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-            <div className="flex-1 text-sm">
-              <h4 className="font-semibold text-red-800 dark:text-red-300">দুঃখিত, সমস্যা হয়েছে</h4>
-              <p className="mt-0.5 text-red-700 dark:text-red-300/90 leading-relaxed">{errorMessage}</p>
-              <button
-                onClick={() => handleAskQuestion()}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/60 hover:bg-red-200 dark:hover:bg-red-800 text-red-800 dark:text-red-200 transition-colors cursor-pointer"
-              >
-                আবার চেষ্টা করুন
-              </button>
-            </div>
-          </div>
-        )}
+                <div className="flex items-center justify-center gap-1.5 mt-4">
+                  {[0, 1, 2].map((idx) => (
+                    <div
+                      key={idx}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        idx === loadingStep
+                          ? "w-8 bg-blue-600 dark:bg-blue-500"
+                          : idx < loadingStep
+                          ? "w-4 bg-blue-300 dark:bg-blue-800"
+                          : "w-2 bg-stone-200 dark:bg-stone-800"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* Active Answer Card */}
-        {currentResponse && !isLoading && (
-          <div className="mb-6 sm:mb-8">
-            <AnswerCard data={currentResponse} />
-          </div>
-        )}
+            {/* Error Notification */}
+            {errorMessage && (
+              <div className="bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 dark:text-red-200 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                <div className="flex-1 text-sm">
+                  <h4 className="font-semibold text-red-800 dark:text-red-300">{t.errorTitle}</h4>
+                  <p className="mt-0.5 text-red-700 dark:text-red-300/90 leading-relaxed">{errorMessage}</p>
+                  <button
+                    onClick={() => handleAskQuestion()}
+                    className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/60 hover:bg-red-200 dark:hover:bg-red-800 text-red-800 dark:text-red-200 transition-colors cursor-pointer"
+                  >
+                    {t.errorRetry}
+                  </button>
+                </div>
+              </div>
+            )}
 
-        {/* Sample Topics & Questions */}
-        <SampleTopics
-          onSelectQuestion={(qText) => {
-            setQuestion(qText);
-            handleAskQuestion(qText);
-          }}
-          isLoading={isLoading}
-        />
+            {/* Active Answer Card */}
+            {currentResponse && !isLoading && (
+              <div className="mb-6 sm:mb-8">
+                <AnswerCard data={currentResponse} language={resolvedLanguage} />
+              </div>
+            )}
+
+            {/* Sample Topics & Questions */}
+            <SampleTopics
+              onSelectQuestion={(qText) => {
+                setQuestion(qText);
+                handleAskQuestion(qText);
+              }}
+              isLoading={isLoading}
+              language={resolvedLanguage}
+            />
 
             {/* Support Project Callout on Home */}
             <section aria-label="Support Us Callout" className="mt-6 p-4 rounded-2xl bg-pink-50/70 dark:bg-pink-950/20 border border-pink-200/80 dark:border-pink-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
@@ -366,25 +412,26 @@ export default function App() {
                   <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
                 </div>
                 <div>
-                  <span className="font-bold text-stone-900 dark:text-stone-100 block sm:inline mr-1">আমাদের কার্যক্রমকে এগিয়ে নিতে সহায়তা করুন:</span>
-                  <span className="text-stone-600 dark:text-stone-300">সার্ভার ও এআই খরচ পরিচালনায় বিকাশে ডোনেট করতে পারেন।</span>
+                  <span className="font-bold text-stone-900 dark:text-stone-100 block sm:inline mr-1">{t.donateCalloutPre}</span>
+                  <span className="text-stone-600 dark:text-stone-300">{t.donateCalloutDesc}</span>
                 </div>
               </div>
               <button
                 onClick={handleNavigateToSupport}
                 className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#E2136E] hover:bg-[#c2105e] text-white font-semibold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 self-start sm:self-center"
               >
-                <span>ডোনেট করুন (bKash)</span>
+                <span>{t.donateBtn}</span>
                 <span>→</span>
               </button>
             </section>
 
-            {/* AI Disclaimer Banner - Displayed on home at the bottom of content right before footer */}
+            {/* AI Disclaimer Banner */}
             <section aria-label="AI Disclaimer" className="mt-8 sm:mt-12 pt-5 border-t border-stone-200/80 dark:border-stone-800">
               <div className="bg-stone-100/70 dark:bg-stone-900/70 border border-stone-200 dark:border-stone-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 flex items-start gap-2.5 sm:gap-3 leading-relaxed shadow-xs">
                 <Info className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
                 <p>
-                  <strong className="font-semibold text-stone-900 dark:text-stone-100">AI Disclaimer:</strong> This tool is intended for educational and informational purposes only. Its responses are based on content from IslamQA.info and should not be treated as a personal fatwa or a substitute for qualified scholarly guidance. For complex or sensitive matters, please consult a qualified Islamic scholar.
+                  <strong className="font-semibold text-stone-900 dark:text-stone-100">{t.aiDisclaimerTitle}</strong>
+                  {t.aiDisclaimerText}
                 </p>
               </div>
             </section>
@@ -398,17 +445,17 @@ export default function App() {
           <button
             onClick={scrollToInput}
             className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-blue-500/40 cursor-pointer"
-            title="নতুন প্রশ্ন লিখুন"
+            title={t.floatingNewQuestion}
           >
             <MessageSquarePlus className="w-4 h-4" />
-            <span>নতুন প্রশ্ন</span>
+            <span>{t.floatingNewQuestion}</span>
           </button>
 
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="w-10 h-10 rounded-full bg-stone-900/90 dark:bg-stone-800/95 hover:bg-stone-900 dark:hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white flex items-center justify-center shadow-lg transition-all border border-stone-700 cursor-pointer"
-            title="পৃষ্ঠার শীর্ষে যান"
-            aria-label="Scroll to top"
+            title={t.floatingScrollTop}
+            aria-label={t.floatingScrollTop}
           >
             <ArrowUp className="w-4 h-4" />
           </button>
@@ -423,14 +470,14 @@ export default function App() {
               href="/"
               onClick={handleResetHome}
               className="inline-flex items-center gap-2 text-white hover:text-blue-400 transition-colors font-semibold group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded px-1 -mx-1"
-              title="মূল পাতায় ফিরে যান (Go to Home)"
+              title={t.homeTitle}
             >
               <BookOpen className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span>IslamQA Assistant</span>
+              <span>IslamQA {t.appSubtitle}</span>
             </a>
             <span>—</span>
             <span className="text-stone-400 dark:text-stone-500">
-              Developed by{" "}
+              {t.footerDevelopedBy}{" "}
               <a
                 href="https://www.facebook.com/imran.shorif.shuvo"
                 target="_blank"
@@ -447,19 +494,19 @@ export default function App() {
             <button
               onClick={handleNavigateToAbout}
               className="inline-flex items-center gap-1.5 text-stone-300 dark:text-stone-300 hover:text-blue-400 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
-              title="আমাদের সম্পর্কে জানুন (About Us)"
+              title={t.aboutTitle}
             >
               <Info className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-              <span>About Us (পরিচিতি)</span>
+              <span>{t.footerAboutUs}</span>
             </button>
             <span>•</span>
             <button
               onClick={handleNavigateToSupport}
               className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-semibold cursor-pointer"
-              title="আমাদের সাপোর্ট করুন (Support Us)"
+              title={t.supportTitle}
             >
               <Heart className="w-3.5 h-3.5 fill-pink-400 text-pink-400" />
-              <span>Support Us (ডোনেট করুন)</span>
+              <span>{t.footerSupportUs}</span>
             </button>
             <span>•</span>
             <a
@@ -468,10 +515,10 @@ export default function App() {
               rel="noopener noreferrer"
               className="hover:text-blue-400 transition-colors underline sm:no-underline"
             >
-              Visit islamqa.info ↗
+              {t.footerVisitSite}
             </a>
             <span>•</span>
-            <span>Supervised by Shaykh Muhammad Saalih al-Munajjid</span>
+            <span>{t.footerSupervised}</span>
           </div>
         </div>
       </footer>
@@ -494,6 +541,7 @@ export default function App() {
         }}
         onClearHistory={handleClearHistory}
         onDeleteItem={handleDeleteItem}
+        language={resolvedLanguage}
       />
     </div>
   );

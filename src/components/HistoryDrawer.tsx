@@ -1,6 +1,7 @@
 import React from "react";
 import { X, History, Trash2, ChevronRight, Clock } from "lucide-react";
 import { ChatHistoryItem } from "../types";
+import { translations } from "../data/translations";
 
 interface HistoryDrawerProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface HistoryDrawerProps {
   onSelectHistoryItem: (item: ChatHistoryItem) => void;
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
+  language: "bn" | "en";
 }
 
 export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
@@ -18,8 +20,10 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
   onSelectHistoryItem,
   onClearHistory,
   onDeleteItem,
+  language,
 }) => {
   if (!isOpen) return null;
+  const t = translations[language];
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -37,7 +41,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
             <div className="flex items-center gap-2">
               <History className="w-5 h-5 text-blue-400 shrink-0" />
               <h2 className="text-base font-semibold text-white">
-                পূর্ববর্তী জিজ্ঞাসিত প্রশ্ন
+                {t.historyDrawerTitle}
               </h2>
             </div>
             <button
@@ -56,10 +60,10 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
               <div className="text-center py-16 px-4 text-stone-400 dark:text-stone-500">
                 <Clock className="w-10 h-10 mx-auto mb-2 text-stone-300 dark:text-stone-700 stroke-1" />
                 <p className="text-sm font-medium text-stone-600 dark:text-stone-300">
-                  এখনো কোনো প্রশ্ন জিজ্ঞাসা করেননি
+                  {t.historyEmptyTitle}
                 </p>
                 <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                  আপনার অনুসন্ধানকৃত প্রশ্ন ও ফতোয়া এখানে সংরক্ষিত থাকবে।
+                  {t.historyEmptyDesc}
                 </p>
               </div>
             ) : (
@@ -89,7 +93,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                       </span>
                       {item.sources.length > 0 && (
                         <span className="text-blue-600 dark:text-blue-400 font-medium">
-                          {item.sources.length} টি রেফারেন্স
+                          {t.historyReferencesCount(item.sources.length)}
                         </span>
                       )}
                     </div>
@@ -106,7 +110,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                       }}
                       className="min-h-[36px] py-1 text-xs text-blue-600 dark:text-blue-400 font-semibold flex items-center gap-1 hover:underline active:opacity-75 cursor-pointer"
                     >
-                      <span>উত্তর দেখুন</span>
+                      <span>{t.historyViewAnswer}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                     <button
@@ -115,7 +119,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                         onDeleteItem(item.id);
                       }}
                       className="min-h-[36px] min-w-[36px] p-1.5 rounded-lg text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors flex items-center justify-center cursor-pointer"
-                      title="মুছুন"
+                      title={t.historyDelete}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -133,7 +137,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                 className="w-full flex items-center justify-center gap-1.5 min-h-[42px] py-2 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/60 active:bg-red-100 border border-red-200 dark:border-red-900/60 text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>সব ইতিহাস মুছে ফেলুন (Clear All)</span>
+                <span>{t.historyClearAll}</span>
               </button>
             </div>
           )}

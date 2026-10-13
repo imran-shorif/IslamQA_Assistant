@@ -21,16 +21,19 @@ import {
 } from "./SocialIcons";
 import { QnAResponse } from "../types";
 import { SourceCard } from "./SourceCard";
+import { translations } from "../data/translations";
 
 interface AnswerCardProps {
   data: QnAResponse;
+  language?: "bn" | "en";
 }
 
-export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
+export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" }) => {
   const [copied, setCopied] = useState(false);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [fontSize, setFontSize] = useState<"normal" | "large">("normal");
   const shareMenuRef = useRef<HTMLDivElement>(null);
+  const t = translations[language];
 
   // Close share popover menu on click outside
   useEffect(() => {
@@ -62,7 +65,9 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
   const sourceUrl = data.sources[0]?.url || "https://islamqa.info";
   const appUrl = typeof window !== "undefined" ? window.location.href : "https://islamqa.info";
 
-  const formattedShareText = `প্রশ্ন: ${data.question}\n\nউত্তর (ইসলামকিউএ সারসংক্ষেপ):\n${cleanSummary}\n\nসরাসরি ফতোয়া রেফারেন্স:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
+  const formattedShareText = language === "en"
+    ? `Question: ${data.question}\n\nAnswer (IslamQA Summary):\n${cleanSummary}\n\nVerified IslamQA References:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`
+    : `প্রশ্ন: ${data.question}\n\nউত্তর (ইসলামকিউএ সারসংক্ষেপ):\n${cleanSummary}\n\nসরাসরি ফতোয়া রেফারেন্স:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
 
   const handleCopy = async () => {
     try {
@@ -76,26 +81,35 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
   };
 
   const handleShareWhatsApp = () => {
-    const waText = `*প্রশ্ন:* ${data.question}\n\n*উত্তর:* ${shortSummary}\n\n*সরাসরি ইসলামকিউএ ফতোয়া:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
+    const waText = language === "en"
+      ? `*Question:* ${data.question}\n\n*Answer:* ${shortSummary}\n\n*Direct IslamQA Fatwa:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`
+      : `*প্রশ্ন:* ${data.question}\n\n*উত্তর:* ${shortSummary}\n\n*সরাসরি ইসলামকিউএ ফতোয়া:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareFacebook = () => {
-    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sourceUrl)}&quote=${encodeURIComponent(`প্রশ্ন: ${data.question}\n\n${shortSummary}`)}`;
+    const quoteText = language === "en"
+      ? `Question: ${data.question}\n\n${shortSummary}`
+      : `প্রশ্ন: ${data.question}\n\n${shortSummary}`;
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sourceUrl)}&quote=${encodeURIComponent(quoteText)}`;
     window.open(fbUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareTelegram = () => {
-    const tgText = `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary}`;
+    const tgText = language === "en"
+      ? `Question: ${data.question}\n\nAnswer: ${shortSummary}`
+      : `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary}`;
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(sourceUrl)}&text=${encodeURIComponent(tgText)}`;
     window.open(tgUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareX = () => {
-    const tweetText = `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary.slice(0, 130)}...`;
+    const tweetText = language === "en"
+      ? `Question: ${data.question}\n\nAnswer: ${shortSummary.slice(0, 130)}...`
+      : `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary.slice(0, 130)}...`;
     const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(sourceUrl)}`;
     window.open(xUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
@@ -105,7 +119,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `ইসলামিক ফতোয়া: ${data.question}`,
+          title: language === "en" ? `Islamic Fatwa: ${data.question}` : `ইসলামিক ফতোয়া: ${data.question}`,
           text: formattedShareText,
           url: sourceUrl,
         });
@@ -132,7 +146,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
         <div className="flex items-center justify-between gap-2 mb-1.5">
           <span className="text-xs font-semibold tracking-wide text-blue-700 dark:text-blue-400 uppercase flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
-            <span>অনুসন্ধানকৃত প্রশ্ন</span>
+            <span>{t.ansQueriedQuestion}</span>
           </span>
           <span className="text-[11px] text-stone-400 dark:text-stone-500">
             {new Date(data.timestamp).toLocaleTimeString([], {
@@ -151,7 +165,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
         <div className="flex items-center gap-1.5">
           <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-blue-200/70 dark:border-blue-800/70">
             <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span>islamqa.info ভিত্তিক সমাধান</span>
+            <span>{t.ansIslamqaBased}</span>
           </span>
         </div>
 
@@ -169,7 +183,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               <ZoomOut className="w-4 h-4" />
             )}
             <span className="text-[11px] hidden sm:inline">
-              {fontSize === "normal" ? "বড় ফন্ট" : "স্বাভাবিক"}
+              {fontSize === "normal" ? t.ansLargeFont : t.ansNormalFont}
             </span>
           </button>
 
@@ -184,11 +198,11 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                   ? "bg-blue-600 text-white border-blue-600 shadow-xs"
                   : "hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium border-stone-200 dark:border-stone-700"
               }`}
-              title="সোশ্যাল মিডিয়ায় শেয়ার করুন"
-              aria-label="সোশ্যাল মিডিয়ায় শেয়ার করুন"
+              title={t.ansShareDropdownTitle}
+              aria-label={t.ansShareDropdownTitle}
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span className="text-[11px] sm:text-xs">শেয়ার</span>
+              <span className="text-[11px] sm:text-xs">{t.ansShare}</span>
               <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isShareMenuOpen ? "rotate-180" : ""}`} />
             </button>
 
@@ -200,7 +214,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 className="absolute right-0 mt-1.5 w-60 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-750 shadow-xl z-40 p-2 text-stone-800 dark:text-stone-100 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-md"
               >
                 <div className="px-2.5 py-1.5 border-b border-stone-100 dark:border-stone-800 text-[11px] font-semibold text-stone-500 dark:text-stone-400">
-                  সোশ্যাল মিডিয়ায় শেয়ার করুন
+                  {t.ansShareDropdownTitle}
                 </div>
 
                 <div className="py-1 space-y-0.5 text-xs">
@@ -247,7 +261,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                       className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 transition-colors cursor-pointer text-left border-t border-stone-100 dark:border-stone-800 mt-1 pt-1.5"
                     >
                       <Smartphone className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                      <span className="font-medium">ডিভাইস শেয়ার মেনু</span>
+                      <span className="font-medium">{t.ansDeviceShare}</span>
                     </button>
                   )}
 
@@ -259,12 +273,12 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                     {copied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold">কপি সম্পন্ন হয়েছে!</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold">{t.ansCopied}</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-                        <span>সম্পূর্ণ উত্তর কপি করুন</span>
+                        <span>{t.ansCopyFullAnswer}</span>
                       </>
                     )}
                   </button>
@@ -277,17 +291,17 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
           <button
             onClick={handleCopy}
             className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 active:bg-stone-200 dark:active:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium transition-colors border border-stone-200 dark:border-stone-700 flex items-center gap-1 cursor-pointer"
-            title="সম্পূর্ণ উত্তর কপি করুন"
+            title={t.ansCopyFullAnswer}
           >
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span className="text-blue-700 dark:text-blue-400 font-semibold text-[11px] sm:text-xs">কপি হয়েছে!</span>
+                <span className="text-blue-700 dark:text-blue-400 font-semibold text-[11px] sm:text-xs">{t.ansCopySuccess}</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-stone-600 dark:text-stone-400" />
-                <span className="text-[11px] sm:text-xs">কপি</span>
+                <span className="text-[11px] sm:text-xs">{t.ansCopyBtn}</span>
               </>
             )}
           </button>
@@ -369,13 +383,13 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
-                    <span>এই ফতোয়াটি শেয়ার করুন</span>
+                    <span>{t.ansShareBoxTitle}</span>
                     <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full">
-                      সদকায়ে জারিয়া
+                      {t.ansSadqahBadge}
                     </span>
                   </h4>
                   <p className="text-[11px] text-stone-500 dark:text-stone-400 mt-0.5">
-                    দ্বীনি জ্ঞান ও সঠিক তথ্য মানুষের কাছে পৌঁছে দিতে পরিচিতদের সাথে শেয়ার করুন
+                    {t.ansShareBoxDesc}
                   </p>
                 </div>
               </div>
@@ -384,10 +398,10 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                 <button
                   onClick={handleNativeShare}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs self-start sm:self-auto shrink-0"
-                  title="ডিভাইসের শেয়ার শিটে পাঠান"
+                  title={t.ansDeviceShare}
                 >
                   <Smartphone className="w-3.5 h-3.5" />
-                  <span>ডিভাইস শেয়ার</span>
+                  <span>{t.ansDeviceShare}</span>
                 </button>
               )}
             </div>
@@ -398,7 +412,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               <button
                 onClick={handleShareWhatsApp}
                 className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 active:scale-95 text-[#128C7E] dark:text-[#25D366] border border-[#25D366]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-                title="হোয়াটসঅ্যাপে শেয়ার করুন"
+                title="WhatsApp"
               >
                 <WhatsAppIcon className="w-4 h-4 fill-[#25D366] shrink-0" />
                 <span>WhatsApp</span>
@@ -408,7 +422,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               <button
                 onClick={handleShareFacebook}
                 className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#1877F2]/10 hover:bg-[#1877F2]/20 active:scale-95 text-[#1877F2] dark:text-blue-400 border border-[#1877F2]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-                title="ফেসবুকে শেয়ার করুন"
+                title="Facebook"
               >
                 <FacebookIcon className="w-4 h-4 fill-[#1877F2] shrink-0" />
                 <span>Facebook</span>
@@ -418,7 +432,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               <button
                 onClick={handleShareTelegram}
                 className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#229ED9]/10 hover:bg-[#229ED9]/20 active:scale-95 text-[#229ED9] dark:text-sky-400 border border-[#229ED9]/30 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-                title="টেলিগ্রামে শেয়ার করুন"
+                title="Telegram"
               >
                 <TelegramIcon className="w-4 h-4 fill-[#229ED9] shrink-0" />
                 <span>Telegram</span>
@@ -428,7 +442,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
               <button
                 onClick={handleShareX}
                 className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-stone-200/70 hover:bg-stone-300/80 active:scale-95 dark:bg-stone-800 dark:hover:bg-stone-750 text-stone-900 dark:text-stone-100 border border-stone-300 dark:border-stone-700 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-                title="এক্স (টুইটার)-এ শেয়ার করুন"
+                title="X / Twitter"
               >
                 <XTwitterIcon className="w-3.5 h-3.5 fill-current shrink-0" />
                 <span>X / Twitter</span>
@@ -442,17 +456,17 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-750 text-stone-700 dark:text-stone-200 border-stone-300 dark:border-stone-700"
                 }`}
-                title="সম্পূর্ণ উত্তর ও রেফারেন্স কপি করুন"
+                title={t.ansCopyFullAnswer}
               >
                 {copied ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                    <span>কপি হয়েছে!</span>
+                    <span>{t.ansCopySuccess}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-                    <span>কপি করুন</span>
+                    <span>{t.ansCopyBtn}</span>
                   </>
                 )}
               </button>
@@ -465,28 +479,28 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
             <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-              <span>সরাসরি ইসলামকিউএ রেফারেন্স ও মূল লিঙ্ক (IslamQA Sources)</span>
+              <span>{t.ansDirectSourcesTitle}</span>
             </h4>
             <span className="text-[11px] sm:text-xs text-stone-500 dark:text-stone-400 font-medium">
-              {data.sources.length > 0 ? `${data.sources.length} টি লাইভ ফতোয়া লিঙ্ক` : "ইসলামকিউএ ডাটাবেজ"}
+              {data.sources.length > 0 ? t.ansLiveLinksCount(data.sources.length) : t.ansDatabaseLabel}
             </span>
           </div>
 
           <p className="text-[11px] sm:text-xs text-stone-600 dark:text-stone-300 mb-3">
-            নিচের যেকোনো কার্ডে ক্লিক করলে সরাসরি <strong className="text-blue-600 dark:text-blue-400 font-medium">islamqa.info</strong> মূল ওয়েবসাইটে গিয়ে সম্পূর্ণ ফতোয়া, মূল আরবী ইবারত ও বিস্তারিত দলিল দেখা যাবে:
+            {t.ansSourcesIntro}
           </p>
 
           {data.sources.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {data.sources.map((src, idx) => (
-                <SourceCard key={idx} source={src} index={idx} />
+                <SourceCard key={idx} source={src} index={idx} language={language} />
               ))}
             </div>
           ) : (
             <div className="bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-800 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-2 text-xs text-stone-600 dark:text-stone-300">
               <div className="flex items-center gap-2 min-w-0">
                 <BookOpen className="w-4 h-4 text-stone-400 shrink-0" />
-                <span className="truncate">উত্তরে উল্লিখিত ফতোয়া সরাসরি islamqa.info পোর্টালে যাচাই করতে পারেন।</span>
+                <span className="truncate">{t.ansFallbackNotice}</span>
               </div>
               <a
                 href="https://islamqa.info"
