@@ -1,7 +1,8 @@
 import React from "react";
-import { X, History, Trash2, ChevronRight, Clock } from "lucide-react";
+import { X, History, Trash2, ChevronRight, Clock, Cloud, LogIn } from "lucide-react";
 import { ChatHistoryItem } from "../types";
 import { translations } from "../data/translations";
+import { useAuth } from "../context/AuthContext";
 
 interface HistoryDrawerProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface HistoryDrawerProps {
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
   language: "bn" | "en";
+  onOpenAuthModal?: () => void;
 }
 
 export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
@@ -21,7 +23,9 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
   onClearHistory,
   onDeleteItem,
   language,
+  onOpenAuthModal,
 }) => {
+  const { currentUser } = useAuth();
   if (!isOpen) return null;
   const t = translations[language];
 
@@ -52,6 +56,41 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
             >
               <X className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Sync Status Banner */}
+          <div className="px-4 py-2.5 bg-stone-100 dark:bg-stone-850 border-b border-stone-200 dark:border-stone-800 text-xs flex items-center justify-between">
+            {currentUser ? (
+              <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium">
+                <Cloud className="w-3.5 h-3.5" />
+                <span>
+                  {language === "bn"
+                    ? "ক্লাউড সিঙ্ক চালু (ফায়ারবেস)"
+                    : "Cloud Synced (Firebase)"}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <span className="text-stone-500 dark:text-stone-400 text-[11px]">
+                  {language === "bn"
+                    ? "গেস্ট মোড (লোকাল স্টোরেজ)"
+                    : "Guest Mode (Local Storage)"}
+                </span>
+                {onOpenAuthModal && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenAuthModal();
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                  >
+                    <LogIn className="w-3 h-3" />
+                    <span>{t.authSignIn}</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* List */}
@@ -91,7 +130,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                           minute: "2-digit",
                         })}
                       </span>
-                      {item.sources.length > 0 && (
+                      {item.sources && item.sources.length > 0 && (
                         <span className="text-blue-600 dark:text-blue-400 font-medium">
                           {t.historyReferencesCount(item.sources.length)}
                         </span>

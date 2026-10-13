@@ -7,9 +7,17 @@ import { SampleTopics } from "./components/SampleTopics";
 import { HistoryDrawer } from "./components/HistoryDrawer";
 import { SupportPage } from "./components/SupportPage";
 import { AboutPage } from "./components/AboutPage";
+import { AuthModal } from "./components/AuthModal";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { translations, Language } from "./data/translations";
+import { useAuth } from "./context/AuthContext";
+import {
+  saveHistoryItemToFirestore,
+  fetchUserHistoryFromFirestore,
+  deleteHistoryItemFromFirestore,
+  clearUserHistoryFromFirestore,
+} from "./lib/firestoreHistory";
 import {
   ShieldCheck,
   BookOpen,
@@ -26,7 +34,9 @@ const LANG_STORAGE_KEY = "islamqa_language_pref";
 const PREV_LANG_STORAGE_KEY = "islamqa_prev_resolved_language";
 
 export default function App() {
+  const { currentUser } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
+
   const [currentView, setCurrentView] = useState<"home" | "support" | "about">(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.toLowerCase();
@@ -50,8 +60,7 @@ export default function App() {
   });
 
   // Keep track of previously active language so that when "auto" is chosen,
-  // it retains the previous language state as requested:
-  // "ar auto thakle previous language e thakbe, no change"
+  // it retains the previous language state
   const [lastResolvedLanguage, setLastResolvedLanguage] = useState<"bn" | "en">(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(PREV_LANG_STORAGE_KEY);
@@ -61,7 +70,6 @@ export default function App() {
   });
 
   // Calculate the currently active language for UI rendering:
-  // If 'bn' -> 'bn', if 'en' -> 'en', if 'auto' -> stays in previous language!
   const resolvedLanguage: "bn" | "en" =
     language === "auto" ? lastResolvedLanguage : language;
 
@@ -88,6 +96,10 @@ export default function App() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // Auth modal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"login" | "signup" | "forgot">("login");
+
   // Sync hash/URL with currentView
   useEffect(() => {
     const handleLocationChange = () => {
@@ -110,7 +122,7 @@ export default function App() {
     };
   }, []);
 
-  // Load history from localStorage
+  // Initial load history from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -122,6 +134,51 @@ export default function App() {
     }
   }, []);
 
+  // Sync history with Firestore when user logs in
+  useEffect(() => {
+    let isCancelled = false;
+    async function syncFirestoreHistory() {
+      if (!currentUser) return;
+      try {
+        const cloudItems = await fetchUserHistoryFromFirestore(currentUser.uid);
+        if (isCancelled) return;
+
+        if (cloudItems && cloudItems.length > 0) {
+          setHistory((prev) => {
+            const map = new Map<string, ChatHistoryItem>();
+            cloudItems.forEach((ci) => map.set(ci.id, ci));
+            prev.forEach((pi) => {
+              if (!map.has(pi.id)) {
+                map.set(pi.id, pi);
+                // Also persist unsynced local search to cloud
+                saveHistoryItemToFirestore(currentUser.uid, pi, resolvedLanguage).catch(() => {});
+              }
+            });
+            const merged = Array.from(map.values())
+              .sort((a, b) => b.timestamp - a.timestamp)
+              .slice(0, 50);
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            } catch (e) {}
+            return merged;
+          });
+        } else {
+          // Cloud empty; back-populate from current local history
+          history.forEach((h) => {
+            saveHistoryItemToFirestore(currentUser.uid, h, resolvedLanguage).catch(() => {});
+          });
+        }
+      } catch (err) {
+        console.warn("Could not sync history with Firestore:", err);
+      }
+    }
+
+    syncFirestoreHistory();
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentUser]);
+
   // Listen to window scroll to show/hide FAB
   useEffect(() => {
     const handleScroll = () => {
@@ -132,21 +189,30 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Save history to localStorage
+  // Save history to localStorage and Firestore
   const saveToHistory = (item: ChatHistoryItem) => {
     try {
       const updated = [item, ...history.filter((h) => h.question !== item.question)].slice(0, 30);
       setHistory(updated);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      if (currentUser) {
+        saveHistoryItemToFirestore(currentUser.uid, item, resolvedLanguage).catch((e) => {
+          console.warn("Could not save history to Firestore:", e);
+        });
+      }
     } catch (e) {
       console.warn("Could not save to history:", e);
     }
   };
 
   const handleClearHistory = () => {
+    const ids = history.map((h) => h.id);
     setHistory([]);
     try {
       localStorage.removeItem(STORAGE_KEY);
+      if (currentUser && ids.length > 0) {
+        clearUserHistoryFromFirestore(currentUser.uid, ids).catch(() => {});
+      }
     } catch (e) {
       console.warn("Could not clear history:", e);
     }
@@ -157,6 +223,9 @@ export default function App() {
     setHistory(updated);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      if (currentUser) {
+        deleteHistoryItemFromFirestore(currentUser.uid, id).catch(() => {});
+      }
     } catch (e) {
       console.warn("Could not delete history item:", e);
     }
@@ -196,13 +265,22 @@ export default function App() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || (resolvedLanguage === "en" ? "Failed to process query." : "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।"));
+        throw new Error(
+          data.error ||
+            (resolvedLanguage === "en"
+              ? "Failed to process query."
+              : "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।")
+        );
       }
 
       const responseObj: QnAResponse = {
         id: data.id || "ans-" + Date.now(),
         question: data.question || q,
-        answer: data.answer || (resolvedLanguage === "en" ? "No answer found." : "কোনো উত্তর পাওয়া যায়নি।"),
+        answer:
+          data.answer ||
+          (resolvedLanguage === "en"
+            ? "No answer found."
+            : "কোনো উত্তর পাওয়া যায়নি।"),
         sources: data.sources || [],
         timestamp: data.timestamp || Date.now(),
         model: data.model || "gemini-3.8-flash (grounded in islamqa.info)",
@@ -229,7 +307,10 @@ export default function App() {
     } catch (err: any) {
       console.error("Ask question error:", err);
       setErrorMessage(
-        err.message || (resolvedLanguage === "en" ? "Sorry, connection error occurred. Please try again later." : "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।")
+        err.message ||
+          (resolvedLanguage === "en"
+            ? "Sorry, connection error occurred. Please try again later."
+            : "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।")
       );
     } finally {
       setIsLoading(false);
@@ -255,6 +336,26 @@ export default function App() {
   const handleNavigateToAbout = () => {
     setCurrentView("about");
     window.history.pushState(null, "", "#about");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSelectSample = (sampleQuestion: string) => {
+    setQuestion(sampleQuestion);
+    handleAskQuestion(sampleQuestion);
+  };
+
+  const handleNewQuestion = () => {
+    setQuestion("");
+    setCurrentResponse(null);
+    setErrorMessage(null);
+    const inputElement = document.getElementById("islamic-question-input");
+    if (inputElement) {
+      inputElement.focus();
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -284,6 +385,10 @@ export default function App() {
         currentView={currentView}
         onSupportClick={handleNavigateToSupport}
         onAboutClick={handleNavigateToAbout}
+        onOpenAuthModal={() => {
+          setAuthModalMode("login");
+          setIsAuthModalOpen(true);
+        }}
       />
 
       {/* Main Container */}
@@ -308,7 +413,7 @@ export default function App() {
                 <span>{t.heroBadge}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:white tracking-tight leading-tight sm:leading-snug">
                 {t.heroHeading1} <br className="hidden sm:inline" />
                 <span className="text-blue-600 dark:text-blue-400">
                   {t.heroHeadingHighlight}
@@ -317,7 +422,9 @@ export default function App() {
 
               <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
                 {t.heroDescPre}
-                <strong className="text-stone-800 dark:text-stone-100 font-semibold">{t.heroDescBold}</strong>
+                <strong className="text-stone-800 dark:text-stone-100 font-semibold">
+                  {t.heroDescBold}
+                </strong>
                 {t.heroDescPost}
               </p>
             </section>
@@ -340,47 +447,36 @@ export default function App() {
               />
             </div>
 
-            {/* Loading State with scholarly steps */}
+            {/* Loading Indicator */}
             {isLoading && (
-              <div className="bg-white dark:bg-stone-900 border border-blue-200/90 dark:border-blue-800/70 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8 text-center shadow-xs">
-                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 flex items-center justify-center mx-auto mb-3.5">
-                  <Loader2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" />
+              <div className="my-6 p-6 sm:p-8 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-850 rounded-2xl flex flex-col items-center justify-center text-center animate-pulse">
+                <div className="relative mb-4">
+                  <div className="w-12 h-12 rounded-full border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 animate-spin"></div>
+                  <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400 absolute inset-0 m-auto" />
                 </div>
-
-                <h3 className="text-base sm:text-lg font-bold text-stone-800 dark:text-stone-100 mb-2">
+                <h3 className="text-base sm:text-lg font-semibold text-stone-850 dark:text-stone-100">
                   {t.loadingTitle}
                 </h3>
-                <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium max-w-md mx-auto min-h-[22px] transition-all leading-relaxed">
+                <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 mt-2 max-w-md min-h-[40px] flex items-center justify-center transition-all duration-300">
                   {t.loadingSteps[loadingStep]}
                 </p>
-
-                <div className="flex items-center justify-center gap-1.5 mt-4">
-                  {[0, 1, 2].map((idx) => (
-                    <div
-                      key={idx}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        idx === loadingStep
-                          ? "w-8 bg-blue-600 dark:bg-blue-500"
-                          : idx < loadingStep
-                          ? "w-4 bg-blue-300 dark:bg-blue-800"
-                          : "w-2 bg-stone-200 dark:bg-stone-800"
-                      }`}
-                    />
-                  ))}
-                </div>
               </div>
             )}
 
-            {/* Error Notification */}
+            {/* Error Message */}
             {errorMessage && (
-              <div className="bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 text-red-900 dark:text-red-200 flex items-start gap-3">
+              <div className="my-5 p-4 sm:p-5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-850 rounded-2xl flex items-start gap-3.5 text-red-850 dark:text-red-200 shadow-xs">
                 <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                <div className="flex-1 text-sm">
-                  <h4 className="font-semibold text-red-800 dark:text-red-300">{t.errorTitle}</h4>
-                  <p className="mt-0.5 text-red-700 dark:text-red-300/90 leading-relaxed">{errorMessage}</p>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-red-900 dark:text-red-100">
+                    {t.errorTitle}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-red-750 dark:text-red-300 mt-0.5 leading-relaxed">
+                    {errorMessage}
+                  </p>
                   <button
                     onClick={() => handleAskQuestion()}
-                    className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/60 hover:bg-red-200 dark:hover:bg-red-800 text-red-800 dark:text-red-200 transition-colors cursor-pointer"
+                    className="mt-3 text-xs font-semibold text-red-800 dark:text-red-200 bg-red-100 dark:bg-red-900/60 hover:bg-red-200 dark:hover:bg-red-900 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                   >
                     {t.errorRetry}
                   </button>
@@ -388,115 +484,72 @@ export default function App() {
               </div>
             )}
 
-            {/* Active Answer Card */}
+            {/* Answer Display */}
             {currentResponse && !isLoading && (
-              <div className="mb-6 sm:mb-8">
-                <AnswerCard data={currentResponse} language={resolvedLanguage} />
+              <div className="mb-8">
+                <AnswerCard
+                  data={currentResponse}
+                  language={resolvedLanguage}
+                />
               </div>
             )}
 
-            {/* Sample Topics & Questions */}
-            <SampleTopics
-              onSelectQuestion={(qText) => {
-                setQuestion(qText);
-                handleAskQuestion(qText);
-              }}
-              isLoading={isLoading}
-              language={resolvedLanguage}
-            />
-
-            {/* Support Project Callout on Home */}
-            <section aria-label="Support Us Callout" className="mt-6 p-4 rounded-2xl bg-pink-50/70 dark:bg-pink-950/20 border border-pink-200/80 dark:border-pink-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
-              <div className="flex items-center gap-2.5 text-stone-700 dark:text-stone-300">
-                <div className="w-8 h-8 rounded-xl bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0">
-                  <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
-                </div>
-                <div>
-                  <span className="font-bold text-stone-900 dark:text-stone-100 block sm:inline mr-1">{t.donateCalloutPre}</span>
-                  <span className="text-stone-600 dark:text-stone-300">{t.donateCalloutDesc}</span>
-                </div>
+            {/* Sample Suggested Topics */}
+            {!currentResponse && !isLoading && (
+              <div className="mt-2 mb-8">
+                <SampleTopics
+                  onSelectQuestion={handleSelectSample}
+                  isLoading={isLoading}
+                  language={resolvedLanguage}
+                />
               </div>
-              <button
-                onClick={handleNavigateToSupport}
-                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#E2136E] hover:bg-[#c2105e] text-white font-semibold transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 self-start sm:self-center"
-              >
-                <span>{t.donateBtn}</span>
-                <span>→</span>
-              </button>
-            </section>
-
-            {/* AI Disclaimer Banner */}
-            <section aria-label="AI Disclaimer" className="mt-8 sm:mt-12 pt-5 border-t border-stone-200/80 dark:border-stone-800">
-              <div className="bg-stone-100/70 dark:bg-stone-900/70 border border-stone-200 dark:border-stone-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-[13px] text-stone-600 dark:text-stone-300 flex items-start gap-2.5 sm:gap-3 leading-relaxed shadow-xs">
-                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-                <p>
-                  <strong className="font-semibold text-stone-900 dark:text-stone-100">{t.aiDisclaimerTitle}</strong>
-                  {t.aiDisclaimerText}
-                </p>
-              </div>
-            </section>
+            )}
           </>
         )}
       </main>
 
-      {/* Floating Action Button for Mobile Users when scrolled */}
-      {showScrollTop && (
-        <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2">
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-2.5 items-end">
+        {/* Floating "New Question" FAB */}
+        {currentResponse && !isLoading && (
           <button
             onClick={scrollToInput}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 active:scale-95 text-white font-medium text-xs shadow-lg transition-all border border-blue-500/40 cursor-pointer"
+            className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white px-3.5 py-2.5 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all text-xs sm:text-sm font-semibold cursor-pointer border border-blue-500/40"
             title={t.floatingNewQuestion}
+            aria-label={t.floatingNewQuestion}
           >
             <MessageSquarePlus className="w-4 h-4" />
-            <span>{t.floatingNewQuestion}</span>
+            <span className="hidden sm:inline">{t.floatingNewQuestion}</span>
           </button>
+        )}
 
+        {/* Scroll To Top FAB */}
+        {showScrollTop && (
           <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="w-10 h-10 rounded-full bg-stone-900/90 dark:bg-stone-800/95 hover:bg-stone-900 dark:hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white flex items-center justify-center shadow-lg transition-all border border-stone-700 cursor-pointer"
+            onClick={scrollToTop}
+            className="w-10 h-10 rounded-full bg-stone-850 hover:bg-stone-750 text-stone-200 hover:text-white shadow-lg active:scale-95 transition-all flex items-center justify-center border border-stone-700/60 cursor-pointer"
             title={t.floatingScrollTop}
             aria-label={t.floatingScrollTop}
           >
             <ArrowUp className="w-4 h-4" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Footer */}
-      <footer className="bg-stone-900 dark:bg-black text-stone-400 dark:text-stone-500 border-t border-stone-800 dark:border-stone-850 py-6 mt-10 sm:mt-12 text-xs pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] transition-colors">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-stone-300 dark:text-stone-400">
-            <a
-              href="/"
-              onClick={handleResetHome}
-              className="inline-flex items-center gap-2 text-white hover:text-blue-400 transition-colors font-semibold group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded px-1 -mx-1"
-              title={t.homeTitle}
-            >
-              <BookOpen className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform" />
-              <span>IslamQA {t.appSubtitle}</span>
-            </a>
-            <span>—</span>
-            <span className="text-stone-400 dark:text-stone-500">
-              {t.footerDevelopedBy}{" "}
-              <a
-                href="https://www.facebook.com/imran.shorif.shuvo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-stone-300 dark:text-stone-300 hover:text-blue-400 dark:hover:text-blue-400 transition-colors font-medium underline sm:no-underline hover:underline"
-              >
-                Imran Shorif Shuvo
-              </a>{" "}
-              & Sabbir Ahmed
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-stone-400 dark:text-stone-500 text-[11px]">
+      <footer className="mt-auto border-t border-stone-200 dark:border-stone-850 bg-white/70 dark:bg-stone-900/70 backdrop-blur-xs py-5 px-4 text-center text-xs text-stone-500 dark:text-stone-400">
+        <div className="max-w-4xl mx-auto space-y-2">
+          <p className="leading-relaxed">
+            <span className="font-semibold text-stone-600 dark:text-stone-300 mr-1">{t.aiDisclaimerTitle}</span>
+            {t.aiDisclaimerText}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] text-stone-400 dark:text-stone-500">
             <button
               onClick={handleNavigateToAbout}
-              className="inline-flex items-center gap-1.5 text-stone-300 dark:text-stone-300 hover:text-blue-400 dark:hover:text-blue-400 transition-colors font-medium cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-blue-500 dark:text-blue-400 hover:underline font-medium cursor-pointer"
               title={t.aboutTitle}
             >
-              <Info className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <Info className="w-3.5 h-3.5" />
               <span>{t.footerAboutUs}</span>
             </button>
             <span>•</span>
@@ -542,6 +595,18 @@ export default function App() {
         onClearHistory={handleClearHistory}
         onDeleteItem={handleDeleteItem}
         language={resolvedLanguage}
+        onOpenAuthModal={() => {
+          setAuthModalMode("login");
+          setIsAuthModalOpen(true);
+        }}
+      />
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        language={resolvedLanguage}
+        initialMode={authModalMode}
       />
     </div>
   );

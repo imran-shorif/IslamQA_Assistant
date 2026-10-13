@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile details and authentication metadata",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email address",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User full name or handle",
+          "maxLength": 100
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar photo URL",
+          "maxLength": 1024
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the user registered"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last profile update"
+        }
+      },
+      "required": ["uid", "email", "createdAt", "updatedAt"]
+    },
+    "UserHistoryItem": {
+      "title": "UserHistoryItem",
+      "description": "User query and Fatwa search response stored in history",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the history item",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of user who made the query",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "question": {
+          "type": "string",
+          "description": "The search question submitted",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "summary": {
+          "type": "string",
+          "description": "Concise summary of the fatwa answer",
+          "maxLength": 5000
+        },
+        "language": {
+          "type": "string",
+          "description": "Language used for the question and answer",
+          "maxLength": 10
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds"
+        },
+        "sourcesCount": {
+          "type": "number",
+          "description": "Count of IslamQA reference sources"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when saved"
+        }
+      },
+      "required": ["id", "userId", "question", "summary", "timestamp", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private profile document for each authenticated user"
+    },
+    "/users/{userId}/history/{historyId}": {
+      "schema": "UserHistoryItem",
+      "description": "Private fatwa search and query history entries for the user"
+    }
+  }
+}
