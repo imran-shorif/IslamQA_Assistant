@@ -114,6 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
             theme={theme}
             resolvedTheme={resolvedTheme}
             onThemeChange={onThemeChange}
+            language={resolvedLanguage}
           />
 
           {/* Language selector - Auto, বাংলা, English */}

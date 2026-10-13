@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Sun, Moon, Monitor, Check, ChevronDown } from "lucide-react";
+import { translations } from "../data/translations";
 
 export type ThemeMode = "system" | "light" | "dark";
 
@@ -7,15 +8,18 @@ interface ThemeToggleProps {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   onThemeChange: (theme: ThemeMode) => void;
+  language?: "bn" | "en";
 }
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   theme,
   resolvedTheme,
   onThemeChange,
+  language = "bn",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const t = translations[language] || translations.bn;
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -77,28 +81,28 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const getLabel = () => {
-    if (theme === "system") return "ডিভাইস থিম (Default)";
-    if (theme === "dark") return "ডার্ক মোড (Dark)";
-    return "লাইট মোড (Light)";
+    if (theme === "system") return t.themeDeviceLabel;
+    if (theme === "dark") return t.themeDarkLabel;
+    return t.themeLightLabel;
   };
 
   const options: { id: ThemeMode; label: string; sub: string; icon: React.ReactNode }[] = [
     {
       id: "system",
-      label: "ডিভাইস থিম (Default)",
-      sub: "ডিভাইস সেটিংসের সাথে স্বয়ংক্রিয় সমন্বয়",
+      label: t.themeDeviceLabel,
+      sub: t.themeDeviceDesc,
       icon: <Monitor className="w-4 h-4 text-blue-400" />,
     },
     {
       id: "light",
-      label: "লাইট মোড (Light)",
-      sub: "সবসময় স্পষ্ট ও হালকা থিম",
+      label: t.themeLightLabel,
+      sub: t.themeLightDesc,
       icon: <Sun className="w-4 h-4 text-amber-400" />,
     },
     {
       id: "dark",
-      label: "ডার্ক মোড (Dark)",
-      sub: "চোখের আরামদায়ক ডার্ক থিম",
+      label: t.themeDarkLabel,
+      sub: t.themeDarkDesc,
       icon: <Moon className="w-4 h-4 text-indigo-300" />,
     },
   ];
@@ -112,12 +116,12 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-haspopup="true"
-          title={`বর্তমান থিম: ${getLabel()} (ক্লিক করে থিম পরিবর্তন করুন)`}
+          title={`${t.themeTitleTooltip}: ${getLabel()} (${t.themeTitleChangeHint})`}
           className="flex items-center justify-center gap-1 h-8 w-8 sm:w-auto sm:h-9 sm:px-2.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:bg-stone-600 active:scale-95 text-stone-200 text-xs font-medium transition-all border border-stone-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 cursor-pointer shadow-xs shrink-0"
         >
           {getButtonIcon()}
           <span className="hidden md:inline font-medium text-xs">
-            {theme === "system" ? "ডিভাইস" : theme === "dark" ? "ডার্ক" : "লাইট"}
+            {theme === "system" ? t.themeDevice : theme === "dark" ? t.themeDark : t.themeLight}
           </span>
           <ChevronDown
             className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-stone-400 hidden sm:inline-block transition-transform duration-200 ${
@@ -136,10 +140,10 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         >
           <div className="px-3 py-2 border-b border-stone-800 text-[11px] text-stone-400 flex items-center justify-between">
             <span className="font-semibold text-stone-300 uppercase tracking-wider text-[10px]">
-              থিম নির্বাচন (Theme)
+              {t.themeMenuTitle}
             </span>
             <span className="text-[10px] text-blue-400">
-              কার্যকর: {resolvedTheme === "dark" ? "ডার্ক" : "লাইট"}
+              {t.themeActiveLabel}: {resolvedTheme === "dark" ? t.themeDark : t.themeLight}
             </span>
           </div>
 
@@ -182,7 +186,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 
           {/* Quick cycle footer hint */}
           <div className="mt-1 pt-2 border-t border-stone-800/80 px-2 py-1 text-[10px] text-stone-400 flex items-center justify-between">
-            <span>ক্লিক করে পছন্দ নির্বাচন করুন</span>
+            <span>{t.themeFooterHint}</span>
             <button
               type="button"
               onClick={() => {
@@ -190,7 +194,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
               }}
               className="text-blue-400 hover:underline font-medium cursor-pointer"
             >
-              টগল করুন ↻
+              {t.themeFooterToggle}
             </button>
           </div>
         </div>

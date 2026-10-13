@@ -214,6 +214,23 @@ export const translations = {
     authAlreadyHaveAccount: "ইতিমধ্যেই একাউন্ট আছে? লগইন করুন",
     authGuestNotice: "বর্তমানে আপনি গেস্ট হিসেবে ব্যবহার করছেন। হিস্ট্রি ক্লাউডে সেভ রাখতে লগইন করুন।",
     authLoggedInAs: "লগইন অবস্থায় আছেন",
+
+    // Theme Selector
+    themeDevice: "ডিভাইস",
+    themeLight: "লাইট",
+    themeDark: "ডার্ক",
+    themeDeviceLabel: "ডিভাইস থিম (Default)",
+    themeDeviceDesc: "ডিভাইস সেটিংসের সাথে স্বয়ংক্রিয় সমন্বয়",
+    themeLightLabel: "লাইট মোড (Light)",
+    themeLightDesc: "সবসময় স্পষ্ট ও হালকা থিম",
+    themeDarkLabel: "ডার্ক মোড (Dark)",
+    themeDarkDesc: "চোখের আরামদায়ক ডার্ক থিম",
+    themeMenuTitle: "থিম নির্বাচন (Theme)",
+    themeActiveLabel: "কার্যকর",
+    themeTitleTooltip: "বর্তমান থিম",
+    themeTitleChangeHint: "ক্লিক করে থিম পরিবর্তন করুন",
+    themeFooterHint: "ক্লিক করে পছন্দ নির্বাচন করুন",
+    themeFooterToggle: "টগল করুন ↻",
   },
   en: {
     // Header
@@ -428,5 +445,22 @@ export const translations = {
     authAlreadyHaveAccount: "Already have an account? Sign in",
     authGuestNotice: "You are browsing as a guest. Sign in to sync your fatwa history to the cloud.",
     authLoggedInAs: "Signed in as",
+
+    // Theme Selector
+    themeDevice: "System",
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeDeviceLabel: "System Theme (Default)",
+    themeDeviceDesc: "Synchronizes automatically with system preference",
+    themeLightLabel: "Light Mode",
+    themeLightDesc: "Bright and clear display mode",
+    themeDarkLabel: "Dark Mode",
+    themeDarkDesc: "Comfortable and easy on the eyes",
+    themeMenuTitle: "Theme Selection",
+    themeActiveLabel: "Active",
+    themeTitleTooltip: "Current theme",
+    themeTitleChangeHint: "Click to change theme",
+    themeFooterHint: "Click to select preferred theme",
+    themeFooterToggle: "Toggle ↻",
   },
 };
