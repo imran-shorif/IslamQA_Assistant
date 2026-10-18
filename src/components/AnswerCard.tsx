@@ -100,7 +100,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
 
   const labels = getShareLabels();
 
-  const formattedShareText = `${labels.q}: ${data.question}\n\n${labels.a}:\n${cleanSummary}\n\n${labels.ref}:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
+  const formattedShareText = `${labels.q}: ${data.question}\n\n${labels.a}:\n${cleanSummary}\n\n${labels.ref}:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nSearch Fatwa: ${appUrl}`;
 
   const handleCopy = async () => {
     try {
@@ -114,7 +114,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
   };
 
   const handleShareWhatsApp = () => {
-    const waText = `*${labels.q}:* ${data.question}\n\n*${labels.a}:* ${shortSummary}\n\n*IslamQA:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
+    const waText = `*${labels.q}:* ${data.question}\n\n*${labels.a}:* ${shortSummary}\n\n*IslamQA:* ${sourceUrl}\n\n*Search Fatwa:* ${appUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };

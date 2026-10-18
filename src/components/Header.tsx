@@ -15,6 +15,7 @@ import {
 import { ThemeToggle, ThemeMode } from "./ThemeToggle";
 import { translations, Language } from "../data/translations";
 import { useAuth } from "../context/AuthContext";
+import { SearchFatwaLogo } from "./SearchFatwaLogo";
 
 interface HeaderProps {
   language: Language;
@@ -76,10 +77,14 @@ export const Header: React.FC<HeaderProps> = ({
           <a
             href="/"
             onClick={onHomeClick}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-blue-700/90 border border-blue-500/30 flex items-center justify-center text-blue-100 shadow-inner hover:bg-blue-600 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm border border-amber-500/30 bg-stone-950"
             title={t.homeTitle}
           >
-            <BookOpen className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-blue-200" />
+            <img
+              src="/logo.svg"
+              alt="Search Fatwa"
+              className="w-full h-full object-cover"
+            />
           </a>
 
           <div className="min-w-0 flex items-center gap-2">
@@ -87,10 +92,11 @@ export const Header: React.FC<HeaderProps> = ({
             <a
               href="/"
               onClick={onHomeClick}
-              className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white hover:text-blue-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded whitespace-nowrap"
+              className="font-extrabold text-sm sm:text-base md:text-lg tracking-tight text-white hover:text-amber-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded whitespace-nowrap flex items-center gap-1"
               title={t.homeTitle}
             >
-              IslamQA <span className="text-blue-400 font-semibold">{t.appSubtitle}</span>
+              <span>{t.appName}</span>
+              <span className="text-amber-400 font-bold">{t.appSubtitle}</span>
             </a>
 
             {/* Source Link (redirects to islamqa.info) - Shown on sm and larger */}
