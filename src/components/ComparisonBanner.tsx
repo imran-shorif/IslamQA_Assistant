@@ -16,7 +16,7 @@ export const ComparisonBanner: React.FC<ComparisonBannerProps> = ({ language }) 
       <section className="bg-stone-900/60 dark:bg-stone-900/80 border border-stone-800 dark:border-stone-800/90 rounded-2xl p-3.5 sm:p-5 text-stone-200 shadow-sm backdrop-blur-xs">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-blue-950/80 border border-blue-800/60 flex items-center justify-center text-blue-400 shrink-0 mt-0.5 shadow-inner">
+            <div className="w-9 h-9 rounded-xl bg-emerald-950/80 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5 shadow-inner">
               <Sparkles className="w-4.5 h-4.5" />
             </div>
             <div className="min-w-0">
@@ -24,8 +24,8 @@ export const ComparisonBanner: React.FC<ComparisonBannerProps> = ({ language }) 
                 <h3 className="text-sm sm:text-base font-semibold text-stone-100">
                   {t.compTitle}
                 </h3>
-                <span className="text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-900/70 text-blue-300 border border-blue-700/50 flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-blue-400" />
+                <span className="text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-900/70 text-emerald-300 border border-emerald-700/50 flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-emerald-400" />
                   {t.compBadge}
                 </span>
               </div>
