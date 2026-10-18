@@ -88,6 +88,57 @@
         }
       },
       "required": ["id", "userId", "question", "summary", "timestamp", "createdAt"]
+    },
+    "SiteStats": {
+      "title": "SiteStats",
+      "description": "Public site analytics including cumulative total visitor count",
+      "type": "object",
+      "properties": {
+        "totalVisitors": {
+          "type": "number",
+          "description": "Total number of visits to the homepage"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last recorded visit timestamp"
+        }
+      },
+      "required": ["totalVisitors", "updatedAt"]
+    },
+    "ActiveSession": {
+      "title": "ActiveSession",
+      "description": "Presence heartbeat for active online visitors",
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Unique session identifier",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "city": {
+          "type": "string",
+          "description": "Detected city name",
+          "maxLength": 100
+        },
+        "country": {
+          "type": "string",
+          "description": "Detected country name",
+          "maxLength": 100
+        },
+        "lastSeen": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last heartbeat timestamp"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Session creation timestamp"
+        }
+      },
+      "required": ["sessionId", "lastSeen"]
     }
   },
   "firestore": {
@@ -98,6 +149,14 @@
     "/users/{userId}/history/{historyId}": {
       "schema": "UserHistoryItem",
       "description": "Private fatwa search and query history entries for the user"
+    },
+    "/stats/{statId}": {
+      "schema": "SiteStats",
+      "description": "Public statistics collection storing site-wide counters such as total visitor count"
+    },
+    "/active_sessions/{sessionId}": {
+      "schema": "ActiveSession",
+      "description": "Public presence heartbeats for tracking real-time live active visitor counts"
     }
   }
 }

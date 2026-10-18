@@ -50,6 +50,51 @@ service cloud.firestore {
         && (!('sourcesCount' in data) || data.sourcesCount is number);
     }
 
+    function isValidSiteStats(data) {
+      return data.keys().hasAll(['totalVisitors', 'updatedAt'])
+        && data.keys().hasOnly(['totalVisitors', 'updatedAt'])
+        && data.totalVisitors is number
+        && data.totalVisitors >= 0;
+    }
+
+    function isValidActiveSession(data, sessionId) {
+      return data.keys().hasAll(['sessionId', 'lastSeen'])
+        && data.keys().hasOnly(['sessionId', 'city', 'country', 'lastSeen', 'createdAt'])
+        && data.sessionId is string && data.sessionId == sessionId
+        && (!('city' in data) || data.city == null || (data.city is string && data.city.size() <= 100))
+        && (!('country' in data) || data.country == null || (data.country is string && data.country.size() <= 100))
+        && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    // Public Site Statistics (Lifetime Total Visitors Counter)
+    match /stats/{statId} {
+      allow get: if isValidId(statId) && (statId == 'site_stats' || statId == 'visitors');
+      allow list: if false;
+      allow create: if isValidId(statId)
+        && (statId == 'site_stats' || statId == 'visitors')
+        && isValidSiteStats(incoming())
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(statId)
+        && (statId == 'site_stats' || statId == 'visitors')
+        && isValidSiteStats(incoming())
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['totalVisitors', 'updatedAt'])
+        && incoming().totalVisitors >= existing().totalVisitors;
+      allow delete: if false;
+    }
+
+    // Real-Time Active Sessions (Live Online Count)
+    match /active_sessions/{sessionId} {
+      allow get, list: if true;
+      allow create: if isValidId(sessionId)
+        && isValidActiveSession(incoming(), sessionId)
+        && incoming().lastSeen == request.time;
+      allow update: if isValidId(sessionId)
+        && isValidActiveSession(incoming(), sessionId)
+        && incoming().lastSeen == request.time;
+      allow delete: if isValidId(sessionId);
+    }
+
     // User profile documents
     match /users/{userId} {
       allow get: if isOwner(userId);

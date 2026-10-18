@@ -231,6 +231,19 @@ export const translations = {
     themeTitleChangeHint: "ক্লিক করে থিম পরিবর্তন করুন",
     themeFooterHint: "ক্লিক করে পছন্দ নির্বাচন করুন",
     themeFooterToggle: "টগল করুন ↻",
+
+    // Visitor Count & Realtime Presence
+    visitorCountLabel: "মোট পরিদর্শক",
+    visitorCountSuffix: "জন",
+    visitorCountLive: "লাইভ",
+    visitorCountTitle: "ইসলামকিউএ এসিস্ট্যান্টে লাইভ ও মোট পরিদর্শকের তথ্য",
+    visitorLiveLabel: "লাইভ সক্রিয়",
+    visitorLiveSuffix: "জন অনলাইন",
+    visitorLifetimeLabel: "লাইফটাইম",
+    visitorLifetimeSuffix: "জন পরিদর্শক",
+    visitorLocalTimeLabel: "স্থানীয় সময়",
+    visitorCityLabel: "শহর",
+    visitorCityFallback: "ঢাকা",
   },
   en: {
     // Header
@@ -462,5 +475,18 @@ export const translations = {
     themeTitleChangeHint: "Click to change theme",
     themeFooterHint: "Click to select preferred theme",
     themeFooterToggle: "Toggle ↻",
+
+    // Visitor Count & Realtime Presence
+    visitorCountLabel: "Total Visitors",
+    visitorCountSuffix: "visitors",
+    visitorCountLive: "Live",
+    visitorCountTitle: "Realtime presence and lifetime visitor metrics on IslamQA Assistant",
+    visitorLiveLabel: "Live Online",
+    visitorLiveSuffix: "active now",
+    visitorLifetimeLabel: "Lifetime",
+    visitorLifetimeSuffix: "visitors",
+    visitorLocalTimeLabel: "Local Time",
+    visitorCityLabel: "City",
+    visitorCityFallback: "Dhaka",
   },
 };

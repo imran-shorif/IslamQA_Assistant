@@ -8,6 +8,7 @@ import { HistoryDrawer } from "./components/HistoryDrawer";
 import { SupportPage } from "./components/SupportPage";
 import { AboutPage } from "./components/AboutPage";
 import { AuthModal } from "./components/AuthModal";
+import { VisitorCounter } from "./components/VisitorCounter";
 import { QnAResponse, ChatHistoryItem } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { translations, Language } from "./data/translations";
@@ -408,12 +409,15 @@ export default function App() {
           <>
             {/* Hero Section */}
             <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-[11px] sm:text-xs font-semibold mb-3 leading-snug">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                <span>{t.heroBadge}</span>
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-[11px] sm:text-xs font-semibold leading-snug">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span>{t.heroBadge}</span>
+                </div>
+                <VisitorCounter language={resolvedLanguage} variant="hero" />
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:white tracking-tight leading-tight sm:leading-snug">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
                 {t.heroHeading1} <br className="hidden sm:inline" />
                 <span className="text-blue-600 dark:text-blue-400">
                   {t.heroHeadingHighlight}
@@ -572,6 +576,10 @@ export default function App() {
             </a>
             <span>•</span>
             <span>{t.footerSupervised}</span>
+          </div>
+
+          <div className="pt-1 flex items-center justify-center">
+            <VisitorCounter language={resolvedLanguage} variant="footer" />
           </div>
         </div>
       </footer>
