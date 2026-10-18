@@ -13,12 +13,12 @@ import {
   Heart,
   HelpCircle,
 } from "lucide-react";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface AboutPageProps {
   onBackToHome: () => void;
   onNavigateToSupport?: () => void;
-  language?: "bn" | "en";
+  language?: Language;
 }
 
 export const AboutPage: React.FC<AboutPageProps> = ({
@@ -26,7 +26,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   onNavigateToSupport,
   language = "bn",
 }) => {
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8 animate-in fade-in duration-300">

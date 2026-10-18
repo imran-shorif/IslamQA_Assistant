@@ -14,6 +14,7 @@ import {
   OperationType,
 } from "./firebase";
 import { getTimezoneFallbackCity } from "./geoUtils";
+import { Language } from "../data/translations";
 
 const STATS_DOC_PATH = "stats/site_stats";
 const SESSIONS_COLLECTION_PATH = "active_sessions";
@@ -34,11 +35,17 @@ export function getOrCreateSessionId(): string {
 }
 
 /**
- * Format a number using Bengali or English numerals
+ * Format a number using appropriate language locale
  */
-export function formatVisitorCount(count: number, language: "bn" | "en" = "bn"): string {
+export function formatVisitorCount(count: number, language: Language = "bn"): string {
   if (language === "bn") {
     return count.toLocaleString("bn-BD");
+  }
+  if (language === "ar") {
+    return count.toLocaleString("ar-SA");
+  }
+  if (language === "ur") {
+    return count.toLocaleString("ur-PK");
   }
   return count.toLocaleString("en-US");
 }
@@ -95,7 +102,7 @@ export async function recordVisitorSession(): Promise<void> {
 /**
  * React hook to subscribe to both Live Active visitors and Lifetime Total visitors in real time
  */
-export function useVisitorStats(language: "bn" | "en" = "bn") {
+export function useVisitorStats(language: Language = "bn") {
   const [totalVisitors, setTotalVisitors] = useState<number | null>(null);
   const [liveCount, setLiveCount] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);

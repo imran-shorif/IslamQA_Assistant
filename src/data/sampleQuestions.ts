@@ -1,10 +1,16 @@
+import { Language } from "./translations";
+
 export interface SampleQuestion {
   id: string;
   category: string;
   question: string;
   questionBn: string;
+  questionAr?: string;
+  questionUr?: string;
   tag: string;
   tagEn: string;
+  tagAr?: string;
+  tagUr?: string;
 }
 
 export const SAMPLE_QUESTIONS: SampleQuestion[] = [
@@ -13,58 +19,82 @@ export const SAMPLE_QUESTIONS: SampleQuestion[] = [
     category: "Sawm & Fasting",
     question: "Does receiving an injection or IV drip invalidate the fast in Ramadan?",
     questionBn: "রোজা রাখা অবস্থায় ইনজেকশন বা স্যালাইন নিলে কি রোজা ভেঙ্গে যাবে?",
+    questionAr: "هل أخذ الإبرة أو المغذي يفسد الصيام في رمضان؟",
+    questionUr: "کیا روزے کی حالت میں ڈرپ یا انجکشن لگوانے سے روزہ ٹوٹ جاتا ہے؟",
     tag: "রোজা ও ইনজেকশন",
     tagEn: "Fasting & Injections",
+    tagAr: "الصيام والإبر",
+    tagUr: "روزہ اور انجکشن",
   },
   {
     id: "q2",
     category: "Salah & Prayer",
     question: "What is the ruling on missed prayers due to oversleeping or forgetfulness?",
     questionBn: "ঘুম বা অনিচ্ছাকৃত ভুলে নামাজ ছুটে গেলে কীভাবে তা আদায় করতে হবে?",
+    questionAr: "ما حكم صلاة من نام عنها أو نسيها، وكيف يقضيها؟",
+    questionUr: "نیند یا بھول چوک کی وجہ سے نماز قضا ہو جائے تو کیسے ادا کریں؟",
     tag: "কাজা নামাজ",
     tagEn: "Missed Prayers",
+    tagAr: "قضاء الصلاة",
+    tagUr: "قضا نمازیں",
   },
   {
     id: "q3",
     category: "Salah & Travel",
     question: "How to pray while traveling on an airplane or moving train if the prayer time is expiring?",
     questionBn: "চলন্ত বিমান, ট্রেন বা গাড়িতে নামাজের ওয়াক্ত চলে যাওয়ার উপক্রম হলে কীভাবে সালাত আদায় করবে?",
+    questionAr: "كيف يصلي المسافر في الطائرة أو القطار إذا خشي خروج الوقت؟",
+    questionUr: "چلتی ٹرین یا جہاز میں وقت نکلنے کا اندیشہ ہو تو نماز کیسے ادا کریں؟",
     tag: "সফরে সালাত",
     tagEn: "Prayer during Travel",
+    tagAr: "صلاة المسافر",
+    tagUr: "سفر میں نماز",
   },
   {
     id: "q4",
     category: "Transactions & Halal",
     question: "What is the Islamic ruling on trading cryptocurrencies and digital assets according to IslamQA?",
     questionBn: "ক্রিপ্টোকারেন্সি এবং ডিজিটাল কয়েন লেনদেন সম্পর্কে ইসলামকিউএ এর ফতোয়া কী?",
+    questionAr: "ما هو حكم التعامل بالعملات الرقمية المشفرة (البيتكوين) حسب موقع الإسلام سؤال وجواب؟",
+    questionUr: "اسلام سوال و جواب کے مطابق کرپٹو کرنسی اور ڈیجیٹل کوائنز کا شرعی حکم کیا ہے؟",
     tag: "ক্রিপ্টোকারেন্সি",
     tagEn: "Cryptocurrency",
+    tagAr: "العملات الرقمية",
+    tagUr: "کرپٹو کرنسی",
   },
   {
     id: "q5",
     category: "Contemporary & Arts",
     question: "What is the ruling on digital drawing, 2D illustration, and anime characters without realistic facial features?",
     questionBn: "ডিজিটাল ড্রয়িং এবং প্রাণীর মুখাবয়ব আঁকার ব্যাপারে শরীয়তের সুনির্দিষ্ট বিধান কী?",
+    questionAr: "ما حكم الرسم الرقمي والرسوم الكرتونية وذوات الأرواح في الشريعة الإسلامية؟",
+    questionUr: "ڈیجیٹل ڈرائنگ اور جانداروں کی تصاویر بنانے کے بارے میں شرعی حکم کیا ہے؟",
     tag: "ডিজিটাল ড্রয়িং",
     tagEn: "Digital Drawing",
+    tagAr: "الرسم الرقمي",
+    tagUr: "ڈیجیٹل ڈرائنگ",
   },
   {
     id: "q6",
     category: "Taharah & Purity",
     question: "What should a person do if they doubt whether wudhu is broken or if gas has passed?",
     questionBn: "অজু ভেঙেছে কি না এ বিষয়ে মনে সন্দেহ বা ওয়াসওয়াসা সৃষ্টি হলে করণীয় কী?",
+    questionAr: "ماذا يفعل من شك في انتقاض وضوئه أو خروج الريح منه؟",
+    questionUr: "وضو ٹوٹنے یا ریح خارج ہونے میں شک و وسوسہ ہو تو کیا کرنا چاہیے؟",
     tag: "অজু ও ওয়াসওয়াসা",
     tagEn: "Wudu & Whispers",
+    tagAr: "الشك في الوضوء",
+    tagUr: "وضو اور وسوسہ",
   },
 ];
 
 export const CATEGORIES = [
-  { id: "all", labelEn: "All Topics", labelBn: "সকল বিষয়" },
-  { id: "salah", labelEn: "Salah & Prayer", labelBn: "সালাত ও নামাজ" },
-  { id: "sawm", labelEn: "Fasting & Sawm", labelBn: "সাওম ও রোজা" },
-  { id: "finance", labelEn: "Finance & Trade", labelBn: "ব্যবসা ও অর্থনীতি" },
-  { id: "family", labelEn: "Family & Marriage", labelBn: "পরিবার ও বিবাহ" },
-  { id: "taharah", labelEn: "Taharah & Purity", labelBn: "পবিত্রতা ও অজু" },
+  { id: "all", labelEn: "All Topics", labelBn: "সকল বিষয়", labelAr: "جميع الموضوعات", labelUr: "تمام موضوعات" },
+  { id: "salah", labelEn: "Salah & Prayer", labelBn: "সালাত ও নামাজ", labelAr: "الصلاة والعبادات", labelUr: "نماز و عبادات" },
+  { id: "sawm", labelEn: "Fasting & Sawm", labelBn: "সাওম ও রোজা", labelAr: "الصيام ورمضان", labelUr: "روزہ اور صیام" },
+  { id: "finance", labelEn: "Finance & Trade", labelBn: "ব্যবসা ও অর্থনীতি", labelAr: "المعاملات والتجارة", labelUr: "تجارت و معاشیات" },
+  { id: "family", labelEn: "Family & Marriage", labelBn: "পরিবার ও বিবাহ", labelAr: "الأسرة والزواج", labelUr: "خاندان و نکاح" },
+  { id: "taharah", labelEn: "Taharah & Purity", labelBn: "পবিত্রতা ও অজু", labelAr: "الطهارة والوضوء", labelUr: "طہارت و وضو" },
 ];
 
 export const RANDOM_ISLAMIC_QUESTIONS_BN: string[] = [
@@ -126,8 +156,75 @@ export const RANDOM_ISLAMIC_QUESTIONS_EN: string[] = [
   "What is the ruling on taking photographs with digital cameras and smartphones?"
 ];
 
-export function getRandomIslamicQuestion(currentQuestion?: string, language: "bn" | "en" = "bn"): string {
-  const poolList = language === "en" ? RANDOM_ISLAMIC_QUESTIONS_EN : RANDOM_ISLAMIC_QUESTIONS_BN;
+export const RANDOM_ISLAMIC_QUESTIONS_AR: string[] = [
+  "هل استعمال معجون الأسنان وفرشاة الأسنان يفسد الصيام؟",
+  "ما حكم الاستثمار والمضاربة في سوق الأسهم والبورصة؟",
+  "هل أخذ الإبر العضلية أو الوريدية والمغذي يفطر الصائم في رمضان؟",
+  "ما حكم من فاتته الصلاة بسبب النوم أو النسيان وكيف يقضيها؟",
+  "كيف يصلي الراكب في الطائرة أو القطار إذا خشي خروج وقت الصلاة؟",
+  "ما هو حكم التعامل بالعملات الرقمية المشفرة (البيتكوين) في الإسلام؟",
+  "ما حكم الرسم الرقمي والرسوم الكرتونية لذوات الأرواح في الشريعة؟",
+  "ماذا يفعل المسلم إذا شك في انتقاض وضوئه أو طهارته؟",
+  "هل يجوز التخلص من فوائد البنوك الربوية بصرفها في وجوه الخير؟",
+  "هل يجوز قضاء سنة الفجر وفريضتها عند طلوع الشمس مباشرة؟",
+  "ما حكم الاستماع إلى المعازف والآلات الموسيقية في المذاهب الأربعة؟",
+  "هل يجوز للمرأة السفر لأداء العمرة بدون محرم؟",
+  "كيف تحسب زكاة الذهب والفضة والأموال النقدية المدخرة؟",
+  "ما هي الكيفية الصحيحة لسجود السهو قبل السلام وبعده؟",
+  "ما هي شروط قصر الصلاة وجمعها للمسافر في السفر؟",
+  "ما حكم التجارة الإلكترونية بنظام الدروب شيبينغ (Dropshipping)؟",
+  "هل استخدام بخاخ الربو أو قطرة العين يفسد الصيام؟",
+  "ما الفرق بين صلاة التهجد وصلاة الوتر وكيف تصلى؟",
+  "هل يجوز تأجيل دفع مهر الزوجة بعد عقد النكاح؟",
+  "ما هو الموقف الشرعي والأخلاقي في بر الوالدين غير المسلمين؟",
+  "ماذا يفعل المسبوق إذا أدرك الإمام في الركعة الثانية من صلاة الجمعة؟",
+  "ما هو حكم التدخين واستعمال السجائر الإلكترونية (الفيب)؟",
+  "كيف يصلي المريض إذا عجز عن القيام في الفريضة؟",
+  "ما حكم التصوير الفوتوغرافي بكاميرات الهواتف الذكية؟"
+];
+
+export const RANDOM_ISLAMIC_QUESTIONS_UR: string[] = [
+  "کیا روزے کے دوران ٹوتھ پیسٹ یا منجن سے دانت صاف کرنے سے روزہ ٹوٹ جاتا ہے؟",
+  "کیا اسٹاک مارکیٹ میں شیئرز کی خرید و فروخت اور سرمایہ کاری حلال ہے؟",
+  "کیا روزے میں گلوکوز کی ڈرپ یا طاقت کا انجکشن لگوانا جائز ہے؟",
+  "نیند یا بھول کی وجہ سے چھوٹی ہوئی نماز کو ادا کرنے کا شرعی طریقہ کیا ہے؟",
+  "چلتی ٹرین، گاڑی یا ہوائی جہاز میں اگر وقت ختم ہو رہا ہو تو نماز کیسے ادا کریں؟",
+  "کرپٹو کرنسی اور ڈیجیٹل کوائنز میں لین دین کے بارے میں اسلام کیو اے کا فتویٰ کیا ہے؟",
+  "ڈیجیٹل ڈرائنگ اور اینیمیشن میں جانداروں کے چہرے بنانے کا کیا شرعی حکم ہے؟",
+  "اگر وضو ٹوٹنے یا نہ ٹوٹنے میں شک و وسوسہ پیدا ہو تو کیا کرنا چاہیے؟",
+  "کیا روایتی بینکوں کے سودی منافع کو ثواب کی نیت کے بغیر خیراتی کاموں میں دیا جا سکتا ہے؟",
+  "کیا سورج طلوع ہوتے وقت فجر کی قضا نماز پڑھی جا سکتی ہے؟",
+  "چاروں ائمہ کے نزدیک موسیقی اور آلاتِ موسیقی سننے کی کیا ممانعت ہے؟",
+  "کیا عورت کا بغیر محرم کے عمرہ یا سفر پر جانا جائز ہے؟",
+  "سونے، چاندی اور نقد بچت پر زکوٰۃ کا حساب لگانے کا مستند طریقہ کیا ہے؟",
+  "سجدہ سہو کا صحیح اور مسنون طریقہ کیا ہے؟",
+  "سفر کے دوران نماز قصر اور جمع کرنے کی کیا شرائط ہیں؟",
+  "ای کامرس ڈراپ شپنگ کے ذریعے تجارت کرنے کا شرعی حکم کیا ہے؟",
+  "کیا دمہ کے مریض کے لیے انہیلر یا آنکھ کے ڈراپس استعمال کرنے سے روزہ فاسد ہوتا ہے؟",
+  "تہجد اور وتر کی نماز میں کیا فرق ہے اور وتر کس طرح پڑھنا افضل ہے؟",
+  "کیا بیوی کا مہر نقد ادا نہ کر کے مؤجل (ادھار) رکھنا جائز ہے؟",
+  "غیر مسلم والدین کے ساتھ حسن سلوک اور ان کے حقوق سے متعلق اسلام کی کیا تعلیمات ہیں؟",
+  "اگر جمعہ کی نماز کی پہلی رکعت نکل جائے تو بقیہ نماز کیسے مکمل کی جائے؟",
+  "سگریٹ نوشی اور ای سگریٹ (ویپ) استعمال کرنے کا کیا شرعی حکم ہے؟",
+  "بیماری کی حالت میں کھڑے ہونے سے معذور شخص کس طرح نماز ادا کرے؟",
+  "موبائل فون یا ڈیجیٹل کیمرے سے عام تصویر کشی کا کیا شرعی حکم ہے؟"
+];
+
+export function getRandomIslamicQuestion(
+  currentQuestion?: string,
+  language: Language = "bn"
+): string {
+  let poolList: string[];
+  if (language === "en") {
+    poolList = RANDOM_ISLAMIC_QUESTIONS_EN;
+  } else if (language === "ar") {
+    poolList = RANDOM_ISLAMIC_QUESTIONS_AR;
+  } else if (language === "ur") {
+    poolList = RANDOM_ISLAMIC_QUESTIONS_UR;
+  } else {
+    poolList = RANDOM_ISLAMIC_QUESTIONS_BN;
+  }
+
   const available = poolList.filter(
     (q) => q.trim() !== (currentQuestion || "").trim()
   );

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Search, Sparkles, CornerDownLeft, Loader2, X, Shuffle } from "lucide-react";
 import { getRandomIslamicQuestion } from "../data/sampleQuestions";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface QuestionInputProps {
   question: string;
@@ -9,7 +9,7 @@ interface QuestionInputProps {
   onSubmit: (e?: React.FormEvent) => void;
   isLoading: boolean;
   onClear: () => void;
-  language: "bn" | "en";
+  language: Language;
 }
 
 export const QuestionInput: React.FC<QuestionInputProps> = ({

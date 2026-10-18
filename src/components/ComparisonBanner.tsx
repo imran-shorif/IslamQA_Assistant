@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Sparkles, CheckCircle2, XCircle, ChevronDown, ChevronUp, Zap } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface ComparisonBannerProps {
-  language: "bn" | "en";
+  language: Language;
 }
 
 export const ComparisonBanner: React.FC<ComparisonBannerProps> = ({ language }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
 
   return (
     <ScrollReveal animation="fade-up" delay={100} className="mb-5 sm:mb-6">

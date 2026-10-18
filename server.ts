@@ -82,8 +82,16 @@ app.post("/api/ask", async (req, res) => {
     const matchingFallback = findMatchingFatwa(question, language);
     const fallbackSources = matchingFallback ? matchingFallback.sources : [];
 
-    const languageInstruction = language && language !== "auto"
-      ? `\nPlease formulate your answer primarily in ${language === "bn" ? "Bengali (বাংলা)" : language === "ar" ? "Arabic" : "English"}.`
+    const languageInstruction = language
+      ? `\nPlease formulate your answer primarily in ${
+          language === "bn"
+            ? "Bengali (বাংলা)"
+            : language === "ar"
+            ? "Arabic (العربية الفصحى)"
+            : language === "ur"
+            ? "Urdu (اردو)"
+            : "English"
+        }.`
       : "";
 
     const userPrompt = `User Islamic Question:

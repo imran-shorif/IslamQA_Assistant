@@ -29,8 +29,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   initialMode = "login",
 }) => {
   const { loginWithEmail, signUpWithEmail, loginWithGoogle, resetPassword } = useAuth();
-  const resolvedLang: "bn" | "en" = language === "en" ? "en" : "bn";
-  const t = translations[resolvedLang];
+  const t = translations[language] || translations.bn;
 
   const [mode, setMode] = useState<"login" | "signup" | "forgot">(initialMode);
   const [email, setEmail] = useState("");
@@ -47,41 +46,51 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const getFriendlyError = (err: any): string => {
     const code = err?.code || "";
     if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
-      return resolvedLang === "bn"
-        ? "ভুল ইমেইল অথবা পাসওয়ার্ড।"
-        : "Invalid email or password.";
+      if (language === "ar") return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      if (language === "ur") return "ای میل یا پاس ورڈ غلط ہے۔";
+      if (language === "en") return "Invalid email or password.";
+      return "ভুল ইমেইল অথবা পাসওয়ার্ড।";
     }
     if (code === "auth/user-not-found") {
-      return resolvedLang === "bn"
-        ? "এই ইমেইলে কোনো একাউন্ট পাওয়া যায়নি।"
-        : "No account found with this email.";
+      if (language === "ar") return "لم يتم العثور على حساب بهذا البريد.";
+      if (language === "ur") return "اس ای میل سے کوئی اکاؤنٹ نہیں ملا۔";
+      if (language === "en") return "No account found with this email.";
+      return "এই ইমেইলে কোনো একাউন্ট পাওয়া যায়নি।";
     }
     if (code === "auth/email-already-in-use") {
-      return resolvedLang === "bn"
-        ? "এই ইমেইল দিয়ে ইতিমধ্যেই একটি একাউন্ট খোলা আছে। অনুগ্রহ করে লগইন করুন।"
-        : "An account with this email already exists. Please log in.";
+      if (language === "ar") return "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.";
+      if (language === "ur") return "یہ ای میل پہلے سے موجود ہے۔ لاگ ان کریں۔";
+      if (language === "en") return "An account with this email already exists. Please log in.";
+      return "এই ইমেইল দিয়ে ইতিমধ্যেই একটি একাউন্ট খোলা আছে। অনুগ্রহ করে লগইন করুন।";
     }
     if (code === "auth/weak-password") {
-      return resolvedLang === "bn"
-        ? "পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে।"
-        : "Password should be at least 6 characters.";
+      if (language === "ar") return "يجب أن تتكون كلمة المرور من ٦ أحرف على الأقل.";
+      if (language === "ur") return "پاس ورڈ کم از کم ۶ حروف کا ہونا چاہیے۔";
+      if (language === "en") return "Password should be at least 6 characters.";
+      return "পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে।";
     }
     if (code === "auth/invalid-email") {
-      return resolvedLang === "bn"
-        ? "অনুগ্রহ করে একটি সঠিক ইমেইল এড্রেস লিখুন।"
-        : "Please enter a valid email address.";
+      if (language === "ar") return "يرجى إدخال عنوان بريد إلكتروني صحيح.";
+      if (language === "ur") return "برائے مہربانی درست ای میل درج کریں۔";
+      if (language === "en") return "Please enter a valid email address.";
+      return "অনুগ্রহ করে একটি সঠিক ইমেইল এড্রেস লিখুন।";
     }
     if (code === "auth/popup-closed-by-user") {
-      return resolvedLang === "bn"
-        ? "গুগল সাইন-ইন উইন্ডো বন্ধ করা হয়েছে।"
-        : "Google sign-in popup was cancelled.";
+      if (language === "ar") return "تم إغلاق نافذة تسجيل الدخول.";
+      if (language === "ur") return "گوگل سائن ان منسوخ کر دیا گیا۔";
+      if (language === "en") return "Google sign-in popup was cancelled.";
+      return "গুগল সাইন-ইন উইন্ডো বন্ধ করা হয়েছে।";
     }
     if (code === "auth/operation-not-allowed") {
-      return resolvedLang === "bn"
-        ? "ইমেইল/পাসওয়ার্ড সাইন-ইন সার্ভিসটি ফায়ারবেসে একটিভ করতে হবে।"
-        : "Email/password provider is not enabled in Firebase Console.";
+      if (language === "ar") return "طريقة تسجيل الدخول غير مفعلة.";
+      if (language === "ur") return "سائن ان کا طریقہ فعال نہیں ہے۔";
+      if (language === "en") return "Email/password provider is not enabled.";
+      return "ইমেইল/পাসওয়ার্ড সাইন-ইন সার্ভিসটি ফায়ারবেসে একটিভ করতে হবে।";
     }
-    return err?.message || (resolvedLang === "bn" ? "একটি ত্রুটি ঘটেছে। পুনরায় চেষ্টা করুন।" : "An error occurred. Please try again.");
+    if (language === "ar") return err?.message || "حدث خطأ أثناء المعالجة. يرجى المحاولة لاحقاً.";
+    if (language === "ur") return err?.message || "کوئی مسئلہ پیش آیا۔ دوبارہ کوشش کریں۔";
+    if (language === "en") return err?.message || "An error occurred. Please try again.";
+    return err?.message || "একটি ত্রুটি ঘটেছে। পুনরায় চেষ্টা করুন।";
   };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -90,21 +99,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setResetSuccess(false);
 
     if (!email.trim()) {
-      setErrorMsg(resolvedLang === "bn" ? "অনুগ্রহ করে ইমেইল লিখুন।" : "Please enter your email.");
+      const emptyEmailMsg =
+        language === "ar"
+          ? "يرجى إدخال البريد الإلكتروني."
+          : language === "ur"
+          ? "برائے مہربانی ای میل درج کریں۔"
+          : language === "en"
+          ? "Please enter your email."
+          : "অনুগ্রহ করে ইমেইল লিখুন।";
+      setErrorMsg(emptyEmailMsg);
       return;
     }
 
     if (mode !== "forgot" && !password) {
-      setErrorMsg(resolvedLang === "bn" ? "অনুগ্রহ করে পাসওয়ার্ড লিখুন।" : "Please enter your password.");
+      const emptyPassMsg =
+        language === "ar"
+          ? "يرجى إدخال كلمة المرور."
+          : language === "ur"
+          ? "برائے مہربانی پاس ورڈ درج کریں۔"
+          : language === "en"
+          ? "Please enter your password."
+          : "অনুগ্রহ করে পাসওয়ার্ড লিখুন।";
+      setErrorMsg(emptyPassMsg);
       return;
     }
 
     if (mode === "signup" && password.length < 6) {
-      setErrorMsg(
-        resolvedLang === "bn"
-          ? "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।"
-          : "Password must be at least 6 characters."
-      );
+      const weakPassMsg =
+        language === "ar"
+          ? "يجب أن تكون كلمة المرور ٦ أحرف على الأقل."
+          : language === "ur"
+          ? "پاس ورڈ کم از کم ۶ حروف کا ہونا چاہیے۔"
+          : language === "en"
+          ? "Password must be at least 6 characters."
+          : "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।";
+      setErrorMsg(weakPassMsg);
       return;
     }
 
@@ -160,16 +189,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div>
                 <h3 className="font-semibold text-lg text-slate-900 dark:text-white leading-tight">
                   {mode === "forgot"
-                    ? resolvedLang === "bn"
-                      ? "পাসওয়ার্ড রিকভারি"
-                      : "Account Recovery"
+                    ? language === "ar"
+                      ? "استعادة الحساب"
+                      : language === "ur"
+                      ? "پاس ورڈ بحالی"
+                      : language === "en"
+                      ? "Account Recovery"
+                      : "পাসওয়ার্ড রিকভারি"
                     : t.authModalTitle}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {mode === "forgot"
-                    ? resolvedLang === "bn"
-                      ? "ইমেইল এড্রেস দিয়ে পাসওয়ার্ড রিসেট করুন"
-                      : "Reset password via email recovery link"
+                    ? language === "ar"
+                      ? "أدخل بريدك الإلكتروني لاستلام رابط إعادة التعيين"
+                      : language === "ur"
+                      ? "پاس ورڈ ری سیٹ کے لیے اپنا ای میل درج کریں"
+                      : language === "en"
+                      ? "Reset password via email recovery link"
+                      : "ইমেইল এড্রেস দিয়ে পাসওয়ার্ড রিসেট করুন"
                     : t.authModalSubtitle}
                 </p>
               </div>
@@ -379,12 +416,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>
                     {mode === "forgot"
-                      ? resolvedLang === "bn"
-                        ? "রিকভারি ইমেইল পাঠানো হচ্ছে..."
-                        : "Sending reset email..."
-                      : resolvedLang === "bn"
-                      ? "প্রসেস হচ্ছে..."
-                      : "Processing..."}
+                      ? language === "ar"
+                        ? "جاري إرسال رابط الاستعادة..."
+                        : language === "ur"
+                        ? "بحالی کا لنک بھیجا جا رہا ہے..."
+                        : language === "en"
+                        ? "Sending reset email..."
+                        : "রিকভারি ইমেইল পাঠানো হচ্ছে..."
+                      : language === "ar"
+                      ? "جاري المعالجة..."
+                      : language === "ur"
+                      ? "کارروائی جاری ہے..."
+                      : language === "en"
+                      ? "Processing..."
+                      : "প্রসেস হচ্ছে..."}
                   </span>
                 </>
               ) : mode === "login" ? (

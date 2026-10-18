@@ -1,11 +1,11 @@
 import React from "react";
 import { Users, Clock, MapPin, Activity } from "lucide-react";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 import { useVisitorStats } from "../lib/visitorCounter";
 import { useUserCity, useUserLocalTime } from "../lib/geoUtils";
 
 interface VisitorCounterProps {
-  language: "bn" | "en";
+  language: Language;
   variant?: "hero" | "footer";
 }
 
@@ -18,6 +18,9 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
   const { city } = useUserCity(language);
   const { formattedTime } = useUserLocalTime(language);
   const t = translations[language] || translations.bn;
+
+  const defaultTotalNum =
+    language === "bn" ? "১" : language === "ar" ? "١" : language === "ur" ? "۱" : "1";
 
   // Footer Variant: Ultra-compact, elegant unified footer badge
   if (variant === "footer") {
@@ -36,7 +39,7 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
             {formattedLive}
           </span>
           <span className="text-stone-500 dark:text-stone-400">
-            {language === "bn" ? "লাইভ" : "live"}
+            {t.visitorCountLive}
           </span>
         </div>
 
@@ -52,7 +55,7 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
             <span className="inline-block w-8 h-2.5 bg-stone-300 dark:bg-stone-700 animate-pulse rounded"></span>
           ) : (
             <span className="font-bold text-stone-800 dark:text-stone-100 font-mono">
-              {formattedTotal || (language === "bn" ? "১" : "1")}{" "}
+              {formattedTotal || defaultTotalNum}{" "}
               <span className="font-sans font-normal text-[10px] text-stone-500 dark:text-stone-400">
                 {t.visitorCountSuffix}
               </span>
@@ -81,7 +84,7 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
       {/* 1. Live Online Visitor Pill */}
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/90 dark:bg-emerald-950/60 border border-emerald-250 dark:border-emerald-800/80 text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 shadow-2xs transition-all hover:border-emerald-400/70"
-        title={language === "bn" ? "বর্তমানে ওয়েবসাইটে লাইভ সক্রিয় ভিজিটর" : "Active visitors on site right now"}
+        title={t.visitorLiveSuffix}
       >
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
@@ -89,12 +92,12 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
         </span>
         <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span className="font-medium text-emerald-700 dark:text-emerald-300">
-          {language === "bn" ? "লাইভ" : "Live"}:
+          {t.visitorCountLive}:
         </span>
         <span className="font-bold font-mono tracking-tight text-emerald-900 dark:text-emerald-100">
           {formattedLive}{" "}
           <span className="font-sans font-normal text-[10px] sm:text-[11px] opacity-90">
-            {language === "bn" ? "জন" : "active"}
+            {t.visitorCountSuffix}
           </span>
         </span>
       </div>
@@ -113,7 +116,7 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
           <span className="inline-block w-10 h-3 bg-stone-200 dark:bg-stone-800 animate-pulse rounded"></span>
         ) : (
           <span className="font-bold text-stone-900 dark:text-white font-mono tracking-tight">
-            {formattedTotal || (language === "bn" ? "১" : "1")}{" "}
+            {formattedTotal || defaultTotalNum}{" "}
             <span className="font-sans font-normal text-[10px] sm:text-[11px] text-stone-500 dark:text-stone-400">
               {t.visitorCountSuffix}
             </span>
@@ -124,7 +127,7 @@ export const VisitorCounter: React.FC<VisitorCounterProps> = ({
       {/* 3. User's City and Live Local Clock Pill */}
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-[11px] sm:text-xs text-amber-900 dark:text-amber-200 shadow-2xs transition-all hover:border-amber-400/60"
-        title={language === "bn" ? "আপনার শহর ও স্থানীয় সময়" : "Your detected city and live local time"}
+        title={`${t.visitorCityLabel} & ${t.visitorLocalTimeLabel}`}
       >
         <MapPin className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0" />
         <span className="font-semibold text-stone-800 dark:text-stone-100">

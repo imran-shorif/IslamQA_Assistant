@@ -49,45 +49,37 @@ export default function App() {
   });
   const [question, setQuestion] = useState("");
 
-  // Language setting: auto | bn | en
+  // Language setting: bn | en | ar | ur
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(LANG_STORAGE_KEY) as Language;
-      if (saved === "auto" || saved === "bn" || saved === "en") {
+      if (saved === "bn" || saved === "en" || saved === "ar" || saved === "ur") {
         return saved;
       }
-    }
-    return "auto";
-  });
-
-  // Keep track of previously active language so that when "auto" is chosen,
-  // it retains the previous language state
-  const [lastResolvedLanguage, setLastResolvedLanguage] = useState<"bn" | "en">(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(PREV_LANG_STORAGE_KEY);
-      if (saved === "en" || saved === "bn") return saved;
     }
     return "bn"; // Default base language is Bengali
   });
 
-  // Calculate the currently active language for UI rendering:
-  const resolvedLanguage: "bn" | "en" =
-    language === "auto" ? lastResolvedLanguage : language;
+  // Keep document language and direction (RTL for Arabic and Urdu) in sync
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === "ar" || language === "ur" ? "rtl" : "ltr";
+    }
+  }, [language]);
+
+  const resolvedLanguage: Language = language;
 
   const handleLanguageChange = (newLang: Language) => {
     setLanguage(newLang);
     try {
       localStorage.setItem(LANG_STORAGE_KEY, newLang);
-      if (newLang === "bn" || newLang === "en") {
-        setLastResolvedLanguage(newLang);
-        localStorage.setItem(PREV_LANG_STORAGE_KEY, newLang);
-      }
     } catch (e) {
       console.warn("Could not save language to localStorage:", e);
     }
   };
 
-  const t = translations[resolvedLanguage];
+  const t = translations[language] || translations.bn;
 
   const [isLoading, setIsLoading] = useState(false);
   const [currentResponse, setCurrentResponse] = useState<QnAResponse | null>(null);
@@ -266,12 +258,11 @@ export default function App() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(
-          data.error ||
-            (resolvedLanguage === "en"
-              ? "Failed to process query."
-              : "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।")
-        );
+        let defaultErr = "ফতোয়া প্রক্রিয়া করতে সমস্যা হয়েছে।";
+        if (language === "en") defaultErr = "Failed to process query.";
+        else if (language === "ar") defaultErr = "فشل في معالجة الاستفسار.";
+        else if (language === "ur") defaultErr = "فتویٰ حاصل کرنے میں دشواری پیش آئی۔";
+        throw new Error(data.error || defaultErr);
       }
 
       const responseObj: QnAResponse = {
@@ -279,8 +270,12 @@ export default function App() {
         question: data.question || q,
         answer:
           data.answer ||
-          (resolvedLanguage === "en"
+          (language === "en"
             ? "No answer found."
+            : language === "ar"
+            ? "لم يتم العثور على إجابة."
+            : language === "ur"
+            ? "کوئی جواب نہیں مل سکا۔"
             : "কোনো উত্তর পাওয়া যায়নি।"),
         sources: data.sources || [],
         timestamp: data.timestamp || Date.now(),
@@ -307,12 +302,12 @@ export default function App() {
       }, 100);
     } catch (err: any) {
       console.error("Ask question error:", err);
-      setErrorMessage(
-        err.message ||
-          (resolvedLanguage === "en"
-            ? "Sorry, connection error occurred. Please try again later."
-            : "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।")
-      );
+      let defaultConnectionErr = "দুঃখিত, সংযোগে ত্রুটি দেখা দিয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।";
+      if (language === "en") defaultConnectionErr = "Sorry, connection error occurred. Please try again later.";
+      else if (language === "ar") defaultConnectionErr = "عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.";
+      else if (language === "ur") defaultConnectionErr = "معذرت، رابطہ منقطع ہو گیا۔ کچھ دیر بعد دوبارہ کوشش کریں۔";
+
+      setErrorMessage(err.message || defaultConnectionErr);
     } finally {
       setIsLoading(false);
     }

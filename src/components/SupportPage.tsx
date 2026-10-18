@@ -11,17 +11,17 @@ import {
   Users,
   Gift,
 } from "lucide-react";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface SupportPageProps {
   onBackToHome: () => void;
-  language?: "bn" | "en";
+  language?: Language;
 }
 
 export const SupportPage: React.FC<SupportPageProps> = ({ onBackToHome, language = "bn" }) => {
   const [copiedNumber, setCopiedNumber] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
 
   const bkashNumber = "+880 1728-245120";
   const rawNumber = "+8801728245120";

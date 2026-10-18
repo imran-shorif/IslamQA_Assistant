@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { ExternalLink, ShieldCheck, Globe, Copy, Check } from "lucide-react";
 import { IslamQASource } from "../types";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface SourceCardProps {
   source: IslamQASource;
   index: number;
-  language?: "bn" | "en";
+  language?: Language;
 }
 
 export const SourceCard: React.FC<SourceCardProps> = ({ source, index, language = "bn" }) => {
   const [copied, setCopied] = useState(false);
   const isIslamQADomain = source.url.includes("islamqa.info");
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation();

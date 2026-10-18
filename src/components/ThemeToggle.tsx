@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Sun, Moon, Monitor, Check, ChevronDown } from "lucide-react";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 export type ThemeMode = "system" | "light" | "dark";
 
@@ -8,7 +8,7 @@ interface ThemeToggleProps {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   onThemeChange: (theme: ThemeMode) => void;
-  language?: "bn" | "en";
+  language?: Language;
 }
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({

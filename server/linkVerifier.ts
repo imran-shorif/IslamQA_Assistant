@@ -192,7 +192,7 @@ for (const [id, data] of Object.entries(KNOWN_VERIFIED)) {
  */
 export async function verifyIslamQAUrl(
   rawUrlOrId: string,
-  preferredLang: "bn" | "en" | "ar" = "bn"
+  preferredLang: "bn" | "en" | "ar" | "ur" = "bn"
 ): Promise<{
   valid: boolean;
   canonicalUrl?: string;
@@ -239,6 +239,8 @@ export async function verifyIslamQAUrl(
     testUrls.push(`https://islamqa.info/bn/answers/${id}`, `https://islamqa.info/en/answers/${id}`);
   } else if (preferredLang === "ar") {
     testUrls.push(`https://islamqa.info/ar/answers/${id}`, `https://islamqa.info/en/answers/${id}`);
+  } else if (preferredLang === "ur") {
+    testUrls.push(`https://islamqa.info/ur/answers/${id}`, `https://islamqa.info/en/answers/${id}`);
   } else {
     testUrls.push(`https://islamqa.info/en/answers/${id}`, `https://islamqa.info/bn/answers/${id}`);
   }
@@ -314,7 +316,7 @@ export async function verifyIslamQAUrl(
  */
 export function findTopicalIslamQAFatwas(
   combinedText: string,
-  preferredLang: "bn" | "en"
+  preferredLang: "bn" | "en" | "ar" | "ur" = "bn"
 ): VerifiedSource[] {
   const lower = combinedText.toLowerCase();
 
@@ -417,7 +419,15 @@ export function findTopicalIslamQAFatwas(
       for (const id of rule.fatwaIds) {
         const item = KNOWN_VERIFIED[id];
         if (item) {
-          const url = preferredLang === "bn" ? `https://islamqa.info/bn/answers/${id}` : `https://islamqa.info/en/answers/${id}`;
+          const url =
+            preferredLang === "ar"
+              ? `https://islamqa.info/ar/answers/${id}`
+              : preferredLang === "ur"
+              ? `https://islamqa.info/ur/answers/${id}`
+              : preferredLang === "bn"
+              ? `https://islamqa.info/bn/answers/${id}`
+              : `https://islamqa.info/en/answers/${id}`;
+
           results.push({
             title: preferredLang === "bn" ? item.titleBn : item.title,
             url,
@@ -431,10 +441,19 @@ export function findTopicalIslamQAFatwas(
   }
 
   // Default fallback if generic query
+  const fallbackUrl =
+    preferredLang === "ar"
+      ? "https://islamqa.info/ar/answers/38023"
+      : preferredLang === "ur"
+      ? "https://islamqa.info/ur/answers/38023"
+      : preferredLang === "bn"
+      ? "https://islamqa.info/bn/answers/38023"
+      : "https://islamqa.info/en/answers/38023";
+
   return [
     {
       title: preferredLang === "bn" ? KNOWN_VERIFIED["38023"].titleBn : KNOWN_VERIFIED["38023"].title,
-      url: preferredLang === "bn" ? "https://islamqa.info/bn/answers/38023" : "https://islamqa.info/en/answers/38023",
+      url: fallbackUrl,
       questionNo: "38023",
       verified: true,
     },
@@ -464,8 +483,15 @@ export async function sanitizeAndVerifyAllLinks(
   let cleanText = markdownText;
   const verifiedMap = new Map<string, VerifiedSource>();
 
-  const isBengali = preferredLanguage === "bn" || (preferredLanguage === "auto" && /[\u0980-\u09FF]/.test(cleanText));
-  const langKey: "bn" | "en" = isBengali ? "bn" : "en";
+  const isBengali = preferredLanguage === "bn";
+  const langKey: "bn" | "en" | "ar" | "ur" =
+    preferredLanguage === "ar"
+      ? "ar"
+      : preferredLanguage === "ur"
+      ? "ur"
+      : preferredLanguage === "en"
+      ? "en"
+      : "bn";
 
   // STEP 1: Process candidate raw sources from LLM or grounding
   for (const src of rawSources) {
@@ -658,7 +684,23 @@ export async function sanitizeAndVerifyAllLinks(
     const refHeaderRegex = /(?:###?\s*(?:তথ্যসূত্র|রেফারেন্স|ফতোয়া লিংক|ফতোয়া লিংক|References|Sources|IslamQA References)[^\n]*)([\s\S]*)$/i;
     const refHeaderMatch = cleanText.match(refHeaderRegex);
 
-    const formattedReferenceSection = isBengali
+    const formattedReferenceSection = preferredLanguage === "ar"
+      ? `### 📚 مراجع وروابط فتاوى الإسلام سؤال وجواب (IslamQA References):\n\n` +
+        verifiedSources
+          .map((s, idx) => {
+            const fatwaLabel = s.questionNo ? `فتوى رقم #${s.questionNo}` : "حكم الإسلام سؤال وجواب";
+            return `${idx + 1}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+          })
+          .join("\n\n")
+      : preferredLanguage === "ur"
+      ? `### 📚 مستند حوالہ جات و فتاویٰ لنکس (IslamQA References):\n\n` +
+        verifiedSources
+          .map((s, idx) => {
+            const fatwaLabel = s.questionNo ? `فتویٰ نمبر #${s.questionNo}` : "شرعی حکم (IslamQA)";
+            return `${idx + 1}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+          })
+          .join("\n\n")
+      : isBengali
       ? `### 📚 সরাসরি ইসলামকিউএ ফতোয়া রেফারেন্স ও ওয়েবসাইট লিঙ্ক (IslamQA Sources):\n\n` +
         verifiedSources
           .map((s, idx) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { X, History, Trash2, ChevronRight, Clock, Cloud, LogIn } from "lucide-react";
 import { ChatHistoryItem } from "../types";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 import { useAuth } from "../context/AuthContext";
 
 interface HistoryDrawerProps {
@@ -11,7 +11,7 @@ interface HistoryDrawerProps {
   onSelectHistoryItem: (item: ChatHistoryItem) => void;
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
-  language: "bn" | "en";
+  language: Language;
   onOpenAuthModal?: () => void;
 }
 
@@ -27,7 +27,25 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
 }) => {
   const { currentUser } = useAuth();
   if (!isOpen) return null;
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
+
+  const syncLabel =
+    language === "bn"
+      ? "ক্লাউড সিঙ্ক চালু (ফায়ারবেস)"
+      : language === "ar"
+      ? "مزامنة سحابية نشطة (Firebase)"
+      : language === "ur"
+      ? "کلاؤڈ ہم آہنگی فعال ہے (Firebase)"
+      : "Cloud Synced (Firebase)";
+
+  const guestLabel =
+    language === "bn"
+      ? "গেস্ট মোড (লোকাল স্টোরেজ)"
+      : language === "ar"
+      ? "وضع الزائر (تخزين محلي)"
+      : language === "ur"
+      ? "مہمان موڈ (مقامی اسٹوریج)"
+      : "Guest Mode (Local Storage)";
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -63,18 +81,12 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
             {currentUser ? (
               <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-medium">
                 <Cloud className="w-3.5 h-3.5" />
-                <span>
-                  {language === "bn"
-                    ? "ক্লাউড সিঙ্ক চালু (ফায়ারবেস)"
-                    : "Cloud Synced (Firebase)"}
-                </span>
+                <span>{syncLabel}</span>
               </div>
             ) : (
               <div className="flex items-center justify-between w-full">
                 <span className="text-stone-500 dark:text-stone-400 text-[11px]">
-                  {language === "bn"
-                    ? "গেস্ট মোড (লোকাল স্টোরেজ)"
-                    : "Guest Mode (Local Storage)"}
+                  {guestLabel}
                 </span>
                 {onOpenAuthModal && (
                   <button

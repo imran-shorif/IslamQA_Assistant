@@ -21,11 +21,11 @@ import {
 } from "./SocialIcons";
 import { QnAResponse } from "../types";
 import { SourceCard } from "./SourceCard";
-import { translations } from "../data/translations";
+import { translations, Language } from "../data/translations";
 
 interface AnswerCardProps {
   data: QnAResponse;
-  language?: "bn" | "en";
+  language?: Language;
 }
 
 export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" }) => {
@@ -33,7 +33,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [fontSize, setFontSize] = useState<"normal" | "large">("normal");
   const shareMenuRef = useRef<HTMLDivElement>(null);
-  const t = translations[language];
+  const t = translations[language] || translations.bn;
 
   // Close share popover menu on click outside
   useEffect(() => {
@@ -65,9 +65,42 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
   const sourceUrl = data.sources[0]?.url || "https://islamqa.info";
   const appUrl = typeof window !== "undefined" ? window.location.href : "https://islamqa.info";
 
-  const formattedShareText = language === "en"
-    ? `Question: ${data.question}\n\nAnswer (IslamQA Summary):\n${cleanSummary}\n\nVerified IslamQA References:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`
-    : `প্রশ্ন: ${data.question}\n\nউত্তর (ইসলামকিউএ সারসংক্ষেপ):\n${cleanSummary}\n\nসরাসরি ফতোয়া রেফারেন্স:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
+  const getShareLabels = () => {
+    if (language === "ar") {
+      return {
+        q: "السؤال",
+        a: "الجواب (ملخص فتوى الإسلام سؤال وجواب)",
+        ref: "مراجع وروابط الفتاوى المباشرة",
+        title: `فتوى إسلامية: ${data.question}`,
+      };
+    }
+    if (language === "ur") {
+      return {
+        q: "سوال",
+        a: "جواب (خلاصہ اسلام سوال و جواب)",
+        ref: "مستند فتاویٰ لنکس و حوالہ جات",
+        title: `اسلامی فتویٰ: ${data.question}`,
+      };
+    }
+    if (language === "en") {
+      return {
+        q: "Question",
+        a: "Answer (IslamQA Summary)",
+        ref: "Verified IslamQA References",
+        title: `Islamic Fatwa: ${data.question}`,
+      };
+    }
+    return {
+      q: "প্রশ্ন",
+      a: "উত্তর (ইসলামকিউএ সারসংক্ষেপ)",
+      ref: "সরাসরি ফতোয়া রেফারেন্স",
+      title: `ইসলামিক ফতোয়া: ${data.question}`,
+    };
+  };
+
+  const labels = getShareLabels();
+
+  const formattedShareText = `${labels.q}: ${data.question}\n\n${labels.a}:\n${cleanSummary}\n\n${labels.ref}:\n${data.sources.map((s) => s.url).join("\n") || sourceUrl}\n\nIslamQA Assistant: ${appUrl}`;
 
   const handleCopy = async () => {
     try {
@@ -81,35 +114,27 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
   };
 
   const handleShareWhatsApp = () => {
-    const waText = language === "en"
-      ? `*Question:* ${data.question}\n\n*Answer:* ${shortSummary}\n\n*Direct IslamQA Fatwa:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`
-      : `*প্রশ্ন:* ${data.question}\n\n*উত্তর:* ${shortSummary}\n\n*সরাসরি ইসলামকিউএ ফতোয়া:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
+    const waText = `*${labels.q}:* ${data.question}\n\n*${labels.a}:* ${shortSummary}\n\n*IslamQA:* ${sourceUrl}\n\n*IslamQA Assistant:* ${appUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareFacebook = () => {
-    const quoteText = language === "en"
-      ? `Question: ${data.question}\n\n${shortSummary}`
-      : `প্রশ্ন: ${data.question}\n\n${shortSummary}`;
+    const quoteText = `${labels.q}: ${data.question}\n\n${shortSummary}`;
     const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sourceUrl)}&quote=${encodeURIComponent(quoteText)}`;
     window.open(fbUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareTelegram = () => {
-    const tgText = language === "en"
-      ? `Question: ${data.question}\n\nAnswer: ${shortSummary}`
-      : `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary}`;
+    const tgText = `${labels.q}: ${data.question}\n\n${labels.a}: ${shortSummary}`;
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(sourceUrl)}&text=${encodeURIComponent(tgText)}`;
     window.open(tgUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };
 
   const handleShareX = () => {
-    const tweetText = language === "en"
-      ? `Question: ${data.question}\n\nAnswer: ${shortSummary.slice(0, 130)}...`
-      : `প্রশ্ন: ${data.question}\n\nউত্তর: ${shortSummary.slice(0, 130)}...`;
+    const tweetText = `${labels.q}: ${data.question}\n\n${labels.a}: ${shortSummary.slice(0, 130)}...`;
     const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(sourceUrl)}`;
     window.open(xUrl, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
@@ -119,7 +144,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: language === "en" ? `Islamic Fatwa: ${data.question}` : `ইসলামিক ফতোয়া: ${data.question}`,
+          title: labels.title,
           text: formattedShareText,
           url: sourceUrl,
         });

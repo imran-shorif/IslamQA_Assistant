@@ -18,7 +18,7 @@ import { useAuth } from "../context/AuthContext";
 
 interface HeaderProps {
   language: Language;
-  resolvedLanguage: "bn" | "en";
+  resolvedLanguage?: Language;
   onLanguageChange: (lang: Language) => void;
   historyCount: number;
   onOpenHistory: () => void;
@@ -48,7 +48,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAuthModal,
 }) => {
   const { currentUser, logout } = useAuth();
-  const t = translations[resolvedLanguage];
+  const activeLang = resolvedLanguage || language;
+  const t = translations[activeLang] || translations.bn;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -117,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
             language={resolvedLanguage}
           />
 
-          {/* Language selector - Auto, বাংলা, English */}
+          {/* Language selector - বাংলা, English, العربية, اردو */}
           <div className="relative flex items-center bg-stone-800/90 hover:bg-stone-750 border border-stone-700/70 rounded-lg px-1.5 sm:px-2 h-8 sm:h-9 text-xs transition-colors shrink-0">
             <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0 mr-1" />
             <select
@@ -128,14 +129,17 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Select preferred language"
               className="bg-transparent text-stone-200 text-[11px] sm:text-xs font-medium focus:outline-none cursor-pointer pr-0.5"
             >
-              <option value="auto" className="bg-stone-900 text-stone-200">
-                Auto
-              </option>
               <option value="bn" className="bg-stone-900 text-stone-200">
                 বাংলা
               </option>
               <option value="en" className="bg-stone-900 text-stone-200">
                 English
+              </option>
+              <option value="ar" className="bg-stone-900 text-stone-200">
+                العربية
+              </option>
+              <option value="ur" className="bg-stone-900 text-stone-200">
+                اردو
               </option>
             </select>
           </div>
@@ -237,7 +241,15 @@ export const Header: React.FC<HeaderProps> = ({
                     </p>
                     <div className="mt-2 flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-2 py-0.5 rounded-full w-fit">
                       <Cloud className="w-3 h-3" />
-                      <span>{resolvedLanguage === "bn" ? "ক্লাউড সিঙ্ক সক্রিয়" : "Cloud Sync Active"}</span>
+                      <span>
+                        {activeLang === "bn"
+                          ? "ক্লাউড সিঙ্ক সক্রিয়"
+                          : activeLang === "ar"
+                          ? "المزامنة السحابية مفعّلة"
+                          : activeLang === "ur"
+                          ? "کلاؤڈ ہم آہنگی فعال ہے"
+                          : "Cloud Sync Active"}
+                      </span>
                     </div>
                   </div>
 
