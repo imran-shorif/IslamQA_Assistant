@@ -63,7 +63,12 @@ STRICT PRINCIPLES TO FOLLOW:
    - Maintain a respectful, humble, and authentic scholarly tone.`;
 
 app.post("/api/ask", async (req, res) => {
-  const { question = "", language = "auto" } = req.body || {};
+  const { question = "", language = "bn", sources = ["all"] } = req.body || {};
+  const selectedSources: string[] = Array.isArray(sources) && sources.length > 0 ? sources : ["all"];
+  const hasIslamQABrain =
+    selectedSources.includes("all") ||
+    selectedSources.includes("hanbali") ||
+    selectedSources.includes("salafi");
 
   try {
     if (!question || typeof question !== "string" || !question.trim()) {
@@ -94,11 +99,19 @@ app.post("/api/ask", async (req, res) => {
         }.`
       : "";
 
+    const sourcesInstruction = hasIslamQABrain
+      ? `Selected Sources/Schools: [${selectedSources.join(", ")}].
+Synthesize primarily from verified rulings on site:islamqa.info (which represents sound scholarly research, Quran & Sunnah, and Hanbali/Salafi scholarship). Highlight the rulings relevant to the selected school(s).`
+      : `Selected Sources/Schools: [${selectedSources.join(", ")}].
+NOTE: The dedicated external portal for ${selectedSources.join(", ")} will be connected in the upcoming platform update. Provide an authentic, classical ruling according to the selected school(s) (e.g. Hanafi, Shafi'i, Maliki, or Shia fiqh) with clear Daleel from Quran, Sunnah, and classical jurisprudence. Begin your answer with a polite, clear notice acknowledging the selected school perspective.`;
+
     const userPrompt = `User Islamic Question:
 "${question.trim()}"
 ${languageInstruction}
 
-IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info. Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic IslamQA fatwa references. ALWAYS hyperlink every cited fatwa number (e.g. [ফতোয়া নং ৩৭৭৬১](https://islamqa.info/bn/answers/37761) or [Fatwa #37761](https://islamqa.info/en/answers/37761)) directly to its verified page on islamqa.info, and conclude with a clickable References section.`;
+${sourcesInstruction}
+
+Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks wherever available, and conclude with a clickable References section.`;
 
     // Try available models in order of quota resilience
     const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
@@ -241,7 +254,8 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
       answer: sanitizedMarkdown,
       sources: verifiedSources,
       timestamp: Date.now(),
-      model: `${usedModel} (Grounded & 100% Verified live on islamqa.info)`,
+      model: `${usedModel} (Search Fatwa Engine)`,
+      selectedSources,
     });
   } catch (error: any) {
     console.error("Error processing IslamQA query:", error);
@@ -264,7 +278,8 @@ IMPORTANT: Ground your synthesis exclusively in the rulings of site:islamqa.info
         answer: sanitizedMarkdown,
         sources: verifiedSources,
         timestamp: Date.now(),
-        model: "IslamQA Verified Archive (100% Verified live on islamqa.info)",
+        model: "Search Fatwa Knowledge Base",
+        selectedSources,
       });
       return;
     }

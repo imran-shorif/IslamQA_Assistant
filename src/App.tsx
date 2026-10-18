@@ -7,9 +7,10 @@ import { SampleTopics } from "./components/SampleTopics";
 import { HistoryDrawer } from "./components/HistoryDrawer";
 import { SupportPage } from "./components/SupportPage";
 import { AboutPage } from "./components/AboutPage";
+import { ReferencePage } from "./components/ReferencePage";
 import { AuthModal } from "./components/AuthModal";
 import { VisitorCounter } from "./components/VisitorCounter";
-import { QnAResponse, ChatHistoryItem } from "./types";
+import { QnAResponse, ChatHistoryItem, MadhhabCategory } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { translations, Language } from "./data/translations";
 import { useAuth } from "./context/AuthContext";
@@ -38,16 +39,18 @@ export default function App() {
   const { currentUser } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
 
-  const [currentView, setCurrentView] = useState<"home" | "support" | "about">(() => {
+  const [currentView, setCurrentView] = useState<"home" | "support" | "about" | "reference">(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
       if (hash === "#about" || path === "/about") return "about";
       if (hash === "#support" || path === "/support") return "support";
+      if (hash === "#reference" || path === "/reference") return "reference";
     }
     return "home";
   });
   const [question, setQuestion] = useState("");
+  const [selectedSources, setSelectedSources] = useState<MadhhabCategory[]>(["all"]);
 
   // Language setting: bn | en | ar | ur
   const [language, setLanguage] = useState<Language>(() => {
@@ -102,6 +105,8 @@ export default function App() {
         setCurrentView("about");
       } else if (hash === "#support" || path === "/support") {
         setCurrentView("support");
+      } else if (hash === "#reference" || path === "/reference") {
+        setCurrentView("reference");
       } else {
         setCurrentView("home");
       }
@@ -252,6 +257,7 @@ export default function App() {
         body: JSON.stringify({
           question: q,
           language: resolvedLanguage,
+          sources: selectedSources,
         }),
       });
 
@@ -279,7 +285,8 @@ export default function App() {
             : "কোনো উত্তর পাওয়া যায়নি।"),
         sources: data.sources || [],
         timestamp: data.timestamp || Date.now(),
-        model: data.model || "gemini-3.8-flash (grounded in islamqa.info)",
+        model: data.model || "gemini-3.8-flash (Search Fatwa Engine)",
+        selectedSources: data.selectedSources || selectedSources,
       };
 
       setCurrentResponse(responseObj);
@@ -291,6 +298,7 @@ export default function App() {
         answer: responseObj.answer,
         sources: responseObj.sources,
         timestamp: responseObj.timestamp,
+        selectedSources: responseObj.selectedSources,
       });
 
       // Scroll to answer smoothly
@@ -335,6 +343,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleNavigateToReference = () => {
+    setCurrentView("reference");
+    window.history.pushState(null, "", "#reference");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSelectSample = (sampleQuestion: string) => {
     setQuestion(sampleQuestion);
     handleAskQuestion(sampleQuestion);
@@ -366,7 +380,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-blue-100 dark:selection:bg-blue-950 selection:text-blue-900 dark:selection:text-blue-200 transition-colors duration-200">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col font-sans selection:bg-emerald-100 dark:selection:bg-emerald-950 selection:text-emerald-900 dark:selection:text-emerald-200 transition-colors duration-200">
       {/* Top Header */}
       <Header
         language={language}
@@ -381,6 +395,7 @@ export default function App() {
         currentView={currentView}
         onSupportClick={handleNavigateToSupport}
         onAboutClick={handleNavigateToAbout}
+        onReferenceClick={handleNavigateToReference}
         onOpenAuthModal={() => {
           setAuthModalMode("login");
           setIsAuthModalOpen(true);
@@ -400,13 +415,18 @@ export default function App() {
             onBackToHome={handleResetHome}
             language={resolvedLanguage}
           />
+        ) : currentView === "reference" ? (
+          <ReferencePage
+            onBackToHome={handleResetHome}
+            language={resolvedLanguage}
+          />
         ) : (
           <>
             {/* Hero Section */}
             <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-[11px] sm:text-xs font-semibold leading-snug">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[11px] sm:text-xs font-semibold leading-snug">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{t.heroBadge}</span>
                 </div>
                 <VisitorCounter language={resolvedLanguage} variant="hero" />
@@ -414,7 +434,7 @@ export default function App() {
 
               <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
                 {t.heroHeading1} <br className="hidden sm:inline" />
-                <span className="text-blue-600 dark:text-blue-400">
+                <span className="text-emerald-600 dark:text-emerald-400">
                   {t.heroHeadingHighlight}
                 </span>
               </h1>
@@ -443,6 +463,8 @@ export default function App() {
                 isLoading={isLoading}
                 onClear={() => setQuestion("")}
                 language={resolvedLanguage}
+                selectedSources={selectedSources}
+                onSourcesChange={setSelectedSources}
               />
             </div>
 
@@ -545,32 +567,32 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] text-stone-400 dark:text-stone-500">
             <button
               onClick={handleNavigateToAbout}
-              className="inline-flex items-center gap-1.5 text-blue-500 dark:text-blue-400 hover:underline font-medium cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
               title={t.aboutTitle}
             >
               <Info className="w-3.5 h-3.5" />
-              <span>{t.footerAboutUs}</span>
+              <span>{t.aboutBtn}</span>
+            </button>
+            <span>•</span>
+            <button
+              onClick={handleNavigateToReference}
+              className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
+              title={t.referenceTitle}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>{t.referenceBtn}</span>
             </button>
             <span>•</span>
             <button
               onClick={handleNavigateToSupport}
-              className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-pink-500 hover:text-pink-400 transition-colors font-semibold cursor-pointer"
               title={t.supportTitle}
             >
-              <Heart className="w-3.5 h-3.5 fill-pink-400 text-pink-400" />
-              <span>{t.footerSupportUs}</span>
+              <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
+              <span>{t.supportBtn}</span>
             </button>
             <span>•</span>
-            <a
-              href="https://islamqa.info"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-400 transition-colors underline sm:no-underline"
-            >
-              {t.footerVisitSite}
-            </a>
-            <span>•</span>
-            <span>{t.footerSupervised}</span>
+            <span>Search Fatwa · {resolvedLanguage === "en" ? "Universal Islamic Knowledge Platform" : "সার্বজনীন ইসলামিক ফতোয়া ও জ্ঞান প্ল্যাটফর্ম"}</span>
           </div>
 
           <div className="pt-1 flex items-center justify-center">

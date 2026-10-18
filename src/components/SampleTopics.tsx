@@ -40,7 +40,7 @@ export const SampleTopics: React.FC<SampleTopicsProps> = ({
     <section className="mt-6 sm:mt-8">
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-stone-700 dark:text-stone-300">
-          <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+          <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{t.topicsHeading}</span>
         </div>
         <span className="text-[11px] text-stone-400 dark:text-stone-500 hidden xs:inline">
@@ -56,7 +56,7 @@ export const SampleTopics: React.FC<SampleTopicsProps> = ({
             onClick={() => setActiveCategory(cat.id)}
             className={`min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all active:scale-95 cursor-pointer shrink-0 ${
               activeCategory === cat.id
-                ? "bg-blue-600 dark:bg-blue-600 text-white shadow-xs font-semibold"
+                ? "bg-emerald-600 dark:bg-emerald-600 text-white shadow-xs font-semibold"
                 : "bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800"
             }`}
           >

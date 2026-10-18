@@ -27,9 +27,10 @@ interface HeaderProps {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   onThemeChange: (theme: ThemeMode) => void;
-  currentView?: "home" | "support" | "about";
+  currentView?: "home" | "support" | "about" | "reference";
   onSupportClick?: () => void;
   onAboutClick?: () => void;
+  onReferenceClick?: () => void;
   onOpenAuthModal?: () => void;
 }
 
@@ -46,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentView = "home",
   onSupportClick,
   onAboutClick,
+  onReferenceClick,
   onOpenAuthModal,
 }) => {
   const { currentUser, logout } = useAuth();
@@ -77,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
           <a
             href="/"
             onClick={onHomeClick}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm border border-amber-500/30 bg-stone-950"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 shadow-sm border border-emerald-500/40 bg-stone-950"
             title={t.homeTitle}
           >
             <img
@@ -92,24 +94,11 @@ export const Header: React.FC<HeaderProps> = ({
             <a
               href="/"
               onClick={onHomeClick}
-              className="font-extrabold text-sm sm:text-base md:text-lg tracking-tight text-white hover:text-amber-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded whitespace-nowrap flex items-center gap-1"
+              className="font-extrabold text-sm sm:text-base md:text-lg tracking-tight text-white hover:text-emerald-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded whitespace-nowrap flex items-center gap-1"
               title={t.homeTitle}
             >
               <span>{t.appName}</span>
-              <span className="text-amber-400 font-bold">{t.appSubtitle}</span>
-            </a>
-
-            {/* Source Link (redirects to islamqa.info) - Shown on sm and larger */}
-            <a
-              href="https://islamqa.info"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full bg-blue-950/80 text-blue-300 border border-blue-800/50 hover:bg-blue-900 hover:border-blue-600 hover:text-blue-100 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 cursor-pointer shrink-0"
-              title="islamqa.info"
-            >
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>islamqa.info</span>
-              <ExternalLink className="w-2.5 h-2.5 text-blue-400 opacity-80 ml-0.5" />
+              <span className="text-emerald-400 font-bold">{t.appSubtitle}</span>
             </a>
           </div>
         </div>
@@ -149,6 +138,23 @@ export const Header: React.FC<HeaderProps> = ({
               </option>
             </select>
           </div>
+
+          {/* Reference Page Button */}
+          {onReferenceClick && (
+            <button
+              onClick={onReferenceClick}
+              className={`flex items-center justify-center gap-1.5 h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs border ${
+                currentView === "reference"
+                  ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
+                  : "bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white border-stone-700/60"
+              }`}
+              title={t.referenceTitle}
+              aria-label={t.referenceBtn}
+            >
+              <BookOpen className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${currentView === "reference" ? "text-white" : "text-emerald-400"}`} />
+              <span className="hidden sm:inline">{t.referenceBtn}</span>
+            </button>
+          )}
 
           {/* History button */}
           <button

@@ -169,7 +169,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
       {/* Question Header */}
       <div className="bg-stone-50 dark:bg-stone-850 border-b border-stone-200/80 dark:border-stone-800 px-4 sm:px-6 py-3.5 sm:py-4 transition-colors">
         <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-xs font-semibold tracking-wide text-blue-700 dark:text-blue-400 uppercase flex items-center gap-1.5">
+          <span className="text-xs font-semibold tracking-wide text-emerald-700 dark:text-emerald-400 uppercase flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 shrink-0" />
             <span>{t.ansQueriedQuestion}</span>
           </span>
@@ -187,10 +187,14 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
 
       {/* Answer Body Header Controls */}
       <div className="px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400 transition-colors">
-        <div className="flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-blue-200/70 dark:border-blue-800/70">
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span>{t.ansIslamqaBased}</span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border border-emerald-200/70 dark:border-emerald-800/70">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>
+              {data.selectedSources && data.selectedSources.length > 0 && !data.selectedSources.includes("all")
+                ? `উৎস / মাযহাব: ${data.selectedSources.join(", ")}`
+                : "Search Fatwa যাচাইকৃত সমাধান"}
+            </span>
           </span>
         </div>
 

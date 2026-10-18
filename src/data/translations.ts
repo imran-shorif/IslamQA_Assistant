@@ -5,8 +5,10 @@ export const translations = {
     // Header
     appName: "Search",
     appSubtitle: "Fatwa",
-    sourceBadge: "Source: islamqa.info",
+    sourceBadge: "Search Fatwa",
     homeTitle: "Search Fatwa - মূল পাতায় ফিরে যান",
+    referenceBtn: "রেফারেন্স",
+    referenceTitle: "রেফারেন্স ও সোর্স ব্রেন",
     historyBtn: "ইতিহাস",
     aboutBtn: "পরিচিতি",
     supportBtn: "সাপোর্ট",
@@ -14,13 +16,17 @@ export const translations = {
     supportTitle: "আমাদের সাপোর্ট করুন (Support Us)",
     historyTitle: "পূর্ববর্তী প্রশ্ন ও ফতোয়া (History)",
 
+    // Source / Madhhab Selector
+    sourcePrompt: "আপনি কোন উৎস থেকে উত্তর চান?",
+    sourcePromptHelp: "এক বা একাধিক উৎস নির্বাচন করতে পারেন",
+
     // Hero Section
-    heroBadge: "১০০% ইসলামকিউএ (islamqa.info) ওয়েবসাইটের তথ্যের ওপর ভিত্তি করে নির্মিত",
+    heroBadge: "প্রামাণ্য দলীল ও নির্ভরযোগ্য ফতোয়া ভিত্তিক ইসলামিক সার্চ প্ল্যাটফর্ম",
     heroHeading1: "ইসলামিক জিজ্ঞাসা ও ফতোয়া খুঁজুন",
     heroHeadingHighlight: "Search Fatwa-তে",
     heroDescPre: "আপনার দৈনন্দিন জীবনের যে কোনো ইসলামিক প্রশ্ন করুন। মডেলটি ",
-    heroDescBold: "islamqa.info",
-    heroDescPost: " এর নির্ভরযোগ্য ফতোয়া থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।",
+    heroDescBold: "নির্বাচিত নির্ভরযোগ্য ফতোয়া ব্রেন",
+    heroDescPost: " থেকে আপনার প্রেক্ষাপট বুঝে গোছানো উত্তর ও সরাসরি রেফারেন্স লিঙ্ক প্রদান করবে।",
 
     // Comparison Banner
     compTitle: "সাধারণ সার্চ বনাম ইসলামকিউএ এআই",
@@ -43,7 +49,7 @@ export const translations = {
 
     // Question Input
     inputPlaceholder: "আপনার ইসলামিক প্রশ্নটি লিখুন (যেমন: রোজা রাখা অবস্থায় ইনজেকশন নিলে কি রোজা ভাঙ্গে?)...",
-    inputFooterNotice: "শুধুমাত্র islamqa.info এর ফতোয়া থেকে উত্তর ও রেফারেন্স দেওয়া হবে",
+    inputFooterNotice: "নির্বাচিত মাযহাব ও নির্ভরযোগ্য রেফারেন্স সোর্স থেকে উত্তর সংকলন করা হবে",
     inputClear: "মুছুন",
     inputRandom: "র‍্যান্ডম প্রশ্ন",
     inputSubmit: "উত্তর খুঁজুন",
@@ -250,8 +256,10 @@ export const translations = {
     // Header
     appName: "Search",
     appSubtitle: "Fatwa",
-    sourceBadge: "Source: islamqa.info",
+    sourceBadge: "Search Fatwa",
     homeTitle: "Search Fatwa - Back to Home",
+    referenceBtn: "References",
+    referenceTitle: "Knowledge Sources & Brain",
     historyBtn: "History",
     aboutBtn: "About",
     supportBtn: "Support",
@@ -259,12 +267,16 @@ export const translations = {
     supportTitle: "Support Us",
     historyTitle: "Past Questions & History",
 
+    // Source / Madhhab Selector
+    sourcePrompt: "Which sources or schools do you want answers from?",
+    sourcePromptHelp: "Select one or multiple sources",
+
     // Hero Section
-    heroBadge: "100% Grounded in Verified Content from IslamQA (islamqa.info)",
+    heroBadge: "Grounded in Authentic Islamic Fatwas & Scholarly Consensus",
     heroHeading1: "Search Islamic Inquiries & Fatwas on",
     heroHeadingHighlight: "Search Fatwa",
-    heroDescPre: "Ask any Islamic questions regarding daily life and worship. The model synthesizes answers directly from reliable fatwas on ",
-    heroDescBold: "islamqa.info",
+    heroDescPre: "Ask any Islamic questions regarding daily life and worship. The model synthesizes answers directly from ",
+    heroDescBold: "selected scholarly fatwa brains",
     heroDescPost: " understanding your exact context, providing direct citations and live reference links.",
 
     // Comparison Banner
@@ -288,7 +300,7 @@ export const translations = {
 
     // Question Input
     inputPlaceholder: "Type your Islamic question (e.g. Does receiving an IV injection invalidate fasting?)...",
-    inputFooterNotice: "Synthesized strictly from islamqa.info fatwas with verifiable references",
+    inputFooterNotice: "Answers synthesized from selected schools and verified reference sources",
     inputClear: "Clear",
     inputRandom: "Random Question",
     inputSubmit: "Find Answer",
@@ -495,8 +507,10 @@ export const translations = {
     // Header
     appName: "Search",
     appSubtitle: "Fatwa",
-    sourceBadge: "المصدر: islamqa.info",
+    sourceBadge: "Search Fatwa",
     homeTitle: "Search Fatwa - الصفحة الرئيسية",
+    referenceBtn: "المراجع",
+    referenceTitle: "مصادر ومراجع الفتاوى",
     historyBtn: "السجل",
     aboutBtn: "عن المنصة",
     supportBtn: "الدعم",
@@ -504,12 +518,16 @@ export const translations = {
     supportTitle: "ادعم هذا المشروع",
     historyTitle: "سجل الأسئلة والفتاوى السابقة",
 
+    // Source / Madhhab Selector
+    sourcePrompt: "من أي مصدر أو مذهب تريد الإجابة؟",
+    sourcePromptHelp: "يمكنك اختيار مصدر واحد أو أكثر",
+
     // Hero Section
-    heroBadge: "مستند بالكامل إلى فتاوى موقع الإسلام سؤال وجواب (islamqa.info)",
+    heroBadge: "محرك بحث إسلامي شامل مستند إلى الفتاوى المحررة والأدلة الشرعية",
     heroHeading1: "ابحث عن الاستفسارات والفتاوى الإسلامية في",
     heroHeadingHighlight: "Search Fatwa",
     heroDescPre: "اطرح أي سؤال في شؤون دينك وعباداتك وحياتك اليومية. يقوم المساعد بتلخيص الفتوى مباشرة من ",
-    heroDescBold: "islamqa.info",
+    heroDescBold: "المصادر والمراجع الفقهية المعتمدة",
     heroDescPost: " مع مراعاة سياق سؤالك وتزويدك بروابط الأدلة والمراجع الحية المعتمدة.",
 
     // Comparison Banner
@@ -740,8 +758,10 @@ export const translations = {
     // Header
     appName: "Search",
     appSubtitle: "Fatwa",
-    sourceBadge: "ماخذ: islamqa.info",
+    sourceBadge: "Search Fatwa",
     homeTitle: "Search Fatwa - مرکزی صفحہ پر جائیں",
+    referenceBtn: "مراجع",
+    referenceTitle: "علمی مراجع و مصادر",
     historyBtn: "تاریخچہ",
     aboutBtn: "ہمارے متعلق",
     supportBtn: "معاونت",
@@ -749,13 +769,17 @@ export const translations = {
     supportTitle: "ہمارا تعاون کریں",
     historyTitle: "سابقہ سوالات و فتاویٰ",
 
+    // Source / Madhhab Selector
+    sourcePrompt: "آپ کس ماخذ یا مکتبہ فکر سے جواب چاہتے ہیں؟",
+    sourcePromptHelp: "ایک یا زائد مصادر منتخب کر سکتے ہیں",
+
     // Hero Section
-    heroBadge: "مستند ویب سائٹ اسلام سوال و جواب (islamqa.info) کے فتاویٰ پر مبنی",
+    heroBadge: "مستند فتاویٰ اور شرعی دلائل پر مبنی جامع اسلامی پلیٹ فارم",
     heroHeading1: "اسلامی سوالات اور فتاویٰ تلاش کریں",
     heroHeadingHighlight: "Search Fatwa میں",
     heroDescPre: "اپنی روزمرہ زندگی کا کوئی بھی دینی یا فقہی سوال پوچھیں۔ یہ ماڈل ",
-    heroDescBold: "islamqa.info",
-    heroDescPost: " کے معتبر فتاویٰ سے آپ کے سوال کا سیاق و سباق سمجھ کر جامع جواب اور براہ راست حوالہ جاتی لنکس فراہم کرتا ہے۔",
+    heroDescBold: "منتخب کردہ معتبر فتاویٰ برین",
+    heroDescPost: " کے فتاویٰ سے آپ کے سوال کا سیاق و سباق سمجھ کر جامع جواب اور براہ راست حوالہ جاتی لنکس فراہم کرتا ہے۔",
 
     // Comparison Banner
     compTitle: "روایتی سرچ بمقابلہ Search Fatwa",
