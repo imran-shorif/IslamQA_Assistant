@@ -613,7 +613,7 @@ export default function App() {
             answer: item.answer,
             sources: item.sources,
             timestamp: item.timestamp,
-            model: "gemini-3.8-flash (grounded in islamqa.info)",
+            model: "Search Fatwa Knowledge Engine",
           });
           setQuestion(item.question);
         }}

@@ -25,7 +25,7 @@ export const SupportPage: React.FC<SupportPageProps> = ({ onBackToHome, language
 
   const bkashNumber = "+880 1728-245120";
   const rawNumber = "+8801728245120";
-  const reference = "fatwa-finder";
+  const reference = "search-fatwa";
 
   const handleCopyNumber = () => {
     navigator.clipboard.writeText(rawNumber);

@@ -196,12 +196,12 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
                         <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                         <span>
                           {language === "en"
-                            ? "Active Brain"
+                            ? "Search Fatwa Brain"
                             : language === "ar"
-                            ? "مصدر مفعل"
+                            ? "مصدر Search Fatwa"
                             : language === "ur"
-                            ? "فعال برین"
-                            : "সক্রিয় ব্রেন"}
+                            ? "Search Fatwa برین"
+                            : "Search Fatwa ব্রেন"}
                         </span>
                       </span>
                     </h3>

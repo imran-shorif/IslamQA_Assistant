@@ -113,7 +113,7 @@ export const translations = {
     ansReadOriginal: "মূল ফতোয়া পড়ুন",
     ansVerifiedBadge: "যাচাইকৃত মূল লিংক",
     ansFatwaNoPrefix: "ফতোয়া নং #",
-    ansRulingBadge: "IslamQA বিধান",
+    ansRulingBadge: "Search Fatwa",
 
     // History Drawer
     historyDrawerTitle: "পূর্ববর্তী জিজ্ঞাসিত প্রশ্ন",
@@ -167,7 +167,7 @@ export const translations = {
     supportBadge: "আমাদের সাপোর্ট করুন • Support Us",
     supportHeroTitle1: "আমাদের কার্যক্রমে আপনার",
     supportHeroTitleHighlight: "সহযোগিতা ও সমর্থন",
-    supportHeroDesc: "আমাদের কার্যক্রমকে এগিয়ে নিতে এবং আমাদের টিমকে সাপোর্ট করতে বিকাশে ডোনেট করুন। সেন্ড মানি (পার্সোনাল) +880 1728-245120. Reference: fatwa-finder",
+    supportHeroDesc: "আমাদের কার্যক্রমকে এগিয়ে নিতে এবং আমাদের টিমকে সাপোর্ট করতে বিকাশে ডোনেট করুন। সেন্ড মানি (পার্সোনাল) +880 1728-245120. Reference: search-fatwa",
     supportVerifiedAccount: "যাচাইকৃত অ্যাকাউন্ট",
     supportBkashNumberLabel: "বিকাশ পার্সোনাল নম্বর (bKash Number):",
     supportCountry: "বাংলাদেশ (+880)",
@@ -364,7 +364,7 @@ export const translations = {
     ansReadOriginal: "Read Original Fatwa",
     ansVerifiedBadge: "Verified Live Link",
     ansFatwaNoPrefix: "Fatwa #",
-    ansRulingBadge: "IslamQA Verdict",
+    ansRulingBadge: "Search Fatwa",
 
     // History Drawer
     historyDrawerTitle: "Previous Questions & History",
@@ -418,7 +418,7 @@ export const translations = {
     supportBadge: "Support Our Project • Support Us",
     supportHeroTitle1: "Help sustain our",
     supportHeroTitleHighlight: "Efforts & Infrastructure",
-    supportHeroDesc: "Help us keep this service active and ad-free. Donate via bKash Send Money (Personal) to +880 1728-245120. Reference: fatwa-finder",
+    supportHeroDesc: "Help us keep this service active and ad-free. Donate via bKash Send Money (Personal) to +880 1728-245120. Reference: search-fatwa",
     supportVerifiedAccount: "Verified Personal Account",
     supportBkashNumberLabel: "bKash Personal Number:",
     supportCountry: "Bangladesh (+880)",
@@ -615,7 +615,7 @@ export const translations = {
     ansReadOriginal: "قراءة الفتوى الأصلية",
     ansVerifiedBadge: "رابط موثق معتمد",
     ansFatwaNoPrefix: "فتوى رقم #",
-    ansRulingBadge: "حكم الإسلام سؤال وجواب",
+    ansRulingBadge: "Search Fatwa",
 
     // History Drawer
     historyDrawerTitle: "سجل الأسئلة السابقة",
@@ -669,7 +669,7 @@ export const translations = {
     supportBadge: "ادعم استمرار المشروع • Support Us",
     supportHeroTitle1: "مساهمتكم الكريمة لدعم",
     supportHeroTitleHighlight: "الخدمة واستمرارها",
-    supportHeroDesc: "ساعدنا في تغطية تكاليف الخوادم والذكاء الاصطناعي لاستمرار تقديم الخدمة مجاناً للجميع بدون إعلانات. التبرع متاح عبر bKash (شخصي) +880 1728-245120. Reference: fatwa-finder",
+    supportHeroDesc: "ساعدنا في تغطية تكاليف الخوادم والذكاء الاصطناعي لاستمرار تقديم الخدمة مجاناً للجميع بدون إعلانات. التبرع متاح عبر bKash (شخصي) +880 1728-245120. Reference: search-fatwa",
     supportVerifiedAccount: "حساب شخصي موثق",
     supportBkashNumberLabel: "رقم التحويل (bKash Number):",
     supportCountry: "بنغلاديش (+880)",
@@ -866,7 +866,7 @@ export const translations = {
     ansReadOriginal: "اصل فتویٰ پڑھیں",
     ansVerifiedBadge: "تصدیق شدہ لائیو لنک",
     ansFatwaNoPrefix: "فتویٰ نمبر #",
-    ansRulingBadge: "شرعی حکم (IslamQA)",
+    ansRulingBadge: "Search Fatwa",
 
     // History Drawer
     historyDrawerTitle: "سابقہ پوچھے گئے سوالات",
@@ -920,7 +920,7 @@ export const translations = {
     supportBadge: "تعاون فرمائیں • Support Us",
     supportHeroTitle1: "اس دینی خدمت میں آپ کا",
     supportHeroTitleHighlight: "تعاون و معاونت",
-    supportHeroDesc: "اس علمی پروجیکٹ کو اشتہارات سے پاک اور مفت رکھنے کے لیے ہمارا تعاون کریں۔ سینڈ منی (پرسنل) +880 1728-245120. Reference: fatwa-finder",
+    supportHeroDesc: "اس علمی پروجیکٹ کو اشتہارات سے پاک اور مفت رکھنے کے لیے ہمارا تعاون کریں۔ سینڈ منی (پرسنل) +880 1728-245120. Reference: search-fatwa",
     supportVerifiedAccount: "تصدیق شدہ پرسنل اکاؤنٹ",
     supportBkashNumberLabel: "رابطہ / بکاش نمبر:",
     supportCountry: "بنگلہ دیش (+880)",

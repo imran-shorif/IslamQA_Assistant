@@ -128,8 +128,8 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
                 }`}
                 title={
                   school.isBrainActive
-                    ? `${school.nameBn} - সক্রিয় ব্রেন (Active Brain: islamqa.info)`
-                    : `${school.nameBn} - পরবর্তী আপডেটে সাইট সংযুক্ত হবে`
+                    ? `${school.nameBn} - সক্রিয় ব্রেন (Search Fatwa Brain)`
+                    : `${school.nameBn}`
                 }
               >
                 {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
@@ -139,7 +139,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
                     className={`w-1.5 h-1.5 rounded-full ${
                       isSelected ? "bg-white" : "bg-emerald-500"
                     }`}
-                    title="Active Brain"
+                    title="Search Fatwa Brain"
                   />
                 )}
               </button>

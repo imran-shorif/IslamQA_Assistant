@@ -114,7 +114,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
   };
 
   const handleShareWhatsApp = () => {
-    const waText = `*${labels.q}:* ${data.question}\n\n*${labels.a}:* ${shortSummary}\n\n*IslamQA:* ${sourceUrl}\n\n*Search Fatwa:* ${appUrl}`;
+    const waText = `*${labels.q}:* ${data.question}\n\n*${labels.a}:* ${shortSummary}\n\n*${labels.ref}:* ${sourceUrl}\n\n*Search Fatwa:* ${appUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
     setIsShareMenuOpen(false);
   };

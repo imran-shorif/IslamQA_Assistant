@@ -66,7 +66,7 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index, language 
 
         {/* Fatwa Title */}
         <h4 className="text-sm sm:text-base font-bold text-stone-900 dark:text-stone-100 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors line-clamp-2 leading-snug mb-3">
-          {source.title || `IslamQA Fatwa Article ${source.questionNo || ""}`}
+          {source.title || (source.questionNo ? `Fatwa #${source.questionNo}` : "Search Fatwa Reference")}
         </h4>
       </div>
 
