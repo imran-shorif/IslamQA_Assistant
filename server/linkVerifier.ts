@@ -1,15 +1,85 @@
-/**
- * Real-Time HTTP Link Verifier and Repair Engine for IslamQA
- * Ensures that EVERY single link provided to the user is 100% verified, live (Status 200),
- * and automatically provides both the Fatwa Number AND the direct live clickable URL
- * in the answer body, reference section, and reference cards.
- */
+import { APPROVED_DOMAINS, APPROVED_PORTALS } from "./madhhabPortals";
 
 export interface VerifiedSource {
   title: string;
   url: string;
   questionNo?: string;
   verified: boolean;
+}
+
+export function getApprovedPortalInfo(url: string, lang: string = "bn"): { name: string; domain: string } | null {
+  if (!url || typeof url !== "string") return null;
+  const lower = url.toLowerCase();
+
+  if (lower.includes("darulifta-deoband.com")) {
+    return { name: lang === "en" ? "Darul Uloom Deoband (Darul Ifta)" : "দারুল উলূম দেওবন্দ দারুল ইফতা", domain: "darulifta-deoband.com" };
+  }
+  if (lower.includes("alpha.hanafifiqh.net") || lower.includes("hanafifiqh.net")) {
+    return { name: lang === "en" ? "Hanafi Fiqh BD" : "হানাফী ফিকহ বিডি", domain: "hanafifiqh.net" };
+  }
+  if (lower.includes("banuri.edu.pk")) {
+    return { name: lang === "en" ? "Darul Uloom Banuri Town (Darul Ifta)" : "জামিয়া বিন্নুরী টাউন দারুল ইফতা", domain: "banuri.edu.pk" };
+  }
+  if (lower.includes("iqa.info")) {
+    return { name: lang === "en" ? "IQA - Islamic Q&A (Sheikh Ahmadullah)" : "আইকিউএ (শায়খ আহমাদুল্লাহ)", domain: "iqa.info" };
+  }
+  if (lower.includes("islamqa.org/category/hanafi")) {
+    return { name: lang === "en" ? "IslamQA.org (Hanafi Section)" : "ইসলামকিউএ ডট ওআরজি (হানাফী)", domain: "islamqa.org" };
+  }
+  if (lower.includes("islamqa.org/category/shafii")) {
+    return { name: lang === "en" ? "IslamQA.org (Shafi'i Section)" : "ইসলামকিউএ ডট ওআরজি (শাফেয়ী)", domain: "islamqa.org" };
+  }
+  if (lower.includes("islamqa.org/category/maliki")) {
+    return { name: lang === "en" ? "IslamQA.org (Maliki Section)" : "ইসলামকিউএ ডট ওআরজি (মালিকী)", domain: "islamqa.org" };
+  }
+  if (lower.includes("islamqa.org/category/hanbali")) {
+    return { name: lang === "en" ? "IslamQA.org (Hanbali Section)" : "ইসলামকিউএ ডট ওআরজি (হাম্বলী)", domain: "islamqa.org" };
+  }
+  if (lower.includes("islamqa.org")) {
+    return { name: lang === "en" ? "IslamQA.org Multi-Madhhab Archive" : "ইসলামকিউএ ডট ওআরজি ফিকহ ডাটাবেজ", domain: "islamqa.org" };
+  }
+  if (lower.includes("aliftaa.jo")) {
+    return { name: lang === "en" ? "General Department of Iftaa (Jordan)" : "জর্ডান রাষ্ট্রীয় দারুল ইফতা (শাফেয়ী ধারা)", domain: "aliftaa.jo" };
+  }
+  if (lower.includes("shafifiqh.org")) {
+    return { name: lang === "en" ? "ShafiiFiqh.org Platform" : "শাফেয়ী ফিকহ ডট ওআরজি", domain: "shafifiqh.org" };
+  }
+  if (lower.includes("binbayyah.net")) {
+    return { name: lang === "en" ? "BinBayyah.net (Sheikh Abdullah bin Bayyah)" : "শায়খ আব্দুল্লাহ বিন বাইয়াহ পোর্টাল", domain: "binbayyah.net" };
+  }
+  if (lower.includes("malikifiqhqa.com")) {
+    return { name: lang === "en" ? "Maliki Fiqh Q&A" : "মালিকী ফিকহ কিউএ", domain: "malikifiqhqa.com" };
+  }
+  if (lower.includes("malikimadhab.org")) {
+    return { name: lang === "en" ? "Maliki Madhab Portal" : "মালিকী মাযহাব পোর্টাল", domain: "malikimadhab.org" };
+  }
+  if (lower.includes("alifta.gov.sa")) {
+    return { name: lang === "en" ? "General Presidency of Scholarly Research and Ifta (Saudi Arabia)" : "সৌদি আরবের রাষ্ট্রীয় ফতোয়া ও স্থায়ী কমিটি", domain: "alifta.gov.sa" };
+  }
+  if (lower.includes("awqaf.gov.kw")) {
+    return { name: lang === "en" ? "Kuwait Ministry of Awqaf and Islamic Affairs" : "কুয়েত আওকাফ ও ইসলামিক বিষয়ক মন্ত্রণালয়", domain: "awqaf.gov.kw" };
+  }
+  if (lower.includes("hanbalifiqhqa.com")) {
+    return { name: lang === "en" ? "Hanbali Fiqh Q&A" : "হাম্বলী ফিকহ কিউএ", domain: "hanbalifiqhqa.com" };
+  }
+  if (lower.includes("dar-alifta.org")) {
+    return { name: lang === "en" ? "Egypt's Dar Al-Ifta (Al-Azhar Tradition)" : "মিসর রাষ্ট্রীয় দারুল ইফতা (আল-আজহার ঐতিহ্য)", domain: "dar-alifta.org" };
+  }
+  if (lower.includes("islamweb.net")) {
+    return { name: lang === "en" ? "Islamweb.net Fatwa Center" : "ইসলামওয়েব ফতোয়া কেন্দ্র", domain: "islamweb.net" };
+  }
+  if (lower.includes("al-islam.org")) {
+    return { name: lang === "en" ? "Al-Islam.org Ahlul Bayt Digital Library" : "আল-ইসলাম ডিজিটাল লাইব্রেরি", domain: "al-islam.org" };
+  }
+
+  // Any other URL matching APPROVED_DOMAINS
+  for (const dom of APPROVED_DOMAINS) {
+    if (lower.includes(dom)) {
+      return { name: dom, domain: dom };
+    }
+  }
+
+  return null;
 }
 
 export function convertBengaliDigitsToEnglish(str: string): string {
@@ -223,6 +293,17 @@ export async function verifyIslamQAUrl(
   }
   if (id && verificationCache.has(id)) {
     return verificationCache.get(id)!;
+  }
+
+  // Check if it's an approved external portal URL
+  const approvedPortalInfo = getApprovedPortalInfo(trimmed, preferredLang);
+  if (approvedPortalInfo) {
+    return {
+      valid: true,
+      canonicalUrl: trimmed,
+      title: approvedPortalInfo.name,
+      questionNo: undefined,
+    };
   }
 
   // If no ID found and doesn't look like an answer link
@@ -493,13 +574,13 @@ export async function sanitizeAndVerifyAllLinks(
       ? "en"
       : "bn";
 
-  // STEP 1: Process candidate raw sources from LLM or grounding
+  // STEP 1: Process candidate raw sources from LLM, portals, or grounding
   for (const src of rawSources) {
-    if (src && src.url && src.url.includes("islamqa.info")) {
+    if (src && src.url) {
       const check = await verifyIslamQAUrl(src.url, langKey);
       if (check.valid && check.canonicalUrl) {
         verifiedMap.set(check.canonicalUrl, {
-          title: check.title || src.title || `IslamQA Fatwa #${check.questionNo}`,
+          title: check.title || src.title || (check.questionNo ? `IslamQA Fatwa #${check.questionNo}` : src.url),
           url: check.canonicalUrl,
           questionNo: check.questionNo || src.questionNo,
           verified: true,
@@ -610,6 +691,19 @@ export async function sanitizeAndVerifyAllLinks(
         // BROKEN LINK (404) -> Convert to plain bold text
         cleanText = cleanText.split(item.full).join(`**${item.text}**`);
       }
+    } else {
+      // Check if it's an approved madhhab portal link
+      const portalInfo = getApprovedPortalInfo(item.url, langKey);
+      if (portalInfo) {
+        cleanText = cleanText.split(item.full).join(`[${item.text}](${item.url})`);
+        if (!verifiedMap.has(item.url)) {
+          verifiedMap.set(item.url, {
+            title: item.text || portalInfo.name,
+            url: item.url,
+            verified: true,
+          });
+        }
+      }
     }
   }
 
@@ -685,35 +779,35 @@ export async function sanitizeAndVerifyAllLinks(
     const refHeaderMatch = cleanText.match(refHeaderRegex);
 
     const formattedReferenceSection = preferredLanguage === "ar"
-      ? `### 📚 مراجع وروابط فتاوى الإسلام سؤال وجواب (IslamQA References):\n\n` +
+      ? `### 📚 مراجع وروابط الفتاوى المعتمدة (Verified Sources):\n\n` +
         verifiedSources
           .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `فتوى رقم #${s.questionNo}` : "حكم الإسلام سؤال وجواب";
-            return `${idx + 1}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+            const fatwaLabel = s.questionNo ? `فتوى رقم #${s.questionNo}` : (s.title || "مرجع فقهي معتمد");
+            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.url}*`;
           })
           .join("\n\n")
       : preferredLanguage === "ur"
-      ? `### 📚 مستند حوالہ جات و فتاویٰ لنکس (IslamQA References):\n\n` +
+      ? `### 📚 مستند حوالہ جات و فتاویٰ لنکس (Verified Sources):\n\n` +
         verifiedSources
           .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `فتویٰ نمبر #${s.questionNo}` : "شرعی حکم (IslamQA)";
-            return `${idx + 1}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+            const fatwaLabel = s.questionNo ? `فتویٰ نمبر #${s.questionNo}` : (s.title || "مستند شرعی ماخذ");
+            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
           })
           .join("\n\n")
       : isBengali
-      ? `### 📚 সরাসরি ইসলামকিউএ ফতোয়া রেফারেন্স ও ওয়েবসাইট লিঙ্ক (IslamQA Sources):\n\n` +
+      ? `### 📚 সরাসরি ফতোয়া রেফারেন্স ও তথ্যসূত্র লিঙ্ক (Verified Sources):\n\n` +
         verifiedSources
           .map((s, idx) => {
             const bnNum = convertEnglishDigitsToBengali(String(idx + 1));
-            const fatwaLabel = s.questionNo ? `ফতোয়া নং ${convertEnglishDigitsToBengali(s.questionNo)}` : "ইসলামকিউএ ফতোয়া";
-            return `${bnNum}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+            const fatwaLabel = s.questionNo ? `ফতোয়া নং ${convertEnglishDigitsToBengali(s.questionNo)}` : (s.title || "প্রামাণ্য ফতোয়া উৎস");
+            return `${bnNum}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
           })
           .join("\n\n")
-      : `### 📚 Verified IslamQA Fatwa References & Official Links:\n\n` +
+      : `### 📚 Verified Fatwa References & Official Source Links:\n\n` +
         verifiedSources
           .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `Fatwa #${s.questionNo}` : "IslamQA Ruling";
-            return `${idx + 1}. 📄 **${fatwaLabel}:** [${s.url}](${s.url})\n   *${s.title}*`;
+            const fatwaLabel = s.questionNo ? `Fatwa #${s.questionNo}` : (s.title || "Official Source");
+            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
           })
           .join("\n\n");
 

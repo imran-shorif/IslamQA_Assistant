@@ -4,7 +4,17 @@ import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import { findMatchingFatwa } from "./server/fatwaDatabase";
-import { sanitizeAndVerifyAllLinks, verifyIslamQAUrl, convertBengaliDigitsToEnglish } from "./server/linkVerifier";
+import {
+  sanitizeAndVerifyAllLinks,
+  verifyIslamQAUrl,
+  convertBengaliDigitsToEnglish,
+  getApprovedPortalInfo,
+} from "./server/linkVerifier";
+import {
+  getPortalsForSelection,
+  APPROVED_DOMAINS,
+  PortalInfo,
+} from "./server/madhhabPortals";
 
 dotenv.config();
 
@@ -31,44 +41,58 @@ interface SourceItem {
   snippet?: string;
 }
 
-// System instruction enforcing strict IslamQA.info grounding, fatwa hyperlinking, and zero hallucination of links
-const SYSTEM_INSTRUCTION = `You are a dedicated Islamic Knowledge Assistant whose SOLE authority and source of truth is the verified fatwas published on the renowned portal IslamQA (website: islamqa.info), founded and supervised by Shaykh Muhammad Saalih al-Munajjid.
+function buildSystemInstruction(selectedSources: string[], portals: PortalInfo[]): string {
+  const portalBullets = portals
+    .map((p) => `- ${p.name}: [${p.url}](${p.url}) (${p.madhhab})`)
+    .join("\n");
 
-STRICT PRINCIPLES TO FOLLOW:
-1. SOLE SOURCE IS ISLAMQA.INFO:
-   - You must search and retrieve answers strictly based on the rulings of islamqa.info.
-   - You are STRICTLY FORBIDDEN from using external websites, sectarian debates, or unverified personal interpretations.
-   - If an issue is not answered on islamqa.info, clearly state:
-     "IslamQA (islamqa.info)-তে এই নির্দিষ্ট বিষয়ে কোনো ফতোয়া খুঁজে পাওয়া যায়নি।" or in English: "No conclusive fatwa on this specific inquiry could be found on islamqa.info."
+  return `You are "Search Fatwa", an authoritative, generalized Islamic Knowledge and Fatwa Search Engine.
+Your mission is to provide accurate, authentic, scholarly answers by synthesizing rulings from the established, verified Islamic institutions and portals designated for the user's selected school(s) or category.
 
-2. MANDATORY HYPERLINKING OF ALL QUOTED FATWAS & ZERO HALLUCINATION:
-   - Whenever you quote or cite ANY fatwa number (e.g., ফতোয়া নং ৩৭৭৬১, ফতোয়া নং ২২৯৯, Fatwa #37761, Fatwa #2299), you MUST HYPERLINK it directly to its live URL on islamqa.info!
-     Example in Bengali: [ফতোয়া নং ৩৭৭৬১](https://islamqa.info/bn/answers/37761)
-     Example in English: [Fatwa #37761](https://islamqa.info/en/answers/37761)
-   - Every single answer MUST conclude with a dedicated, clickable References section containing direct hyperlinks:
-     ### তথ্যসূত্র ও ফতোয়া লিঙ্ক (IslamQA References):
-     - [🔗 ইসলামকিউএ ফতোয়া নং ৩৭৭৬১ - শিরোনাম](https://islamqa.info/bn/answers/37761)
-   - Every single link and fatwa number you provide is checked in REAL TIME via an automated HTTP probe against islamqa.info. Any link that returns 404 is rejected.
-   - Only cite exact Fatwa numbers when you are confident of the real number (e.g. #37761, #2299, #38023, #1312, #20882, #21869, #112445, #72915, #62839).
-   - If you do not know the exact 5-digit fatwa number, explain the fatwa and quotes of the scholars from IslamQA clearly without inventing fake URLs or fabricated numbers.
+USER'S SELECTED SOURCE CATEGORIES:
+[${selectedSources.join(", ")}]
 
-3. SYNTHESIZED, CONTEXT-AWARE & PRECISE STRUCTURE:
-   Rather than presenting a raw list of articles, synthesize the fatwa into a well-organized, coherent, and practical answer tailored to the user's scenario:
-   - **Direct Ruling / হুকুম (Verdict Summary)**: Clear 1-2 sentence ruling (Halal, Haram, Makruh, Mustahabb, Mubah, or valid under conditions).
-   - **Evidences & Scholarly Explanation (দলিল ও ব্যাখ্যা)**: Qur'anic verses, authentic Hadiths, and scholarly consensus cited in the IslamQA fatwa.
-   - **Nuances, Conditions & Exceptions (শর্তাবলী ও সতর্কতা)**: Specific scenarios, cautions, or differences of opinion acknowledged on IslamQA.
+APPROVED BRAIN PORTALS FOR THIS INQUIRY:
+${portalBullets}
 
-4. LANGUAGE:
-   - Answer in the same language as the user's query (Bengali if asked in Bengali or Banglish; English if asked in English; Arabic if in Arabic).
+CRITICAL RULES:
+1. STRICT ADHERENCE TO SELECTED SCHOOL(S) / PORTALS:
+   - If Hanafi is selected, synthesize strictly according to the Hanafi school of jurisprudence using Darul Uloom Deoband (darulifta-deoband.com), Hanafi Fiqh BD (alpha.hanafifiqh.net), Jamia Banuri Town (banuri.edu.pk), IQA Ahmadullah (iqa.info), and IslamQA.org (Hanafi section).
+   - If Shafi'i is selected, synthesize according to the Shafi'i school using Jordan General Department of Iftaa (aliftaa.jo), ShafiiFiqh.org, and IslamQA.org (Shafi'i section).
+   - If Maliki is selected, synthesize according to the Maliki school using BinBayyah.net, Maliki Fiqh Q&A (malikifiqhqa.com), Maliki Madhab (malikimadhab.org), and IslamQA.org (Maliki section).
+   - If Hanbali is selected, synthesize according to the Hanbali school using Saudi Presidency of Scholarly Research and Ifta (alifta.gov.sa), Kuwait Ministry of Awqaf (awqaf.gov.kw), Hanbali Fiqh Q&A (hanbalifiqhqa.com), and IslamQA.info.
+   - If Salafi is selected, synthesize according to Quran & authentic Sunnah via IslamQA.info, Saudi Al-Ifta, and Islamweb.
+   - If Bibidh (Contemporary) is selected, synthesize from IQA (Sheikh Ahmadullah - iqa.info) and Egypt's Dar Al-Ifta (dar-alifta.org - Al-Azhar tradition).
+   - If Shia is selected, synthesize from Al-Islam.org digital library.
+   - If All is selected, provide a multi-school synthesis explaining the positions of the four Sunni madhhabs (Hanafi, Shafi'i, Maliki, Hanbali) with citations to their respective portals.
+
+2. MANDATORY SOURCE CITATION & HYPERLINKING IN ANSWER BODY:
+   - In the opening or synthesis of your answer, explicitly cite which institution/portal this ruling is derived from with an active markdown hyperlink.
+     Example in Bengali:
+     "এই উত্তরটি **[দারুল উলূম দেওবন্দ দারুল ইফতা](https://darulifta-deoband.com/en)** এবং **[হানাফী ফিকহ বিডি](https://alpha.hanafifiqh.net/)**-এর প্রামাণ্য ফতোয়া ও দলিলের আলোকে সংকলন করা হয়েছে।"
+     Or for IslamQA:
+     "এই উত্তরটি **[IslamQA.info](https://islamqa.info)**-এর ফতোয়া নং [৩৭৭৬১](https://islamqa.info/bn/answers/37761)-এর আলোকে প্রস্তুত করা হয়েছে।"
+
+3. STRUCTURE OF ANSWER:
+   - **Direct Ruling / মূল হুকুম (Verdict Summary)**: Clear, unambiguous 1-2 sentence ruling (হালাল, হারাম, জায়েজ, না-জায়েজ, মাকরূহ, মুস্তাহাব ইত্যাদি).
+   - **Evidences & Jurisprudential Explanation (দলিল ও ব্যাখ্যা)**: Relevant Quranic verses, Sahih Hadiths, and classical manuals (e.g. Radd al-Muhtar, Al-Hidayah, Al-Majmu', Al-Mughni, Al-Mudawwanah).
+   - **Nuances & Conditions (শর্তাবলী ও সতর্কতা)**: Practical exceptions or conditional aspects.
+
+4. CLICKABLE REFERENCES SECTION AT THE END:
+   - Conclude every response with a dedicated references section containing live hyperlinks:
+     ### তথ্যসূত্র ও ফতোয়া রেফারেন্স লিঙ্ক (Verified Sources):
+     - [🔗 দারুল উলূম দেওবন্দ দারুল ইফতা](https://darulifta-deoband.com/en)
+     - [🔗 হানাফী ফিকহ বিডি](https://alpha.hanafifiqh.net/)
+
+5. LANGUAGE & TONE:
+   - Answer in the user's requested language (Bengali if queried in Bengali, English if in English, Arabic if in Arabic, Urdu if in Urdu).
    - Maintain a respectful, humble, and authentic scholarly tone.`;
+}
 
 app.post("/api/ask", async (req, res) => {
   const { question = "", language = "bn", sources = ["all"] } = req.body || {};
   const selectedSources: string[] = Array.isArray(sources) && sources.length > 0 ? sources : ["all"];
-  const hasIslamQABrain =
-    selectedSources.includes("all") ||
-    selectedSources.includes("hanbali") ||
-    selectedSources.includes("salafi");
+  const portals = getPortalsForSelection(selectedSources);
 
   try {
     if (!question || typeof question !== "string" || !question.trim()) {
@@ -83,7 +107,7 @@ app.post("/api/ask", async (req, res) => {
       return;
     }
 
-    // Check if we have pre-verified real fatwas for this inquiry
+    // Check if we have pre-verified real fatwas for this inquiry (if IslamQA is among sources)
     const matchingFallback = findMatchingFatwa(question, language);
     const fallbackSources = matchingFallback ? matchingFallback.sources : [];
 
@@ -99,19 +123,27 @@ app.post("/api/ask", async (req, res) => {
         }.`
       : "";
 
-    const sourcesInstruction = hasIslamQABrain
-      ? `Selected Sources/Schools: [${selectedSources.join(", ")}].
-Synthesize primarily from verified rulings on site:islamqa.info (which represents sound scholarly research, Quran & Sunnah, and Hanbali/Salafi scholarship). Highlight the rulings relevant to the selected school(s).`
-      : `Selected Sources/Schools: [${selectedSources.join(", ")}].
-NOTE: The dedicated external portal for ${selectedSources.join(", ")} will be connected in the upcoming platform update. Provide an authentic, classical ruling according to the selected school(s) (e.g. Hanafi, Shafi'i, Maliki, or Shia fiqh) with clear Daleel from Quran, Sunnah, and classical jurisprudence. Begin your answer with a polite, clear notice acknowledging the selected school perspective.`;
+    const systemInstruction = buildSystemInstruction(selectedSources, portals);
+
+    const portalsListForPrompt = portals
+      .map((p) => `${p.name}: ${p.url}`)
+      .join(", ");
 
     const userPrompt = `User Islamic Question:
 "${question.trim()}"
 ${languageInstruction}
 
-${sourcesInstruction}
+Selected Madhhabs / Source Schools: [${selectedSources.join(", ")}]
+Authorized Portals to consult & cite: ${portalsListForPrompt}
 
-Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks wherever available, and conclude with a clickable References section.`;
+Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks from the authorized portals, and conclude with a clickable References section.`;
+
+    // Candidate sources initialized with the authorized portals for the selected school
+    const candidateSources: SourceItem[] = portals.map((p) => ({
+      title: p.name,
+      url: p.url,
+      snippet: p.descriptionBn,
+    }));
 
     // Try available models in order of quota resilience
     const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
@@ -119,14 +151,14 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
     let lastError: any = null;
     let usedModel = "gemini-3.1-flash-lite";
 
-    // 1. First attempt: with Google Search grounding tool if supported
+    // 1. First attempt: with Google Search grounding tool to find live citations
     for (const model of modelsToTry) {
       try {
         response = await ai.models.generateContent({
           model,
           contents: userPrompt,
           config: {
-            systemInstruction: SYSTEM_INSTRUCTION,
+            systemInstruction,
             tools: [{ googleSearch: {} }],
             temperature: 0.2,
           },
@@ -147,9 +179,11 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
         try {
           response = await ai.models.generateContent({
             model,
-            contents: userPrompt + "\n\n(Synthesize from your authentic IslamQA knowledge base. Do not fabricate 404 links).",
+            contents:
+              userPrompt +
+              "\n\n(Synthesize from your authentic knowledge base of the authorized portals. Do not fabricate 404 links).",
             config: {
-              systemInstruction: SYSTEM_INSTRUCTION,
+              systemInstruction,
               temperature: 0.2,
             },
           });
@@ -163,15 +197,16 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       }
     }
 
-    // If Gemini API quota exhausted, fall back to our 100% verified IslamQA archive
+    // If Gemini API quota exhausted, fall back to our verified archive
     if (!response) {
       if (matchingFallback) {
-        const isEnglish = language === "en" || (!language && /[a-zA-Z]{5,}/.test(question) && !/[\u0980-\u09FF]/.test(question));
-        
-        // Sanitize and verify all fallback links
+        const isEnglish =
+          language === "en" ||
+          (!language && /[a-zA-Z]{5,}/.test(question) && !/[\u0980-\u09FF]/.test(question));
+
         const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
           isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
-          matchingFallback.sources,
+          [...candidateSources, ...matchingFallback.sources],
           [],
           isEnglish ? "en" : "bn",
           question.trim()
@@ -183,30 +218,31 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
           answer: sanitizedMarkdown,
           sources: verifiedSources,
           timestamp: Date.now(),
-          model: "IslamQA Verified Archive (100% Verified live on islamqa.info)",
+          model: "Search Fatwa Verified Archive",
+          selectedSources,
         });
         return;
       }
-      throw lastError || new Error("Failed to process question via IslamQA model.");
+      throw lastError || new Error("Failed to process question via Search Fatwa model.");
     }
 
     const rawAnswerText = response.text || "No response received.";
 
-    // Candidate sources gathered from grounding and model output
-    const candidateSources: SourceItem[] = [];
-
     // Extract grounding sources from Google Search grounding (if present)
     const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     for (const chunk of rawChunks) {
-      if (chunk.web && chunk.web.uri && chunk.web.uri.includes("islamqa.info")) {
+      if (chunk.web && chunk.web.uri) {
         const uri = chunk.web.uri;
-        const match = uri.match(/\/answers\/(\d+)/);
-        const qNo = match ? match[1] : undefined;
-        candidateSources.push({
-          title: chunk.web.title || `IslamQA Fatwa #${qNo || ""}`,
-          url: uri,
-          questionNo: qNo,
-        });
+        const isApproved = APPROVED_DOMAINS.some((d) => uri.includes(d));
+        if (isApproved) {
+          const match = uri.match(/\/answers\/(\d+)/);
+          const qNo = match ? match[1] : undefined;
+          candidateSources.push({
+            title: chunk.web.title || `Fatwa Reference`,
+            url: uri,
+            questionNo: qNo,
+          });
+        }
       }
     }
 
@@ -219,6 +255,20 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
         url: urlMatch[0],
         questionNo: urlMatch[1],
       });
+    }
+
+    // Also extract any other approved portal URLs mentioned in text
+    for (const domain of APPROVED_DOMAINS) {
+      if (domain === "islamqa.info") continue;
+      const domainRegex = new RegExp(`https?:\\/\\/(?:[a-zA-Z0-9-_.]+\\.)?${domain.replace(".", "\\.")}[a-zA-Z0-9\\-_/%#?&=.]*`, "gi");
+      let dMatch: RegExpExecArray | null;
+      while ((dMatch = domainRegex.exec(rawAnswerText)) !== null) {
+        const portalInfo = getApprovedPortalInfo(dMatch[0], language);
+        candidateSources.push({
+          title: portalInfo ? portalInfo.name : domain,
+          url: dMatch[0],
+        });
+      }
     }
 
     // Also extract any fatwa numbers quoted in text (e.g. ফতোয়া নং ৩৭৭৬১, Fatwa #37761)
@@ -234,12 +284,7 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
     }
 
     // CRITICAL REPAIR STEP:
-    // Run all markdown text and candidate sources through real-time HTTP verification:
-    // 1. Probes every link via live HTTP GET request to islamqa.info.
-    // 2. Automatically converts quoted fatwa numbers to clickable live hyperlinks.
-    // 3. Generates or updates a clean clickable references section with direct links.
-    // 4. Repairs broken links (404) by converting dead links into plain text.
-    // 5. Filters out any 404 source so NO broken links are ever returned.
+    // Run all markdown text and candidate sources through real-time verification & hyperlinking
     const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
       rawAnswerText,
       candidateSources,
@@ -258,15 +303,17 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       selectedSources,
     });
   } catch (error: any) {
-    console.error("Error processing IslamQA query:", error);
+    console.error("Error processing Search Fatwa query:", error);
 
     // Final emergency fallback check
     const matchingFallback = findMatchingFatwa(question, language);
     if (matchingFallback) {
-      const isEnglish = language === "en" || (!language && /[a-zA-Z]{5,}/.test(question) && !/[\u0980-\u09FF]/.test(question));
+      const isEnglish =
+        language === "en" ||
+        (!language && /[a-zA-Z]{5,}/.test(question) && !/[\u0980-\u09FF]/.test(question));
       const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
         isEnglish ? matchingFallback.answerEn : matchingFallback.answerBn,
-        matchingFallback.sources,
+        [...portals.map((p) => ({ title: p.name, url: p.url })), ...matchingFallback.sources],
         [],
         isEnglish ? "en" : "bn",
         question.trim()
@@ -284,9 +331,10 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       return;
     }
 
-    let errMsg = error?.message || "Failed to process question via IslamQA model.";
+    let errMsg = error?.message || "Failed to process question via Search Fatwa model.";
     if (errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("quota") || errMsg.includes("429")) {
-      errMsg = "Gemini API কোটা সাময়িকভাবে শেষ হয়েছে (Rate Limit / Quota Exceeded)। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।";
+      errMsg =
+        "Gemini API কোটা সাময়িকভাবে শেষ হয়েছে (Rate Limit / Quota Exceeded)। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।";
     }
     res.status(500).json({
       error: errMsg,

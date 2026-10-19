@@ -3,16 +3,17 @@ import {
   ArrowLeft,
   BookOpen,
   CheckCircle2,
-  Clock,
   ExternalLink,
   ShieldCheck,
   Compass,
   Database,
   Layers,
   Sparkles,
+  Globe,
+  Share2,
 } from "lucide-react";
 import { translations, Language } from "../data/translations";
-import { MADHHAB_CHRONOLOGY, MadhhabCategory } from "../types";
+import { MADHHAB_CHRONOLOGY, MadhhabCategory, BrainPortal } from "../types";
 
 interface ReferencePageProps {
   onBackToHome: () => void;
@@ -38,16 +39,29 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
     }
   };
 
-  const getUpcomingNote = (item: (typeof MADHHAB_CHRONOLOGY)[number]) => {
+  const getSummaryNote = (item: (typeof MADHHAB_CHRONOLOGY)[number]) => {
     switch (language) {
       case "en":
-        return item.upcomingNoteEn;
+        return item.summaryNoteEn;
       case "ar":
-        return item.upcomingNoteAr;
+        return item.summaryNoteAr;
       case "ur":
-        return item.upcomingNoteUr;
+        return item.summaryNoteUr;
       default:
-        return item.upcomingNoteBn;
+        return item.summaryNoteBn;
+    }
+  };
+
+  const getPortalDesc = (portal: BrainPortal) => {
+    switch (language) {
+      case "en":
+        return portal.descriptionEn;
+      case "ar":
+        return portal.descriptionAr;
+      case "ur":
+        return portal.descriptionUr;
+      default:
+        return portal.descriptionBn;
     }
   };
 
@@ -65,30 +79,38 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
 
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 text-xs font-semibold">
           <Database className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-          <span>{language === "en" ? "Knowledge Architecture" : language === "ar" ? "هندسة المراجع" : language === "ur" ? "علمی مراجع" : "রেফারেন্স ও সোর্স ব্রেন"}</span>
+          <span>
+            {language === "en"
+              ? "Multi-Brain Knowledge Base"
+              : language === "ar"
+              ? "شبكة مصادر الفتاوى المعتمدة"
+              : language === "ur"
+              ? "کثیر المراجع علمی ڈیٹا بیس"
+              : "রেফারেন্স ও সোর্স ব্রেন"}
+          </span>
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Header */}
       <header className="mb-8 text-center max-w-2xl mx-auto">
         <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2.5">
           <Compass className="w-4 h-4" />
           <span>
             {language === "en"
-              ? "Multi-Source Islamic Knowledge Engine"
+              ? "Multi-School Islamic Knowledge Engine"
               : language === "ar"
-              ? "محرك الفتاوى متعدد المدارس والمصادر"
+              ? "محرك الفتاوى والبحث المقارن الشامل"
               : language === "ur"
               ? "کثیر المصادر اسلامی سرچ انجن"
-              : "সার্বজনীন ইসলামিক জ্ঞান ও গবেষণা প্ল্যাটফর্ম"}
+              : "সার্বজনীন ইসলামিক জ্ঞান ও ফতোয়া প্ল্যাটফর্ম"}
           </span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight mb-3">
           {language === "en"
-            ? "Search Fatwa Knowledge Brain & References"
+            ? "Search Fatwa Knowledge Brain & Verified Portals"
             : language === "ar"
-            ? "مراجع ومصادر سيرش فتاوى المعتمدة"
+            ? "شبكة مراجع وقواعد بيانات سيرش فتاوى المعتمدة"
             : language === "ur"
             ? "سرچ فتاویٰ کے مستند علمی مراجع و مصادر"
             : "Search Fatwa রেফারেন্স ও সোর্স ব্রেন"}
@@ -96,16 +118,16 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
 
         <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
           {language === "en"
-            ? "Search Fatwa is built to be a generalized, multi-school Islamic research platform. Instead of relying on a single perspective, it routes your inquiries to verified, authentic fatwa databases tailored to each madhhab and tradition."
+            ? "Search Fatwa is a generalized Islamic inquiry platform. When you ask a question, our AI brain routes your question to the authoritative, verified fatwa portals of the selected madhhab or category, citing every reference with direct live hyperlinks."
             : language === "ar"
-            ? "تم تصميم سيرش فتاوى كمنصة إسلامية شاملة لا تقتصر على جهة واحدة، بل تهدف إلى ربط كل مذهب بمصادره وقواعد بياناته الفقهية المعتمدة لتحقيق دقة علمية متكاملة."
+            ? "سيرش فتاوى منصة فقهية شاملة غير منحازة لمصدر واحد. عند طرح أي سؤال، يوجه المحرك الذكي بحثه إلى المواقع وقواعد البيانات المعتمدة للمذهب المختار مع توثيق كافة الفتاوى بروابط مباشرة حية."
             : language === "ur"
-            ? "سرچ فتاویٰ کو ایک جامع و غیر جانبدار پلیٹ فارم بنایا گیا ہے۔ یہ کسی ایک ویب سائٹ تک محدود رہنے کے بجائے ہر مکتبہ فکر کو اس کے اپنے مستند اور معتبر فتاویٰ ڈیٹا بیس سے جوڑتا ہے۔"
-            : "সার্চ ফতোয়াকে একটি সার্বজনীন ও স্বয়ংসম্পূর্ণ ইসলামিক গবেষণা প্ল্যাটফর্ম হিসেবে প্রস্তুত করা হচ্ছে। এটি কোনো একক সাইটের ওপর নির্ভরশীল নয়; বরং প্রতিটি মাযহাব ও মতাদর্শের জন্য তাদের নিজস্ব প্রতিষ্ঠিত ও নির্ভরযোগ্য ফতোয়া পোর্টালকে সরাসরি ব্রেন হিসেবে সংযুক্ত করা হচ্ছে।"}
+            ? "سرچ فتاویٰ ایک جامع و غیر جانبدار علمی سرچ انجن ہے۔ جب آپ کوئی سوال پوچھتے ہیں تو منتخب کردہ مکتبہ فکر کے معتبر و مستند پورٹلز سے جواب ترتیب دے کر لائیو لنکس کے ساتھ حوالہ دیا جاتا ہے۔"
+            : "সার্চ ফতোয়া একটি সার্বজনীন ফতোয়া ও জ্ঞান অনুসন্ধান প্ল্যাটফর্ম। প্রশ্ন করার সময় আপনি যে মাযহাব বা উৎস নির্বাচন করবেন, আমাদের এআই ব্রেন সেই মাযহাবের জন্য নির্ধারিত বিশ্বস্ত পোর্টালসমূহ থেকে উত্তর সংগ্রহ করে এবং প্রতিটি তথ্যের সাথে সক্রিয় হাইপারলিঙ্কযুক্ত রেফারেন্স প্রদান করে।"}
         </p>
       </header>
 
-      {/* Information Notice */}
+      {/* Highlights Banner */}
       <div className="mb-8 p-4 sm:p-5 rounded-2xl bg-emerald-500/5 dark:bg-emerald-950/20 border border-emerald-500/20 text-stone-700 dark:text-stone-300">
         <div className="flex items-start gap-3">
           <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
@@ -114,109 +136,124 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
           <div className="space-y-1">
             <h3 className="font-bold text-sm text-stone-900 dark:text-white">
               {language === "en"
-                ? "Current Active Brains & Planned Integrations"
+                ? "Transparent Brain Routing & Direct Hyperlinking"
                 : language === "ar"
-                ? "المصادر المفعلة حالياً والمصادر قيد الإضافة"
+                ? "توجيه ذكي ومباشر وتوثيق بروابط حية"
                 : language === "ur"
-                ? "موجودہ فعال مراجع اور زیرِ تکمیل پورٹلز"
-                : "বর্তমান সক্রিয় ব্রেন ও ভবিষ্যৎ সংযোজন রূপরেখা"}
+                ? "شفاف حوالہ جات اور براہِ راست لائیو لنکس"
+                : "স্বচ্ছ উৎস নির্বাচন ও সরাসরি রেফারেন্স হাইপারলিঙ্ক"}
             </h3>
             <p className="text-xs leading-relaxed text-stone-600 dark:text-stone-400">
               {language === "en"
-                ? "Currently, 'All', 'Hanbali', and 'Salafi' inquiries are synthesized directly from islamqa.info (supervised by Sheikh Muhammad Saalih al-Munajjid). Dedicated authentic portals for Hanafi, Shafi'i, Maliki, and Shia traditions will be connected in upcoming iterations."
+                ? "Every response from Search Fatwa cites the exact source institution or portal it was synthesized from. You can click on any cited reference or source card to view the original Arabic/Bengali/English text on the official institutions' portals."
                 : language === "ar"
-                ? "حالياً يتم استقاء فتاوى 'جميع المصادر' و'المذهب الحنبلي' و'السلفي' مباشرة من موقع الإسلام سؤال وجواب (islamqa.info). وسيتم ربط المواقع المعتمدة للمذاهب الحنفي والشافعي والمالكي والشيعي في التحديثات القادمة."
+                ? "تتضمن كل إجابة توثيقاً صريحاً للمؤسسة الفقهية أو الموقع المعتمد الذي تم استقاء الفتوى منه، مع إمكانية النقر على أي رابط لمطالعة الفتوى الأصلية في موقعها الرسمي."
                 : language === "ur"
-                ? "فی الوقت 'تمام مصادر'، 'حنبلی' اور 'سلفی' کے سوالات کے جوابات براہِ راست islamqa.info سے حاصل کیے جا رہے ہیں۔ حنفی، شافعی، مالکی اور شیعہ کے معتبر ویب پورٹلز اگلی اپڈیٹ میں جوڑے جا رہے ہیں۔"
-                : "বর্তমানে 'All (সকল)', 'হাম্বলী' ও 'সালাফী' ক্যাটাগরির জন্য islamqa.info সাইটের তাহকীক ও ফতোয়া ডাটাবেজ সক্রিয় রয়েছে। হানাফী, শাফেয়ী, মালিকী ও শিয়া ক্যাটাগরির জন্য ডেডিকেটেড নির্ভরযোগ্য পোর্টালসমূহ পরবর্তী আপডেটে সরাসরি যুক্ত করা হচ্ছে।"}
+                ? "سرچ فتاویٰ کے ہر جواب کے ساتھ متعلقہ ادارے یا پورٹل کا نام اور براہِ راست کلک ایبل لنک دیا جاتا ہے تاکہ آپ اصل ماخذ پر جا کر مطالعہ کر سکیں۔"
+                : "সার্চ ফতোয়া থেকে প্রদত্ত প্রতিটি উত্তরের নিচে সুনির্দিষ্ট রেফারেন্স ও সক্রিয় হাইপারলিঙ্ক থাকে, যা নির্দেশ করে কোন প্রতিষ্ঠান বা ওয়েবসাইট থেকে উত্তরটি নেওয়া হয়েছে। লিঙ্কে ক্লিক করে সরাসরি সংশ্লিষ্ট অফিসিয়াল পোর্টালে গিয়ে বিস্তারিত ফতোয়া ও মূল দলিল পাঠ করা যায়।"}
             </p>
           </div>
         </div>
       </div>
 
       {/* Category Chronology Matrix */}
-      <section className="space-y-4">
+      <section className="space-y-6">
         <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
-            {language === "en"
-              ? "Chronological School & Source Breakdown"
-              : language === "ar"
-              ? "ترتيب المصادر والمدارس الفقهية"
-              : language === "ur"
-              ? "مکاتب فکر اور مراجع کی ترتیب"
-              : "মাযহাব ও উৎসসমূহের তালিকা (Chronological Order)"}
+          <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>
+              {language === "en"
+                ? "Categories & Active Brain Portals"
+                : language === "ar"
+                ? "المصادر والمواقع المعتمدة حسب المذهب"
+                : language === "ur"
+                ? "مکاتب فکر اور ان کے باضابطہ مراجع"
+                : "মাযহাব ও ক্যাটাগরি ভিত্তিক সোর্স ব্রেন পোর্টাল"}
+            </span>
           </h2>
-          <span className="text-xs text-stone-400 dark:text-stone-500">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
             {MADHHAB_CHRONOLOGY.length} {language === "en" ? "Categories" : "ক্যাটাগরি"}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3.5">
-          {MADHHAB_CHRONOLOGY.map((item, idx) => (
+        {/* Categories Cards */}
+        <div className="space-y-5">
+          {MADHHAB_CHRONOLOGY.map((category, idx) => (
             <div
-              key={item.id}
-              className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-                item.isBrainActive
-                  ? "bg-white dark:bg-stone-900 border-emerald-500/30 dark:border-emerald-500/20 shadow-xs hover:border-emerald-500/50"
-                  : "bg-stone-50/70 dark:bg-stone-900/40 border-stone-200 dark:border-stone-800/80 opacity-90"
-              }`}
+              key={category.id}
+              className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 sm:p-5 shadow-xs hover:border-emerald-500/40 transition-all"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
-                      item.isBrainActive
-                        ? "bg-emerald-600 text-white"
-                        : "bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400"
-                    }`}
-                  >
+              {/* Category Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-stone-100 dark:border-stone-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
                     {idx + 1}
                   </div>
-
                   <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-extrabold text-stone-900 dark:text-white text-base">
-                        {getMadhabName(item)}
-                      </h3>
-
-                      {item.isBrainActive ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-md border border-emerald-300/40 dark:border-emerald-800/40">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                          <span>{language === "en" ? "Active Brain" : language === "ar" ? "مصدر مفعل" : language === "ur" ? "فعال ماخذ" : "সক্রিয় ব্রেন"}</span>
+                    <h3 className="font-extrabold text-base sm:text-lg text-stone-900 dark:text-white flex items-center gap-2">
+                      <span>{getMadhabName(category)}</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-300/40 dark:border-emerald-800/40">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                        <span>
+                          {language === "en"
+                            ? "Active Brain"
+                            : language === "ar"
+                            ? "مصدر مفعل"
+                            : language === "ur"
+                            ? "فعال برین"
+                            : "সক্রিয় ব্রেন"}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/70 px-2.5 py-0.5 rounded-md border border-amber-300/40 dark:border-amber-800/40">
-                          <Clock className="w-3 h-3 text-amber-500" />
-                          <span>{language === "en" ? "Adding in Next Update" : language === "ar" ? "يُضاف في التحديث القادم" : language === "ur" ? "اگلی اپڈیٹ میں شامل ہوگا" : "পরবর্তী আপডেটে যুক্ত হবে"}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 mt-1 leading-relaxed">
-                      {getUpcomingNote(item)}
-                    </p>
+                      </span>
+                    </h3>
                   </div>
                 </div>
 
-                {/* Right side connection info */}
-                <div className="sm:text-right shrink-0 pl-10 sm:pl-0">
-                  {item.isBrainActive && item.activeBrainUrl ? (
-                    <a
-                      href={item.activeBrainUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300/70 dark:border-emerald-700/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>{item.activeBrainName}</span>
-                      <ExternalLink className="w-3 h-3 opacity-70" />
-                    </a>
-                  ) : (
-                    <span className="text-xs text-stone-400 dark:text-stone-500 font-medium italic">
-                      {language === "en" ? "Sources pending input" : language === "ar" ? "بانتظار ربط المصدر" : language === "ur" ? "سورس زیرِ التواء" : "সাইট লিঙ্ক প্রস্তুত হচ্ছে"}
-                    </span>
-                  )}
+                <div className="text-xs text-stone-500 dark:text-stone-400 font-medium sm:text-right pl-10 sm:pl-0">
+                  {category.portals.length} {language === "en" ? "Institutions / Portals" : "টি স্বীকৃত পোর্টাল"}
                 </div>
+              </div>
+
+              {/* Summary Note */}
+              <p className="text-xs text-stone-600 dark:text-stone-300 my-3 leading-relaxed bg-stone-50 dark:bg-stone-850 p-2.5 rounded-xl border border-stone-200/60 dark:border-stone-800/60">
+                <strong className="text-stone-900 dark:text-white mr-1">
+                  {language === "en" ? "Scope:" : language === "ar" ? "النطاق:" : language === "ur" ? "دائرۂ کار:" : "বিষয়বস্তু ও মূলনীতি:"}
+                </strong>
+                {getSummaryNote(category)}
+              </p>
+
+              {/* Portals Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-2">
+                {category.portals.map((portal, pIdx) => (
+                  <a
+                    key={pIdx}
+                    href={portal.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col justify-between p-3 rounded-xl bg-stone-50/70 dark:bg-stone-800/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/40 border border-stone-200/70 dark:border-stone-750 hover:border-emerald-400/60 dark:hover:border-emerald-600/60 transition-all text-left"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-1.5 mb-1.5">
+                        <span className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          <span>{portal.title}</span>
+                        </span>
+                        {portal.badge && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-100/70 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-700/40 shrink-0">
+                            {portal.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed mb-2">
+                        {getPortalDesc(portal)}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-stone-200/40 dark:border-stone-750 flex items-center justify-between text-[11px] font-mono text-emerald-700 dark:text-emerald-400 group-hover:underline">
+                      <span className="truncate max-w-[220px]">{portal.url}</span>
+                      <ExternalLink className="w-3 h-3 shrink-0 ml-1 opacity-70 group-hover:opacity-100" />
+                    </div>
+                  </a>
+                ))}
               </div>
             </div>
           ))}
@@ -224,25 +261,25 @@ export const ReferencePage: React.FC<ReferencePageProps> = ({
       </section>
 
       {/* Suggestion Section */}
-      <footer className="mt-10 p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-center">
+      <footer className="mt-10 p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-center shadow-xs">
         <Sparkles className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
         <h3 className="font-bold text-sm text-stone-900 dark:text-white mb-1">
           {language === "en"
-            ? "Have recommendations for authentic online fatwa portals?"
+            ? "Know of another authentic online fatwa institution?"
             : language === "ar"
-            ? "هل تقترح مواقع موثوقة لإضافتها لمذهب معين؟"
+            ? "هل تقترح إضافة موقع أو مؤسسة فقهية رسمية أخرى؟"
             : language === "ur"
-            ? "کیا آپ کے پاس کسی مخصوص مکتبہ فکر کی معتبر ویب سائٹ کی تجویز ہے؟"
-            : "কোনো মাযহাবের জন্য নির্ভরযোগ্য ফতোয়া ওয়েবসাইটের প্রস্তাব আছে?"}
+            ? "کیا آپ کے پاس کسی اور معتبر فتاویٰ ادارے یا پورٹل کی تجویز ہے؟"
+            : "অন্য কোনো স্বীকৃত ফতোয়া প্রতিষ্ঠান বা ওয়েবসাইট সংযুক্ত করার প্রস্তাব আছে?"}
         </h3>
-        <p className="text-xs text-stone-600 dark:text-stone-400 max-w-lg mx-auto mb-4">
+        <p className="text-xs text-stone-600 dark:text-stone-400 max-w-lg mx-auto mb-4 leading-relaxed">
           {language === "en"
-            ? "We are actively integrating verified portals for Hanafi, Shafi'i, Maliki, and Shia research to make Search Fatwa truly universal."
+            ? "Search Fatwa is continuously expanding its multi-school brain network to represent established, traditional Islamic scholarship across all mainstream madhhabs."
             : language === "ar"
-            ? "نحن نرحب باقتراحات المواقع الرسمية والمعتمدة لكافة المدارس الفقهية لجعل المنصة مرجعاً شاملاً لجميع المسلمين."
+            ? "تعمل منصة سيرش فتاوى باستمرار على توسيع شبكة المراجع لتمثيل الفقه الإسلامي الأصيل عبر مختلف المذاهب المعترف بها."
             : language === "ur"
-            ? "ہم تمام مکاتب فکر کے مصدقہ فتاویٰ پورٹلز کو سرچ فتاویٰ سے جوڑنے کے لیے کوشاں ہیں۔"
-            : "হানাফী, শাফেয়ী, মালিকী ও শিয়া সহ সকল ঘরানার স্বীকৃত অনলাইন ফতোয়া ডাটাবেজ সংযুক্ত করার কাজ চলমান রয়েছে।"}
+            ? "سرچ فتاویٰ تمام معتبر فقہی مکاتب فکر کے مصدقہ اور باضابطہ علمی اداروں کو شامل کر کے ہر مسلمان کے لیے آسان رسائی فراہم کرتا ہے۔"
+            : "সার্চ ফতোয়া প্রতিনিয়ত বিভিন্ন স্বীকৃত মাযহাব ও ঘরানার প্রামাণ্য অনলাইন ফতোয়া ডাটাবেজ সমন্বিত করে সার্বজনীন রেফারেন্স সেবা প্রদান করছে।"}
         </p>
         <button
           onClick={onBackToHome}

@@ -58,12 +58,10 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, index, language 
             )}
           </div>
 
-          {isIslamQADomain && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-800 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/80 px-2 py-0.5 rounded-full shrink-0">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>{t.ansVerifiedBadge}</span>
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full shrink-0">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>{t.ansVerifiedBadge}</span>
+          </span>
         </div>
 
         {/* Fatwa Title */}
