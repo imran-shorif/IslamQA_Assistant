@@ -403,7 +403,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 flex flex-col">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-6 py-2.5 sm:py-8 flex flex-col">
         {currentView === "about" ? (
           <AboutPage
             onBackToHome={handleResetHome}
@@ -422,24 +422,24 @@ export default function App() {
           />
         ) : (
           <>
-            {/* Hero Section */}
-            <section className="text-center max-w-3xl mx-auto mb-5 sm:mb-6 px-1">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[11px] sm:text-xs font-semibold leading-snug">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            {/* Hero Section - Compact on mobile so search input is right at the top */}
+            <section className="text-center max-w-3xl mx-auto mb-2 sm:mb-6 px-1">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 mb-1.5 sm:mb-3.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[10px] sm:text-xs font-semibold leading-snug">
+                  <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{t.heroBadge}</span>
                 </div>
                 <VisitorCounter language={resolvedLanguage} variant="hero" />
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
+              <h1 className="text-xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight leading-tight sm:leading-snug">
                 {t.heroHeading1} <br className="hidden sm:inline" />
                 <span className="text-emerald-600 dark:text-emerald-400">
                   {t.heroHeadingHighlight}
                 </span>
               </h1>
 
-              <p className="mt-2 text-xs sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto">
+              <p className="mt-1 sm:mt-2 text-[11px] sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-2xl mx-auto line-clamp-2 sm:line-clamp-none">
                 {t.heroDescPre}
                 <strong className="text-stone-800 dark:text-stone-100 font-semibold">
                   {t.heroDescBold}

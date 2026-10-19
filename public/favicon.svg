@@ -1,82 +1,62 @@
 <svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Deep Forest Emerald Radial Background -->
-    <radialGradient id="sfEmeraldBg" cx="45%" cy="40%" r="70%">
+    <!-- Deep Emerald & Dark Slate Radial Background -->
+    <radialGradient id="sfFavBg" cx="50%" cy="45%" r="65%">
       <stop offset="0%" stop-color="#064e3b" />
-      <stop offset="55%" stop-color="#022c22" />
+      <stop offset="60%" stop-color="#022c22" />
       <stop offset="100%" stop-color="#011712" />
     </radialGradient>
 
-    <!-- Vibrant Mint & Emerald Gradient -->
-    <linearGradient id="sfEmeraldPrimary" x1="120" y1="100" x2="380" y2="400" gradientUnits="userSpaceOnUse">
+    <!-- Vibrant Mint to Emerald Gradient for Search Elements -->
+    <linearGradient id="sfFavMint" x1="60" y1="180" x2="440" y2="320" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#a7f3d0" />
-      <stop offset="35%" stop-color="#34d399" />
-      <stop offset="75%" stop-color="#10b981" />
+      <stop offset="40%" stop-color="#34d399" />
+      <stop offset="85%" stop-color="#10b981" />
       <stop offset="100%" stop-color="#059669" />
     </linearGradient>
 
-    <!-- Pristine Platinum & Ice Mint Accent -->
-    <linearGradient id="sfIceHighlight" x1="150" y1="90" x2="350" y2="320" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="40%" stop-color="#e0f2fe" />
-      <stop offset="80%" stop-color="#6ee7b7" />
-      <stop offset="100%" stop-color="#10b981" />
+    <!-- Search Bar Inner Dark Glass -->
+    <linearGradient id="sfFavBar" x1="250" y1="170" x2="250" y2="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#043c2f" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#01221a" stop-opacity="0.98" />
     </linearGradient>
 
-    <!-- Soft Glow Filter -->
-    <filter id="sfEmeraldGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#011712" flood-opacity="0.75" />
-    </filter>
+    <!-- Lens Glass Reflection Gradient -->
+    <linearGradient id="sfFavGlass" x1="105" y1="210" x2="175" y2="290" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+      <stop offset="45%" stop-color="#a7f3d0" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.05" />
+    </linearGradient>
   </defs>
 
-  <!-- Base Rounded Container -->
-  <rect width="500" height="500" rx="115" fill="url(#sfEmeraldBg)" />
-  <rect width="494" height="494" x="3" y="3" rx="112" stroke="url(#sfEmeraldPrimary)" stroke-width="4" stroke-opacity="0.35" />
+  <!-- Base Rounded Tile -->
+  <rect width="500" height="500" rx="115" fill="url(#sfFavBg)" />
+  <rect width="494" height="494" x="3" y="3" rx="112" stroke="url(#sfFavMint)" stroke-width="6" stroke-opacity="0.4" />
 
-  <!-- Subtle Islamic Geometric Backplate -->
-  <circle cx="250" cy="250" r="195" stroke="#10b981" stroke-width="1.5" stroke-opacity="0.12" stroke-dasharray="6 6" />
-  <circle cx="250" cy="250" r="145" fill="#10b981" fill-opacity="0.03" />
+  <!-- Iconic Pill Search Bar Container -->
+  <g>
+    <!-- Outer Search Bar Shape -->
+    <rect x="45" y="170" width="410" height="160" rx="80" fill="url(#sfFavBar)" stroke="url(#sfFavMint)" stroke-width="6" />
 
-  <!-- The Open Book (Rehal / Kitab) with Integrated Search Emblem -->
-  <g filter="url(#sfEmeraldGlow)">
-    <!-- Central Beam / Minaret Finial -->
-    <circle cx="250" cy="115" r="9" fill="url(#sfIceHighlight)" />
-    <path d="M 250 128 L 253 148 L 247 148 Z" fill="url(#sfEmeraldPrimary)" />
+    <!-- Classical Prominent Magnifying Glass (Search Icon) -->
+    <circle cx="135" cy="250" r="42" stroke="url(#sfFavMint)" stroke-width="11" fill="url(#sfFavGlass)" />
 
-    <!-- Left Book Page (Rehal Wing) -->
-    <path d="M 245 160 C 205 152, 145 160, 105 182 C 100 184, 98 190, 100 196 L 118 320 C 120 326, 126 330, 132 328 C 170 312, 215 310, 245 328 Z" 
-          fill="url(#sfEmeraldPrimary)" />
-    <!-- Left Inner Page Leaf Contour -->
-    <path d="M 240 175 C 205 170, 155 178, 125 196 L 138 302 C 168 288, 210 286, 240 305 Z" 
-          fill="#022c22" fill-opacity="0.75" stroke="url(#sfIceHighlight)" stroke-width="2.5" stroke-opacity="0.8" />
+    <!-- Glass Reflection Highlight Arc -->
+    <path d="M 112 232 A 28 28 0 0 1 148 214" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-opacity="0.8" />
 
-    <!-- Right Book Page (Rehal Wing) -->
-    <path d="M 255 160 C 295 152, 355 160, 395 182 C 400 184, 402 190, 400 196 L 382 320 C 380 326, 374 330, 368 328 C 330 312, 285 310, 255 328 Z" 
-          fill="url(#sfEmeraldPrimary)" />
-    <!-- Right Inner Page Leaf Contour -->
-    <path d="M 260 175 C 295 170, 345 178, 375 196 L 362 302 C 332 288, 290 286, 260 305 Z" 
-          fill="#022c22" fill-opacity="0.75" stroke="url(#sfIceHighlight)" stroke-width="2.5" stroke-opacity="0.8" />
+    <!-- Magnifying Glass Angled Solid Handle -->
+    <line x1="166" y1="281" x2="204" y2="319" stroke="url(#sfFavMint)" stroke-width="13" stroke-linecap="round" />
+    <line x1="166" y1="281" x2="204" y2="319" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-opacity="0.7" />
 
-    <!-- Spine Center Curve of the Kitab -->
-    <path d="M 246 155 Q 250 162 254 155 L 254 332 Q 250 338 246 332 Z" fill="url(#sfIceHighlight)" />
+    <!-- Vertical Active Search Cursor -->
+    <line x1="228" y1="215" x2="228" y2="285" stroke="#34d399" stroke-width="7" stroke-linecap="round" />
 
-    <!-- Islamic Open Wooden Stand (Rehal Legs) -->
-    <path d="M 215 325 L 145 385 C 138 391, 142 402, 151 402 L 180 402 L 235 345 Z" fill="url(#sfEmeraldPrimary)" opacity="0.9" />
-    <path d="M 285 325 L 355 385 C 362 391, 358 402, 349 402 L 320 402 L 265 345 Z" fill="url(#sfEmeraldPrimary)" opacity="0.9" />
-    <path d="M 185 390 L 315 390 L 250 335 Z" fill="#011712" opacity="0.6" />
+    <!-- Search Query Representation lines -->
+    <rect x="252" y="224" width="120" height="14" rx="7" fill="#a7f3d0" fill-opacity="0.9" />
+    <rect x="252" y="250" width="75" height="12" rx="6" fill="#34d399" fill-opacity="0.6" />
 
-    <!-- Elegant Search Magnifying Crescent Lens floating over the pages -->
-    <g transform="translate(250, 238)">
-      <!-- Outer illuminated search ring -->
-      <circle cx="0" cy="0" r="54" stroke="url(#sfIceHighlight)" stroke-width="6.5" fill="none" />
-      <circle cx="0" cy="0" r="44" fill="#047857" fill-opacity="0.35" />
-      <!-- Stylized Islamic Crescent inside the lens -->
-      <path d="M 6 -24 C -18 -20, -28 10, -8 30 C -24 16, -20 -10, 6 -24 Z" fill="url(#sfIceHighlight)" />
-      <!-- Sparkling Star in the focal point -->
-      <circle cx="10" cy="-6" r="4" fill="#ffffff" />
-      <!-- Search Handle Extending Gracefully into the Book Rehal -->
-      <path d="M 38 38 L 74 74 C 78 78, 84 78, 88 74 C 92 70, 92 64, 88 60 L 52 24 Z" fill="url(#sfEmeraldPrimary)" />
-      <path d="M 40 40 L 70 70" stroke="url(#sfIceHighlight)" stroke-width="3" stroke-linecap="round" />
-    </g>
+    <!-- Search Action Capsule Pill -->
+    <rect x="382" y="222" width="52" height="56" rx="20" fill="#10b981" fill-opacity="0.35" stroke="#34d399" stroke-width="2.5" />
+    <path d="M 402 242 L 414 250 L 402 258" stroke="#a7f3d0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
   </g>
 </svg>

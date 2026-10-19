@@ -211,8 +211,39 @@ export const APPROVED_PORTALS: Record<string, PortalInfo[]> = {
       descriptionBn: "ডিজিটাল লাইব্রেরি ও স্বীকৃত ইসলামিক রেফারেন্স ডাটাবেজ",
       descriptionEn: "Comprehensive digital library of Shia classical and contemporary scholarship",
     },
+    {
+      name: "Al-Urwah al-Wuthqa al-Zaydiyyah",
+      url: "https://alorwahalwuthqa.com/en/",
+      domain: "alorwahalwuthqa.com",
+      madhhab: "shia",
+      descriptionBn: "ইমাম যায়দ ইবনে আলী ও প্রাচীন যায়দী ঐতিহ্যের প্রামাণ্য প্রাথমিক উৎস ও জ্ঞানভাণ্ডার",
+      descriptionEn: "Foundational primary sources and scholarly heritage in Zaydi Shia tradition",
+    },
+    {
+      name: "Imam Zaid bin Ali Cultural Foundation (IZBACF)",
+      url: "https://hmml.org/stories/zaydi-manuscripts/",
+      domain: "hmml.org",
+      madhhab: "shia",
+      descriptionBn: "ইমাম যায়দ ইবনে আলীর স্মৃতিবিজড়িত সাংস্কৃতিক ও পাণ্ডুলিপি সংরক্ষণ ফাউন্ডেশন",
+      descriptionEn: "Foundation documenting, preserving & publishing Zaydi intellectual heritage",
+    },
   ],
 };
+
+// Auto-populate 'all' category with all unique portals across all schools
+const allUniquePortals: PortalInfo[] = [];
+const seenAllUrls = new Set<string>();
+Object.entries(APPROVED_PORTALS).forEach(([school, portals]) => {
+  if (school !== "all") {
+    portals.forEach((p) => {
+      if (!seenAllUrls.has(p.url)) {
+        seenAllUrls.add(p.url);
+        allUniquePortals.push({ ...p, madhhab: school });
+      }
+    });
+  }
+});
+APPROVED_PORTALS.all = allUniquePortals;
 
 export const APPROVED_DOMAINS = [
   "islamqa.info",
@@ -233,21 +264,13 @@ export const APPROVED_DOMAINS = [
   "islamweb.net",
   "dar-alifta.org",
   "al-islam.org",
+  "alorwahalwuthqa.com",
+  "hmml.org",
 ];
 
 export function getPortalsForSelection(selectedSources: string[]): PortalInfo[] {
   if (selectedSources.includes("all")) {
-    const allList: PortalInfo[] = [];
-    const seen = new Set<string>();
-    Object.values(APPROVED_PORTALS).forEach((list) => {
-      list.forEach((p) => {
-        if (!seen.has(p.url)) {
-          seen.add(p.url);
-          allList.push(p);
-        }
-      });
-    });
-    return allList;
+    return APPROVED_PORTALS.all;
   }
 
   const result: PortalInfo[] = [];
@@ -262,5 +285,5 @@ export function getPortalsForSelection(selectedSources: string[]): PortalInfo[] 
     });
   });
 
-  return result.length > 0 ? result : APPROVED_PORTALS.all || APPROVED_PORTALS.hanafi;
+  return result.length > 0 ? result : APPROVED_PORTALS.all;
 }
