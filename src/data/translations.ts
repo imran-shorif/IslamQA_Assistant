@@ -77,7 +77,7 @@ export const translations = {
     donateCalloutDesc: "সার্ভার ও এআই খরচ পরিচালনায় বিকাশে ডোনেট করতে পারেন।",
     donateBtn: "ডোনেট করুন (bKash)",
     aiDisclaimerTitle: "AI Disclaimer:",
-    aiDisclaimerText: " এই টুলটি মূলত সাধারণ শিক্ষা ও তথ্যের জন্য নির্মিত। এর উত্তরগুলো সম্পূর্ণভাবে IslamQA.info-এর ফতোয়ার ওপর ভিত্তি করে সংকলিত। এটিকে ব্যক্তিগত ফতোয়া বা বিজ্ঞ আলেমের সরাসরি বিকল্প হিসেবে বিবেচনা করবেন না। জটিল বা ব্যক্তিগত স্পর্শকাতর মাসআলায় সবসময় স্থানীয় নির্ভরযোগ্য আলেমের সাথে সরাসরি পরামর্শ করুন।",
+    aiDisclaimerText: " এই টুলটি মূলত সাধারণ শিক্ষা ও তথ্যের জন্য নির্মিত। এর উত্তরগুলো নির্ভরযোগ্য ইসলামিক ফতোয়া সাইট থেকে সংকলিত। এটিকে ব্যক্তিগত ফতোয়া বা বিজ্ঞ আলেমের সরাসরি বিকল্প হিসেবে বিবেচনা করবেন না। জটিল বা ব্যক্তিগত স্পর্শকাতর মাসআলায় সবসময় স্থানীয় নির্ভরযোগ্য আলেমের সাথে সরাসরি পরামর্শ করুন।",
 
     // Floating Buttons
     floatingNewQuestion: "নতুন প্রশ্ন",
@@ -328,7 +328,7 @@ export const translations = {
     donateCalloutDesc: "Support server and AI inference costs via bKash donation.",
     donateBtn: "Support Us (bKash)",
     aiDisclaimerTitle: "AI Disclaimer:",
-    aiDisclaimerText: " This tool is built for general learning and education, synthesized strictly from IslamQA.info fatwas. It is not an alternative to personal scholarly counsel. For sensitive, marital, or legal situations, consult a trusted local Islamic scholar.",
+    aiDisclaimerText: " This tool is built for general learning and education, synthesized from verified and reliable Islamic fatwa sites across recognized schools of thought. It is not an alternative to personal scholarly counsel. For sensitive, marital, or legal situations, consult a trusted local Islamic scholar.",
 
     // Floating Buttons
     floatingNewQuestion: "New Question",
@@ -579,7 +579,7 @@ export const translations = {
     donateCalloutDesc: "يمكنك التبرع للمساعدة في تكاليف الخوادم والذكاء الاصطناعي.",
     donateBtn: "تبرع الآن (Support)",
     aiDisclaimerTitle: "تنبيه شرعي وتقني:",
-    aiDisclaimerText: " هذه الأداة مخصصة للمعرفة والتعليم العام وتعتمد إجاباتها بالكامل على فتاوى موقع islamqa.info. لا تعتبر بديلاً شخصياً عن الفتوى المباشرة من العلماء والفقهاء المعتمدين، وفي القضايا المعقدة أو الحساسة يُرجى دائماً مراجعة أهل العلم الثقات مباشرة.",
+    aiDisclaimerText: " هذه الأداة مخصصة للمعرفة والتعليم العام وتعتمد إجاباتها على فتاوى المواقع الإسلامية الموثوقة والمصادر الفقهية المعتمدة. لا تعتبر بديلاً شخصياً عن الفتوى المباشرة من العلماء والفقهاء المعتمدين، وفي القضايا المعقدة أو الحساسة يُرجى دائماً مراجعة أهل العلم الثقات مباشرة.",
 
     // Floating Buttons
     floatingNewQuestion: "سؤال جديد",
@@ -830,7 +830,7 @@ export const translations = {
     donateCalloutDesc: "سرور اور اے آئی کے اخراجات میں آپ بکاش/تعاون کے ذریعے حصہ لے سکتے ہیں۔",
     donateBtn: "تعاون کریں (Support)",
     aiDisclaimerTitle: "شرعی و تکنیکی وضاحت:",
-    aiDisclaimerText: " یہ ٹول عام دینی معلومات اور آسانی کے لیے بنایا گیا ہے، جس کے جوابات مکمل طور پر IslamQA.info کے فتاویٰ پر مبنی ہیں۔ اسے ذاتی فتوے یا جید علماء کی براہِ راست رہنمائی کا متبادل نہ سمجھا جائے۔ حساس اور پیچیدہ مسائل میں ہمیشہ مقامی مستند علماء کرام سے رجوع کریں۔",
+    aiDisclaimerText: " یہ ٹول عام دینی معلومات اور آسانی کے لیے بنایا گیا ہے، جس کے جوابات معتبر اسلامی فتاویٰ ویب سائٹس اور مستند فقہی مراجع پر مبنی ہیں۔ اسے ذاتی فتوے یا جید علماء کی براہِ راست رہنمائی کا متبادل نہ سمجھا جائے۔ حساس اور پیچیدہ مسائل میں ہمیشہ مقامی مستند علماء کرام سے رجوع کریں۔",
 
     // Floating Buttons
     floatingNewQuestion: "نیا سوال",
