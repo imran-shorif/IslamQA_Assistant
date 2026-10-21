@@ -79,12 +79,12 @@ export const Header: React.FC<HeaderProps> = ({
           <a
             href="/"
             onClick={onHomeClick}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 shadow-sm border border-emerald-500/40 bg-stone-950"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 shadow-sm border border-amber-500/50 bg-stone-950"
             title={t.homeTitle}
           >
             <img
-              src="/logo.svg"
-              alt="Search Fatwa"
+              src="/official-logo.jpg"
+              alt="Search Fatwa Official Logo"
               className="w-full h-full object-cover"
             />
           </a>

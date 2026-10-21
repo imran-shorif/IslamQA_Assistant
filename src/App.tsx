@@ -424,6 +424,18 @@ export default function App() {
           <>
             {/* Hero Section - Compact on mobile so search input is right at the top */}
             <section className="text-center max-w-3xl mx-auto mb-2 sm:mb-6 px-1">
+              {/* Official Brand Emblem */}
+              <div className="flex items-center justify-center mb-2">
+                <div className="relative group">
+                  <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-amber-500/40 via-emerald-500/25 to-amber-500/40 blur-xs opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
+                  <img
+                    src="/official-logo.jpg"
+                    alt="Search Fatwa Official Logo"
+                    className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shadow-md border-2 border-amber-400/60 object-cover"
+                  />
+                </div>
+              </div>
+
               <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 mb-1.5 sm:mb-3.5">
                 <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[10px] sm:text-xs font-semibold leading-snug">
                   <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -592,7 +604,14 @@ export default function App() {
               <span>{t.supportBtn}</span>
             </button>
             <span>•</span>
-            <span>Search Fatwa · {resolvedLanguage === "en" ? "Universal Islamic Knowledge Platform" : "সার্বজনীন ইসলামিক ফতোয়া ও জ্ঞান প্ল্যাটফর্ম"}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <img
+                src="/official-logo.jpg"
+                alt="Search Fatwa"
+                className="w-4 h-4 rounded-sm border border-amber-500/40 object-cover inline-block"
+              />
+              <span>Search Fatwa · {resolvedLanguage === "en" ? "Universal Islamic Knowledge Platform" : "সার্বজনীন ইসলামিক ফতোয়া ও জ্ঞান প্ল্যাটফর্ম"}</span>
+            </span>
           </div>
 
           <div className="pt-1 flex items-center justify-center">

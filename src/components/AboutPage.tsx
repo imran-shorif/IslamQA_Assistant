@@ -53,6 +53,18 @@ export const AboutPage: React.FC<AboutPageProps> = ({
 
       {/* Hero Header */}
       <section className="text-center mb-10 sm:mb-12">
+        {/* Official Brand Emblem */}
+        <div className="flex justify-center mb-5">
+          <div className="relative group">
+            <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-r from-amber-500/40 via-emerald-500/30 to-amber-500/40 blur-md opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+            <img
+              src="/official-logo.jpg"
+              alt="Search Fatwa Official Logo"
+              className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl shadow-xl border-2 border-amber-400/60 object-cover"
+            />
+          </div>
+        </div>
+
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/80 text-xs font-semibold mb-3">
           <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
           <span>{t.aboutBadge}</span>
