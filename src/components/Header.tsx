@@ -11,6 +11,8 @@ import {
   LogOut,
   ChevronDown,
   Cloud,
+  Bot,
+  MessageSquare,
 } from "lucide-react";
 import { ThemeToggle, ThemeMode } from "./ThemeToggle";
 import { translations, Language } from "../data/translations";
@@ -27,10 +29,11 @@ interface HeaderProps {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   onThemeChange: (theme: ThemeMode) => void;
-  currentView?: "home" | "support" | "about" | "reference";
+  currentView?: "home" | "support" | "about" | "reference" | "chat";
   onSupportClick?: () => void;
   onAboutClick?: () => void;
   onReferenceClick?: () => void;
+  onChatClick?: () => void;
   onOpenAuthModal?: () => void;
 }
 
@@ -48,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSupportClick,
   onAboutClick,
   onReferenceClick,
+  onChatClick,
   onOpenAuthModal,
 }) => {
   const { currentUser, logout } = useAuth();
@@ -138,6 +142,24 @@ export const Header: React.FC<HeaderProps> = ({
               </option>
             </select>
           </div>
+
+          {/* AI Chatbot Button */}
+          {onChatClick && (
+            <button
+              onClick={onChatClick}
+              className={`flex items-center justify-center gap-1.5 h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs border ${
+                currentView === "chat"
+                  ? "bg-emerald-600 text-white border-emerald-500 shadow-sm"
+                  : "bg-emerald-950/60 hover:bg-emerald-900/80 active:scale-95 text-emerald-300 hover:text-white border-emerald-600/40"
+              }`}
+              title={t.chatTitle}
+              aria-label={t.chatBtn}
+            >
+              <Bot className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${currentView === "chat" ? "text-white" : "text-emerald-400"}`} />
+              <span className="hidden sm:inline">{t.chatBtn}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse hidden sm:inline" />
+            </button>
+          )}
 
           {/* Reference Page Button */}
           {onReferenceClick && (

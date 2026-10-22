@@ -8,6 +8,7 @@ import { HistoryDrawer } from "./components/HistoryDrawer";
 import { SupportPage } from "./components/SupportPage";
 import { AboutPage } from "./components/AboutPage";
 import { ReferencePage } from "./components/ReferencePage";
+import { ChatbotView } from "./components/ChatbotView";
 import { AuthModal } from "./components/AuthModal";
 import { VisitorCounter } from "./components/VisitorCounter";
 import { QnAResponse, ChatHistoryItem, MadhhabCategory } from "./types";
@@ -29,6 +30,8 @@ import {
   MessageSquarePlus,
   Info,
   Heart,
+  Bot,
+  MessageSquare,
 } from "lucide-react";
 
 const STORAGE_KEY = "islamqa_ai_history_v1";
@@ -39,13 +42,14 @@ export default function App() {
   const { currentUser } = useAuth();
   const { theme, resolvedTheme, setTheme } = useTheme();
 
-  const [currentView, setCurrentView] = useState<"home" | "support" | "about" | "reference">(() => {
+  const [currentView, setCurrentView] = useState<"home" | "support" | "about" | "reference" | "chat">(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
       if (hash === "#about" || path === "/about") return "about";
       if (hash === "#support" || path === "/support") return "support";
       if (hash === "#reference" || path === "/reference") return "reference";
+      if (hash === "#chat" || path === "/chat") return "chat";
     }
     return "home";
   });
@@ -107,6 +111,8 @@ export default function App() {
         setCurrentView("support");
       } else if (hash === "#reference" || path === "/reference") {
         setCurrentView("reference");
+      } else if (hash === "#chat" || path === "/chat") {
+        setCurrentView("chat");
       } else {
         setCurrentView("home");
       }
@@ -349,6 +355,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleNavigateToChat = () => {
+    setCurrentView("chat");
+    window.history.pushState(null, "", "#chat");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSelectSample = (sampleQuestion: string) => {
     setQuestion(sampleQuestion);
     handleAskQuestion(sampleQuestion);
@@ -396,6 +408,7 @@ export default function App() {
         onSupportClick={handleNavigateToSupport}
         onAboutClick={handleNavigateToAbout}
         onReferenceClick={handleNavigateToReference}
+        onChatClick={handleNavigateToChat}
         onOpenAuthModal={() => {
           setAuthModalMode("login");
           setIsAuthModalOpen(true);
@@ -419,6 +432,13 @@ export default function App() {
           <ReferencePage
             onBackToHome={handleResetHome}
             language={resolvedLanguage}
+          />
+        ) : currentView === "chat" ? (
+          <ChatbotView
+            onBackToHome={handleResetHome}
+            language={resolvedLanguage}
+            selectedSources={selectedSources}
+            onSourcesChange={setSelectedSources}
           />
         ) : (
           <>
@@ -459,6 +479,28 @@ export default function App() {
                 {t.heroDescPost}
               </p>
             </section>
+
+            {/* Mode Switcher: Search vs AI Chatbot */}
+            <div className="flex items-center justify-center mb-4 sm:mb-5">
+              <div className="inline-flex p-1 bg-stone-100 dark:bg-stone-850/80 rounded-xl border border-stone-200 dark:border-stone-800 shadow-xs">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white dark:bg-stone-800 text-emerald-700 dark:text-emerald-300 shadow-xs cursor-default"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{resolvedLanguage === "bn" ? "ফতোয়া অনুসন্ধান" : resolvedLanguage === "ar" ? "بحث الفتاوى" : resolvedLanguage === "ur" ? "فتوی تلاش" : "Fatwa Search"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNavigateToChat}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white cursor-pointer hover:bg-white/60 dark:hover:bg-stone-800/60"
+                >
+                  <Bot className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t.chatBtn}</span>
+                  <span className="text-[10px] uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded-full font-bold">New</span>
+                </button>
+              </div>
+            </div>
 
             {/* Comparison Feature Banner */}
             <ComparisonBanner language={resolvedLanguage} />
@@ -543,8 +585,21 @@ export default function App() {
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-2.5 items-end">
+        {/* Floating Chatbot FAB */}
+        {currentView !== "chat" && (
+          <button
+            onClick={handleNavigateToChat}
+            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white px-3.5 py-2.5 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all text-xs sm:text-sm font-semibold cursor-pointer border border-emerald-400/40"
+            title={t.chatTitle}
+            aria-label={t.chatTitle}
+          >
+            <Bot className="w-4 h-4 text-emerald-200" />
+            <span className="hidden sm:inline">{t.chatBtn}</span>
+          </button>
+        )}
+
         {/* Floating "New Question" FAB */}
-        {currentResponse && !isLoading && (
+        {currentResponse && !isLoading && currentView === "home" && (
           <button
             onClick={scrollToInput}
             className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white px-3.5 py-2.5 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all text-xs sm:text-sm font-semibold cursor-pointer border border-blue-500/40"
@@ -577,6 +632,15 @@ export default function App() {
             {t.aiDisclaimerText}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] text-stone-400 dark:text-stone-500">
+            <button
+              onClick={handleNavigateToChat}
+              className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
+              title={t.chatTitle}
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span>{t.chatBtn}</span>
+            </button>
+            <span>•</span>
             <button
               onClick={handleNavigateToAbout}
               className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:underline font-medium cursor-pointer"
