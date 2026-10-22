@@ -406,6 +406,66 @@ export const MADHHAB_CHRONOLOGY: MadhhabDefinition[] = [
   },
 ];
 
+export type AIModelId = "gemini-4-argon" | "gemini-3.8-flash" | "gemini-3.1-flash-lite";
+
+export interface AIModelOption {
+  id: AIModelId;
+  name: string;
+  badgeBn: string;
+  badgeEn: string;
+  badgeAr: string;
+  badgeUr: string;
+  descBn: string;
+  descEn: string;
+  descAr: string;
+  descUr: string;
+  quality: "highest" | "balanced" | "fast";
+  isRecommended?: boolean;
+}
+
+export const AVAILABLE_AI_MODELS: AIModelOption[] = [
+  {
+    id: "gemini-4-argon",
+    name: "Gemini 4 Argon",
+    badgeBn: "সর্বোচ্চ মান ও গভীর বিশ্লেষণ",
+    badgeEn: "Highest Quality & Reasoning",
+    badgeAr: "أعلى جودة وتحليل عميق",
+    badgeUr: "بہترین معیار اور گہرا تجزیہ",
+    descBn: "জটিল ফতোয়া, বিভিন্ন মাজহাবের সূক্ষ্ম পার্থক্য ও প্রামাণ্য দলিলের জন্য সেরা",
+    descEn: "Deep jurisprudence synthesis with detailed evidences and multi-madhhab depth",
+    descAr: "الأفضل للمسائل الفقهية المعقدة والتحليل المقارن بين المذاهب بدقة",
+    descUr: "پیچیدہ مسائل اور تقابلی فقہ کے لیے سب سے بہترین اور مفصل ماڈل",
+    quality: "highest",
+  },
+  {
+    id: "gemini-3.8-flash",
+    name: "Gemini 3.8 Flash",
+    badgeBn: "সুপারিশকৃত ও ভারসাম্যপূর্ণ",
+    badgeEn: "Recommended & Balanced",
+    badgeAr: "موصى به ومتوازن",
+    badgeUr: "تجویز کردہ اور متوازن",
+    descBn: "গতি ও নির্ভরযোগ্য বিস্তারিত ব্যাখ্যার চমৎকার সমন্বয়",
+    descEn: "Optimal combination of high-speed response and authoritative fatwa references",
+    descAr: "توازن مثالي بين السرعة العالية والشرح الموثق بالمراجع",
+    descUr: "تیز رفتار اور جامع تفصیلی جوابات کا بہترین توازن",
+    quality: "balanced",
+    isRecommended: true,
+  },
+  {
+    id: "gemini-3.1-flash-lite",
+    name: "Gemini 3.1 Flash Lite",
+    badgeBn: "দ্রুততম উত্তর",
+    badgeEn: "Ultra Fast",
+    badgeAr: "فائق السرعة",
+    badgeUr: "انتہائی تیز",
+    descBn: "খুব দ্রুত ও সরাসরি মাসআলার সমাধান পাওয়ার জন্য",
+    descEn: "Lightweight, ultra-fast model for immediate rulings and direct points",
+    descAr: "نموذج فائق السرعة للحصول على الأحكام المباشرة في ثوانٍ",
+    descUr: "انتہائی فوری اور براہ راست احکام معلوم کرنے کے لیے",
+    quality: "fast",
+  },
+];
+
 export interface IslamQASource {
   title: string;
   url: string;
@@ -417,6 +477,7 @@ export interface QnARequest {
   question: string;
   language?: Language;
   sources?: MadhhabCategory[];
+  model?: AIModelId;
 }
 
 export interface QnAResponse {

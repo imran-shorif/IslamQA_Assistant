@@ -15,11 +15,6 @@ import {
   APPROVED_DOMAINS,
   PortalInfo,
 } from "./server/madhhabPortals";
-import {
-  buildChatSystemInstruction,
-  ChatMessage,
-  ChatbotRole,
-} from "./server/chatService";
 
 dotenv.config();
 
@@ -100,9 +95,10 @@ CRITICAL RULES:
 }
 
 app.post("/api/ask", async (req, res) => {
-  const { question = "", language = "bn", sources = ["all"] } = req.body || {};
+  const { question = "", language = "bn", sources = ["all"], model = "gemini-3.8-flash" } = req.body || {};
   const selectedSources: string[] = Array.isArray(sources) && sources.length > 0 ? sources : ["all"];
   const portals = getPortalsForSelection(selectedSources);
+  const requestedModel = typeof model === "string" ? model.trim() : "gemini-3.8-flash";
 
   try {
     if (!question || typeof question !== "string" || !question.trim()) {
@@ -139,12 +135,19 @@ app.post("/api/ask", async (req, res) => {
       .map((p) => `${p.name}: ${p.url}`)
       .join(", ");
 
+    const depthInstruction = requestedModel === "gemini-4-argon"
+      ? "\n[HIGH QUALITY REASONING]: Conduct a deep, exhaustive jurisprudential analysis. Provide extensive Quranic and Hadith evidences with exact chapter/hadith references, cite classical fiqh manual consensus/nuances across the schools, and include verified direct hyperlinks to specific portal fatwas."
+      : requestedModel === "gemini-3.1-flash-lite"
+      ? "\n[FAST RESPONSE]: Provide a direct, prompt ruling summary followed by essential evidences and direct portal hyperlinks."
+      : "";
+
     const userPrompt = `User Islamic Question:
 "${question.trim()}"
 ${languageInstruction}
 
 Selected Madhhabs / Source Schools: [${selectedSources.join(", ")}]
 Authorized Portals to consult & cite: ${portalsListForPrompt}
+${depthInstruction}
 
 Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks from the authorized portals, and conclude with a clickable References section.`;
 
@@ -155,11 +158,20 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       snippet: p.descriptionBn,
     }));
 
-    // Try available models in order of quota resilience
-    const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+    // Prioritized model list based on user choice, with resilient fallback order
+    let modelsToTry: string[] = [];
+    if (requestedModel === "gemini-4-argon") {
+      modelsToTry = ["gemini-4-argon", "gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
+    } else if (requestedModel === "gemini-3.1-flash-lite") {
+      modelsToTry = ["gemini-3.1-flash-lite", "gemini-3.8-flash", "gemini-flash-latest"];
+    } else {
+      // Default: gemini-3.8-flash
+      modelsToTry = ["gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
+    }
+
     let response: any = null;
     let lastError: any = null;
-    let usedModel = "gemini-3.1-flash-lite";
+    let usedModel = modelsToTry[0];
 
     // 1. First attempt: with Google Search grounding tool to find live citations
     for (const model of modelsToTry) {
@@ -349,175 +361,6 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
     res.status(500).json({
       error: errMsg,
     });
-  }
-});
-
-// MULTI-TURN GEMINI CHATBOT API
-app.post("/api/chat", async (req, res) => {
-  const {
-    messages = [],
-    model = "gemini-3.8-flash",
-    role = "scholar",
-    sources = ["all"],
-    language = "bn",
-  } = req.body || {};
-
-  try {
-    if (!Array.isArray(messages) || messages.length === 0) {
-      res.status(400).json({ error: "Messages array cannot be empty." });
-      return;
-    }
-
-    const lastMsg = messages[messages.length - 1];
-    if (!lastMsg || !lastMsg.text || !lastMsg.text.trim()) {
-      res.status(400).json({ error: "Last message text cannot be empty." });
-      return;
-    }
-
-    if (!apiKey) {
-      res.status(500).json({
-        error: "GEMINI_API_KEY is not configured in the environment.",
-      });
-      return;
-    }
-
-    const selectedSources: string[] = Array.isArray(sources) && sources.length > 0 ? sources : ["all"];
-    const portals = getPortalsForSelection(selectedSources);
-    const botRole: ChatbotRole = role || "scholar";
-    const systemInstruction = buildChatSystemInstruction(botRole, selectedSources, portals, language);
-
-    // Format multi-turn conversation history for @google/genai
-    const contents = messages.map((m: any) => ({
-      role: m.role === "assistant" || m.role === "model" ? "model" : "user",
-      parts: [{ text: String(m.text || "") }],
-    }));
-
-    // Candidate sources initialized with authorized portals
-    const candidateSources: SourceItem[] = portals.map((p) => ({
-      title: p.name,
-      url: p.url,
-      snippet: p.descriptionBn,
-    }));
-
-    // Model selection based on user preference and task complexity
-    // gemini-4-argon for complex tasks, gemini-3.8-flash for general, gemini-3.1-flash-lite for fast
-    let primaryModel = model;
-    if (!["gemini-4-argon", "gemini-3.8-flash", "gemini-3.1-flash-lite"].includes(primaryModel)) {
-      primaryModel = "gemini-3.8-flash";
-    }
-
-    const fallbackList = [primaryModel, "gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
-    const modelsToTry = Array.from(new Set(fallbackList));
-
-    let response: any = null;
-    let lastError: any = null;
-    let usedModel = primaryModel;
-
-    // First attempt: with Google Search grounding tool
-    for (const mdl of modelsToTry) {
-      try {
-        response = await ai.models.generateContent({
-          model: mdl,
-          contents,
-          config: {
-            systemInstruction,
-            tools: [{ googleSearch: {} }],
-            temperature: 0.3,
-          },
-        });
-        if (response && response.text) {
-          usedModel = mdl;
-          break;
-        }
-      } catch (err: any) {
-        lastError = err;
-      }
-    }
-
-    // Second attempt: without Search tool if tool execution failed
-    if (!response) {
-      for (const mdl of modelsToTry) {
-        try {
-          response = await ai.models.generateContent({
-            model: mdl,
-            contents,
-            config: {
-              systemInstruction,
-              temperature: 0.3,
-            },
-          });
-          if (response && response.text) {
-            usedModel = mdl;
-            break;
-          }
-        } catch (err: any) {
-          lastError = err;
-        }
-      }
-    }
-
-    if (!response || !response.text) {
-      throw lastError || new Error("Failed to generate response from Gemini Chatbot.");
-    }
-
-    const rawReplyText = response.text;
-
-    // Extract grounding sources from Google Search grounding
-    const rawChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    for (const chunk of rawChunks) {
-      if (chunk.web && chunk.web.uri) {
-        const uri = chunk.web.uri;
-        const isApproved = APPROVED_DOMAINS.some((d) => uri.includes(d));
-        if (isApproved) {
-          candidateSources.push({
-            title: chunk.web.title || `Fatwa Reference`,
-            url: uri,
-          });
-        }
-      }
-    }
-
-    // Extract any quoted portal URLs from reply
-    for (const domain of APPROVED_DOMAINS) {
-      const domainRegex = new RegExp(
-        `https?:\\/\\/(?:[a-zA-Z0-9-_.]+\\.)?${domain.replace(".", "\\.")}[a-zA-Z0-9\\-_/%#?&=.]*`,
-        "gi"
-      );
-      let dMatch: RegExpExecArray | null;
-      while ((dMatch = domainRegex.exec(rawReplyText)) !== null) {
-        const pInfo = getApprovedPortalInfo(dMatch[0], language);
-        candidateSources.push({
-          title: pInfo ? pInfo.name : domain,
-          url: dMatch[0],
-        });
-      }
-    }
-
-    // Sanitize and verify all links
-    const { sanitizedMarkdown, verifiedSources } = await sanitizeAndVerifyAllLinks(
-      rawReplyText,
-      candidateSources,
-      [],
-      language,
-      lastMsg.text.trim()
-    );
-
-    res.json({
-      id: "chat-reply-" + Date.now(),
-      reply: sanitizedMarkdown,
-      sources: verifiedSources,
-      modelUsed: usedModel,
-      role: botRole,
-      timestamp: Date.now(),
-    });
-  } catch (error: any) {
-    console.error("Error in /api/chat:", error);
-    let errMsg = error?.message || "Failed to process chat message.";
-    if (errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("quota") || errMsg.includes("429")) {
-      errMsg =
-        "Gemini API কোটা সাময়িকভাবে শেষ হয়েছে (Rate Limit / Quota Exceeded)। অনুগ্রহ করে কিছুক্ষণ পর পুনরায় চেষ্টা করুন।";
-    }
-    res.status(500).json({ error: errMsg });
   }
 });
 
