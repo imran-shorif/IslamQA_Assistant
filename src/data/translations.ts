@@ -15,8 +15,6 @@ export const translations = {
     aboutTitle: "আমাদের সম্পর্কে জানুন (About Us)",
     supportTitle: "আমাদের সাপোর্ট করুন (Support Us)",
     historyTitle: "পূর্ববর্তী প্রশ্ন ও ফতোয়া (History)",
-    chatBtn: "এআই চ্যাটবট",
-    chatTitle: "Search Fatwa AI চ্যাটবট - মাল্টি-টার্ন ইসলামিক আলোচনা",
 
     // Source / Madhhab Selector
     sourcePrompt: "আপনি কোন উৎস থেকে উত্তর চান?",
@@ -268,8 +266,6 @@ export const translations = {
     aboutTitle: "About Search Fatwa",
     supportTitle: "Support Us",
     historyTitle: "Past Questions & History",
-    chatBtn: "AI Chatbot",
-    chatTitle: "Search Fatwa AI Chatbot - Multi-turn Islamic assistant",
 
     // Source / Madhhab Selector
     sourcePrompt: "Which sources or schools do you want answers from?",
@@ -521,8 +517,6 @@ export const translations = {
     aboutTitle: "عن Search Fatwa",
     supportTitle: "ادعم هذا المشروع",
     historyTitle: "سجل الأسئلة والفتاوى السابقة",
-    chatBtn: "المحادثة الذكية",
-    chatTitle: "المحادثة الفقهية الذكية - سيرش فتاوى",
 
     // Source / Madhhab Selector
     sourcePrompt: "من أي مصدر أو مذهب تريد الإجابة؟",
@@ -774,8 +768,6 @@ export const translations = {
     aboutTitle: "Search Fatwa کے بارے میں",
     supportTitle: "ہمارا تعاون کریں",
     historyTitle: "سابقہ سوالات و فتاویٰ",
-    chatBtn: "اے آئی چیٹ",
-    chatTitle: "سرچ فتاویٰ اے آئی چیٹ بوٹ",
 
     // Source / Madhhab Selector
     sourcePrompt: "آپ کس ماخذ یا مکتبہ فکر سے جواب چاہتے ہیں؟",

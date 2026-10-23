@@ -95,10 +95,9 @@ CRITICAL RULES:
 }
 
 app.post("/api/ask", async (req, res) => {
-  const { question = "", language = "bn", sources = ["all"], model = "gemini-3.8-flash" } = req.body || {};
+  const { question = "", language = "bn", sources = ["all"] } = req.body || {};
   const selectedSources: string[] = Array.isArray(sources) && sources.length > 0 ? sources : ["all"];
   const portals = getPortalsForSelection(selectedSources);
-  const requestedModel = typeof model === "string" ? model.trim() : "gemini-3.8-flash";
 
   try {
     if (!question || typeof question !== "string" || !question.trim()) {
@@ -135,19 +134,12 @@ app.post("/api/ask", async (req, res) => {
       .map((p) => `${p.name}: ${p.url}`)
       .join(", ");
 
-    const depthInstruction = requestedModel === "gemini-4-argon"
-      ? "\n[HIGH QUALITY REASONING]: Conduct a deep, exhaustive jurisprudential analysis. Provide extensive Quranic and Hadith evidences with exact chapter/hadith references, cite classical fiqh manual consensus/nuances across the schools, and include verified direct hyperlinks to specific portal fatwas."
-      : requestedModel === "gemini-3.1-flash-lite"
-      ? "\n[FAST RESPONSE]: Provide a direct, prompt ruling summary followed by essential evidences and direct portal hyperlinks."
-      : "";
-
     const userPrompt = `User Islamic Question:
 "${question.trim()}"
 ${languageInstruction}
 
 Selected Madhhabs / Source Schools: [${selectedSources.join(", ")}]
 Authorized Portals to consult & cite: ${portalsListForPrompt}
-${depthInstruction}
 
 Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks from the authorized portals, and conclude with a clickable References section.`;
 
@@ -158,20 +150,11 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       snippet: p.descriptionBn,
     }));
 
-    // Prioritized model list based on user choice, with resilient fallback order
-    let modelsToTry: string[] = [];
-    if (requestedModel === "gemini-4-argon") {
-      modelsToTry = ["gemini-4-argon", "gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
-    } else if (requestedModel === "gemini-3.1-flash-lite") {
-      modelsToTry = ["gemini-3.1-flash-lite", "gemini-3.8-flash", "gemini-flash-latest"];
-    } else {
-      // Default: gemini-3.8-flash
-      modelsToTry = ["gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
-    }
-
+    // Try available models in order of quota resilience
+    const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
     let response: any = null;
     let lastError: any = null;
-    let usedModel = modelsToTry[0];
+    let usedModel = "gemini-3.1-flash-lite";
 
     // 1. First attempt: with Google Search grounding tool to find live citations
     for (const model of modelsToTry) {

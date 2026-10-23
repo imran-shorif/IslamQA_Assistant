@@ -10,12 +10,7 @@ import { AboutPage } from "./components/AboutPage";
 import { ReferencePage } from "./components/ReferencePage";
 import { AuthModal } from "./components/AuthModal";
 import { VisitorCounter } from "./components/VisitorCounter";
-import {
-  QnAResponse,
-  ChatHistoryItem,
-  MadhhabCategory,
-  AIModelId,
-} from "./types";
+import { QnAResponse, ChatHistoryItem, MadhhabCategory } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { translations, Language } from "./data/translations";
 import { useAuth } from "./context/AuthContext";
@@ -39,7 +34,6 @@ import {
 const STORAGE_KEY = "islamqa_ai_history_v1";
 const LANG_STORAGE_KEY = "islamqa_language_pref";
 const PREV_LANG_STORAGE_KEY = "islamqa_prev_resolved_language";
-const MODEL_STORAGE_KEY = "islamqa_selected_model";
 
 export default function App() {
   const { currentUser } = useAuth();
@@ -57,24 +51,6 @@ export default function App() {
   });
   const [question, setQuestion] = useState("");
   const [selectedSources, setSelectedSources] = useState<MadhhabCategory[]>(["all"]);
-  const [selectedModel, setSelectedModel] = useState<AIModelId>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(MODEL_STORAGE_KEY);
-      if (saved === "gemini-4-argon" || saved === "gemini-3.8-flash" || saved === "gemini-3.1-flash-lite") {
-        return saved as AIModelId;
-      }
-    }
-    return "gemini-3.8-flash";
-  });
-
-  const handleModelChange = (newModel: AIModelId) => {
-    setSelectedModel(newModel);
-    try {
-      localStorage.setItem(MODEL_STORAGE_KEY, newModel);
-    } catch (e) {
-      console.warn("Could not save model to localStorage:", e);
-    }
-  };
 
   // Language setting: bn | en | ar | ur
   const [language, setLanguage] = useState<Language>(() => {
@@ -282,7 +258,6 @@ export default function App() {
           question: q,
           language: resolvedLanguage,
           sources: selectedSources,
-          model: selectedModel,
         }),
       });
 
@@ -502,8 +477,6 @@ export default function App() {
                 language={resolvedLanguage}
                 selectedSources={selectedSources}
                 onSourcesChange={setSelectedSources}
-                selectedModel={selectedModel}
-                onModelChange={handleModelChange}
               />
             </div>
 
@@ -571,7 +544,7 @@ export default function App() {
       {/* Floating Action Buttons */}
       <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-2.5 items-end">
         {/* Floating "New Question" FAB */}
-        {currentResponse && !isLoading && currentView === "home" && (
+        {currentResponse && !isLoading && (
           <button
             onClick={scrollToInput}
             className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 text-white px-3.5 py-2.5 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all text-xs sm:text-sm font-semibold cursor-pointer border border-blue-500/40"
