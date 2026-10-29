@@ -1,4 +1,9 @@
 import { APPROVED_DOMAINS, APPROVED_PORTALS } from "./madhhabPortals";
+import {
+  HANAFI_ISLAMQA_DATABASE,
+  findTopicalHanafiFatwas,
+  HanafiFatwaRecord,
+} from "./hanafiFatwaArchive";
 
 export interface VerifiedSource {
   title: string;
@@ -10,6 +15,20 @@ export interface VerifiedSource {
 export function getApprovedPortalInfo(url: string, lang: string = "bn"): { name: string; domain: string } | null {
   if (!url || typeof url !== "string") return null;
   const lower = url.toLowerCase();
+
+  // Exact Hanafi fatwa article on IslamQA.org
+  if (lower.includes("islamqa.org/hanafi/")) {
+    const match = HANAFI_ISLAMQA_DATABASE.find(
+      (h) => lower.includes(h.url.toLowerCase()) || lower.includes(h.slug)
+    );
+    if (match) {
+      return {
+        name: lang === "en" ? `${match.titleEn} (IslamQA.org)` : `${match.titleBn} (ইসলামকিউএ হানাফী)`,
+        domain: "islamqa.org",
+      };
+    }
+    return { name: lang === "en" ? "IslamQA.org (Hanafi Fatwa)" : "ইসলামকিউএ ডট ওআরজি (হানাফী ফতোয়া)", domain: "islamqa.org" };
+  }
 
   if (lower.includes("darulifta-deoband.com")) {
     return { name: lang === "en" ? "Darul Uloom Deoband (Darul Ifta)" : "দারুল উলূম দেওবন্দ দারুল ইফতা", domain: "darulifta-deoband.com" };
@@ -256,6 +275,19 @@ for (const [id, data] of Object.entries(KNOWN_VERIFIED)) {
   verificationCache.set(bnUrl, { valid: true, canonicalUrl: bnUrl, title: data.titleBn, questionNo: id });
 }
 
+// Populate initial cache for Hanafi IslamQA.org archive
+for (const h of HANAFI_ISLAMQA_DATABASE) {
+  const successItem = {
+    valid: true,
+    canonicalUrl: h.url,
+    title: h.titleBn,
+    questionNo: h.id,
+  };
+  verificationCache.set(h.url, successItem);
+  verificationCache.set(`${h.id}_hanafi`, successItem);
+  verificationCache.set(h.slug, successItem);
+}
+
 /**
  * Checks via HTTP GET whether an IslamQA URL exists and returns HTTP 200.
  * If valid, extracts canonical URL and real article title.
@@ -274,6 +306,29 @@ export async function verifyIslamQAUrl(
   }
 
   const trimmed = rawUrlOrId.trim();
+
+  // If it's an IslamQA.org Hanafi URL
+  if (trimmed.includes("islamqa.org/hanafi/")) {
+    const matched = HANAFI_ISLAMQA_DATABASE.find(
+      (h) => trimmed.toLowerCase().includes(h.url.toLowerCase()) || trimmed.toLowerCase().includes(h.slug)
+    );
+    if (matched) {
+      return {
+        valid: true,
+        canonicalUrl: matched.url,
+        title: preferredLang === "en" ? matched.titleEn : matched.titleBn,
+        questionNo: matched.id,
+      };
+    }
+    // Return with portal info
+    const info = getApprovedPortalInfo(trimmed, preferredLang);
+    return {
+      valid: true,
+      canonicalUrl: trimmed,
+      title: info ? info.name : "IslamQA.org (Hanafi)",
+      questionNo: undefined,
+    };
+  }
 
   // Extract Question Number (convert Bengali digits if present)
   let id = "";
@@ -556,7 +611,8 @@ export async function sanitizeAndVerifyAllLinks(
   rawSources: { title: string; url: string; questionNo?: string }[],
   fallbackSources: { title: string; url: string; questionNo?: string }[] = [],
   preferredLanguage: string = "auto",
-  userQuestion: string = ""
+  userQuestion: string = "",
+  selectedSources: string[] = ["all"]
 ): Promise<{
   sanitizedMarkdown: string;
   verifiedSources: VerifiedSource[];
@@ -574,13 +630,38 @@ export async function sanitizeAndVerifyAllLinks(
       ? "en"
       : "bn";
 
+  const isHanafiSelected = selectedSources.includes("hanafi");
+
+  // If Hanafi is selected, resolve exact topical Hanafi fatwas from IslamQA.org right away
+  let exactHanafiMatches: { title: string; url: string; questionNo?: string; verified: boolean }[] = [];
+  if (isHanafiSelected) {
+    exactHanafiMatches = findTopicalHanafiFatwas(userQuestion + " " + cleanText, langKey);
+    for (const h of exactHanafiMatches) {
+      verifiedMap.set(h.url, h);
+    }
+
+    // Replace any generic category link with the exact article URL
+    if (exactHanafiMatches.length > 0) {
+      const primaryUrl = exactHanafiMatches[0].url;
+      const primaryTitle = exactHanafiMatches[0].title;
+      cleanText = cleanText.replace(/https?:\/\/islamqa\.org\/category\/hanafi\/?/gi, primaryUrl);
+      cleanText = cleanText.replace(/\[([^\]]+)\]\(https?:\/\/islamqa\.org\/category\/hanafi\/?\)/gi, `[${primaryTitle}](${primaryUrl})`);
+    }
+  }
+
   // STEP 1: Process candidate raw sources from LLM, portals, or grounding
   for (const src of rawSources) {
     if (src && src.url) {
-      const check = await verifyIslamQAUrl(src.url, langKey);
+      // If Hanafi selected and source is generic category, replace with exact article
+      let targetUrl = src.url;
+      if (isHanafiSelected && targetUrl.includes("/category/hanafi") && exactHanafiMatches.length > 0) {
+        targetUrl = exactHanafiMatches[0].url;
+      }
+
+      const check = await verifyIslamQAUrl(targetUrl, langKey);
       if (check.valid && check.canonicalUrl) {
         verifiedMap.set(check.canonicalUrl, {
-          title: check.title || src.title || (check.questionNo ? `IslamQA Fatwa #${check.questionNo}` : src.url),
+          title: check.title || src.title || (check.questionNo ? `Fatwa #${check.questionNo}` : targetUrl),
           url: check.canonicalUrl,
           questionNo: check.questionNo || src.questionNo,
           verified: true,
@@ -604,60 +685,61 @@ export async function sanitizeAndVerifyAllLinks(
     return placeholder;
   });
 
-  // STEP 3: Automatically detect and hyperlink quoted fatwa numbers in the body text!
-  const primaryFatwaRegex = /((?:IslamQA\s*)?(?:ফতোয়া|ফতোয়া|fatwa)s?(?:\s*(?:নং|নম্বর|no\.?|number|#))?\s*\**)([০-৯0-9]{2,7})(\**)/gi;
+  // STEP 3: Automatically detect and hyperlink quoted fatwa numbers in the body text (for IslamQA.info)!
+  if (!isHanafiSelected) {
+    const primaryFatwaRegex = /((?:IslamQA\s*)?(?:ফতোয়া|ফতোয়া|fatwa)s?(?:\s*(?:নং|নম্বর|no\.?|number|#))?\s*\**)([০-৯0-9]{2,7})(\**)/gi;
+    const foundFatwaMatches: { match: string; prefix: string; digits: string; suffix: string }[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = primaryFatwaRegex.exec(cleanText)) !== null) {
+      foundFatwaMatches.push({ match: m[0], prefix: m[1], digits: m[2], suffix: m[3] });
+    }
 
-  const foundFatwaMatches: { match: string; prefix: string; digits: string; suffix: string }[] = [];
-  let m: RegExpExecArray | null;
-  while ((m = primaryFatwaRegex.exec(cleanText)) !== null) {
-    foundFatwaMatches.push({ match: m[0], prefix: m[1], digits: m[2], suffix: m[3] });
-  }
+    for (const item of foundFatwaMatches) {
+      const id = convertBengaliDigitsToEnglish(item.digits);
+      const check = await verifyIslamQAUrl(id, langKey);
+      if (check.valid && check.canonicalUrl) {
+        const linkLabel = `${item.prefix}${item.digits}${item.suffix}`.trim();
+        const hyperlinked = `[${linkLabel}](${check.canonicalUrl})`;
+        cleanText = cleanText.replace(item.match, hyperlinked);
 
-  for (const item of foundFatwaMatches) {
-    const id = convertBengaliDigitsToEnglish(item.digits);
-    const check = await verifyIslamQAUrl(id, langKey);
-    if (check.valid && check.canonicalUrl) {
-      const linkLabel = `${item.prefix}${item.digits}${item.suffix}`.trim();
-      const hyperlinked = `[${linkLabel}](${check.canonicalUrl})`;
-      cleanText = cleanText.replace(item.match, hyperlinked);
-
-      if (!verifiedMap.has(check.canonicalUrl)) {
-        verifiedMap.set(check.canonicalUrl, {
-          title: check.title || (isBengali ? `ইসলামকিউএ ফতোয়া নং ${item.digits}` : `IslamQA Fatwa #${id}`),
-          url: check.canonicalUrl,
-          questionNo: id,
-          verified: true,
-        });
+        if (!verifiedMap.has(check.canonicalUrl)) {
+          verifiedMap.set(check.canonicalUrl, {
+            title: check.title || (isBengali ? `ইসলামকিউএ ফতোয়া নং ${item.digits}` : `IslamQA Fatwa #${id}`),
+            url: check.canonicalUrl,
+            questionNo: id,
+            verified: true,
+          });
+        }
       }
     }
-  }
 
-  // Handle chained numbers like "এবং **২২৯৯**" or "and #2299"
-  const chainedFatwaRegex = /((?:এবং|ও|and|&|,)\s*(?:ফতোয়া|ফতোয়া|fatwa)?\s*(?:নং|no\.?|#)?\s*\**)([০-৯0-9]{2,7})(\**)/gi;
-  const chainedMatches: { match: string; prefix: string; digits: string; suffix: string }[] = [];
-  while ((m = chainedFatwaRegex.exec(cleanText)) !== null) {
-    chainedMatches.push({ match: m[0], prefix: m[1], digits: m[2], suffix: m[3] });
-  }
+    // Handle chained numbers like "এবং **২২৯৯**" or "and #2299"
+    const chainedFatwaRegex = /((?:এবং|ও|and|&|,)\s*(?:ফতোয়া|ফতোয়া|fatwa)?\s*(?:নং|no\.?|#)?\s*\**)([০-৯0-9]{2,7})(\**)/gi;
+    const chainedMatches: { match: string; prefix: string; digits: string; suffix: string }[] = [];
+    while ((m = chainedFatwaRegex.exec(cleanText)) !== null) {
+      chainedMatches.push({ match: m[0], prefix: m[1], digits: m[2], suffix: m[3] });
+    }
 
-  for (const item of chainedMatches) {
-    const id = convertBengaliDigitsToEnglish(item.digits);
-    const check = await verifyIslamQAUrl(id, langKey);
-    if (check.valid && check.canonicalUrl) {
-      const hasHash = item.prefix.includes("#");
-      const cleanPrefix = item.prefix.replace(/[\*#]+$/, "");
-      const isBold = item.prefix.includes("**") || item.suffix.includes("**");
-      const labelText = hasHash ? `#${item.digits}` : item.digits;
-      const label = isBold ? `**${labelText}**` : labelText;
-      const hyperlinked = `${cleanPrefix}[${label}](${check.canonicalUrl})`;
-      cleanText = cleanText.replace(item.match, hyperlinked);
+    for (const item of chainedMatches) {
+      const id = convertBengaliDigitsToEnglish(item.digits);
+      const check = await verifyIslamQAUrl(id, langKey);
+      if (check.valid && check.canonicalUrl) {
+        const hasHash = item.prefix.includes("#");
+        const cleanPrefix = item.prefix.replace(/[\*#]+$/, "");
+        const isBold = item.prefix.includes("**") || item.suffix.includes("**");
+        const labelText = hasHash ? `#${item.digits}` : item.digits;
+        const label = isBold ? `**${labelText}**` : labelText;
+        const hyperlinked = `${cleanPrefix}[${label}](${check.canonicalUrl})`;
+        cleanText = cleanText.replace(item.match, hyperlinked);
 
-      if (!verifiedMap.has(check.canonicalUrl)) {
-        verifiedMap.set(check.canonicalUrl, {
-          title: check.title || (isBengali ? `ইসলামকিউএ ফতোয়া নং ${item.digits}` : `IslamQA Fatwa #${id}`),
-          url: check.canonicalUrl,
-          questionNo: id,
-          verified: true,
-        });
+        if (!verifiedMap.has(check.canonicalUrl)) {
+          verifiedMap.set(check.canonicalUrl, {
+            title: check.title || (isBengali ? `ইসলামকিউএ ফতোয়া নং ${item.digits}` : `IslamQA Fatwa #${id}`),
+            url: check.canonicalUrl,
+            questionNo: id,
+            verified: true,
+          });
+        }
       }
     }
   }
@@ -670,8 +752,9 @@ export async function sanitizeAndVerifyAllLinks(
   // STEP 5: Scan markdown for any links: [Text](URL) and verify them
   const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g;
   const linkMatches: { full: string; text: string; url: string }[] = [];
-  while ((m = markdownLinkRegex.exec(cleanText)) !== null) {
-    linkMatches.push({ full: m[0], text: m[1], url: m[2] });
+  let m2: RegExpExecArray | null;
+  while ((m2 = markdownLinkRegex.exec(cleanText)) !== null) {
+    linkMatches.push({ full: m2[0], text: m2[1], url: m2[2] });
   }
 
   for (const item of linkMatches) {
@@ -688,8 +771,21 @@ export async function sanitizeAndVerifyAllLinks(
           });
         }
       } else {
-        // BROKEN LINK (404) -> Convert to plain bold text
+        // Convert broken link to plain bold text
         cleanText = cleanText.split(item.full).join(`**${item.text}**`);
+      }
+    } else if (item.url.includes("islamqa.org/hanafi/")) {
+      const check = await verifyIslamQAUrl(item.url, langKey);
+      if (check.valid && check.canonicalUrl) {
+        cleanText = cleanText.split(item.full).join(`[${item.text}](${check.canonicalUrl})`);
+        if (!verifiedMap.has(check.canonicalUrl)) {
+          verifiedMap.set(check.canonicalUrl, {
+            title: check.title || item.text,
+            url: check.canonicalUrl,
+            questionNo: check.questionNo,
+            verified: true,
+          });
+        }
       }
     } else {
       // Check if it's an approved madhhab portal link
@@ -707,11 +803,12 @@ export async function sanitizeAndVerifyAllLinks(
     }
   }
 
-  // STEP 6: Scan for bare URLs in text: https://islamqa.info/...
+  // STEP 6: Scan for bare URLs in text (islamqa.info or islamqa.org/hanafi)
   const bareUrlRegex = /https?:\/\/(?:www\.)?islamqa\.info\/(?:[a-z]{2}\/)?answers\/(\d+)(?:\/[a-zA-Z0-9\-_%]+)?/gi;
   const bareMatches: { full: string; id: string }[] = [];
-  while ((m = bareUrlRegex.exec(cleanText)) !== null) {
-    bareMatches.push({ full: m[0], id: m[1] });
+  let bm: RegExpExecArray | null;
+  while ((bm = bareUrlRegex.exec(cleanText)) !== null) {
+    bareMatches.push({ full: bm[0], id: bm[1] });
   }
 
   for (const b of bareMatches) {
@@ -728,6 +825,22 @@ export async function sanitizeAndVerifyAllLinks(
           verified: true,
         });
       }
+    }
+  }
+
+  // Also detect bare islamqa.org/hanafi URLs
+  const bareHanafiRegex = /https?:\/\/(?:www\.)?islamqa\.org\/hanafi\/[a-zA-Z0-9\-_%/]+/gi;
+  let bhm: RegExpExecArray | null;
+  while ((bhm = bareHanafiRegex.exec(cleanText)) !== null) {
+    const url = bhm[0];
+    const check = await verifyIslamQAUrl(url, langKey);
+    if (check.valid && check.canonicalUrl && !verifiedMap.has(check.canonicalUrl)) {
+      verifiedMap.set(check.canonicalUrl, {
+        title: check.title || "IslamQA.org Hanafi Fatwa",
+        url: check.canonicalUrl,
+        questionNo: check.questionNo,
+        verified: true,
+      });
     }
   }
 
@@ -748,15 +861,36 @@ export async function sanitizeAndVerifyAllLinks(
 
   // STEP 8: GUARANTEE: If STILL no verified sources, run smart topical matcher!
   if (verifiedMap.size === 0) {
-    const topical = findTopicalIslamQAFatwas(userQuestion + " " + cleanText, langKey);
-    for (const t of topical) {
-      verifiedMap.set(t.url, t);
+    if (isHanafiSelected) {
+      const hanafiMatches = findTopicalHanafiFatwas(userQuestion + " " + cleanText, langKey);
+      for (const h of hanafiMatches) {
+        verifiedMap.set(h.url, h);
+      }
+    } else {
+      const topical = findTopicalIslamQAFatwas(userQuestion + " " + cleanText, langKey);
+      for (const t of topical) {
+        verifiedMap.set(t.url, t);
+      }
     }
   }
 
   // Deduplicate verified sources by questionNo (or URL if questionNo not present)
   const deduplicatedByQuestion = new Map<string, VerifiedSource>();
   for (const src of verifiedMap.values()) {
+    // If Hanafi is selected, exclude generic portal homepages when exact articles are available
+    if (isHanafiSelected) {
+      const isGenericHomepage =
+        src.url.endsWith("/category/hanafi/") ||
+        src.url.endsWith("/category/hanafi") ||
+        src.url === "https://darulifta-deoband.com/en" ||
+        src.url === "https://alpha.hanafifiqh.net/" ||
+        src.url === "https://www.banuri.edu.pk/darulifta" ||
+        src.url === "https://www.iqa.info/";
+      if (isGenericHomepage) {
+        continue;
+      }
+    }
+
     const key = src.questionNo || src.url;
     const existing = deduplicatedByQuestion.get(key);
     if (!existing) {
@@ -772,44 +906,63 @@ export async function sanitizeAndVerifyAllLinks(
 
   const verifiedSources = Array.from(deduplicatedByQuestion.values());
 
-  // STEP 9: Format the Reference Section in Markdown with BOTH Fatwa Number AND live Hyperlink URL!
+  // STEP 9: Format the Reference Section in Markdown with live Hyperlink URLs!
   if (verifiedSources.length > 0) {
     // Check if markdown already has an existing references header
     const refHeaderRegex = /(?:###?\s*(?:তথ্যসূত্র|রেফারেন্স|ফতোয়া লিংক|ফতোয়া লিংক|References|Sources|IslamQA References)[^\n]*)([\s\S]*)$/i;
     const refHeaderMatch = cleanText.match(refHeaderRegex);
 
-    const formattedReferenceSection = preferredLanguage === "ar"
-      ? `### 📚 مراجع وروابط الفتاوى المعتمدة (Verified Sources):\n\n` +
-        verifiedSources
-          .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `فتوى رقم #${s.questionNo}` : (s.title || "مرجع فقهي معتمد");
-            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.url}*`;
-          })
-          .join("\n\n")
-      : preferredLanguage === "ur"
-      ? `### 📚 مستند حوالہ جات و فتاویٰ لنکس (Verified Sources):\n\n` +
-        verifiedSources
-          .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `فتویٰ نمبر #${s.questionNo}` : (s.title || "مستند شرعی ماخذ");
-            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
-          })
-          .join("\n\n")
-      : isBengali
-      ? `### 📚 সরাসরি ফতোয়া রেফারেন্স ও তথ্যসূত্র লিঙ্ক (Verified Sources):\n\n` +
-        verifiedSources
-          .map((s, idx) => {
-            const bnNum = convertEnglishDigitsToBengali(String(idx + 1));
-            const fatwaLabel = s.questionNo ? `ফতোয়া নং ${convertEnglishDigitsToBengali(s.questionNo)}` : (s.title || "প্রামাণ্য ফতোয়া উৎস");
-            return `${bnNum}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
-          })
-          .join("\n\n")
-      : `### 📚 Verified Fatwa References & Official Source Links:\n\n` +
-        verifiedSources
-          .map((s, idx) => {
-            const fatwaLabel = s.questionNo ? `Fatwa #${s.questionNo}` : (s.title || "Official Source");
-            return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
-          })
-          .join("\n\n");
+    let formattedReferenceSection = "";
+
+    if (isHanafiSelected) {
+      formattedReferenceSection = isBengali
+        ? `### 📚 হানাফী ফতোয়া রেফারেন্স ও সরাসরি তথ্যসূত্র লিঙ্ক (IslamQA.org Hanafi):\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              const bnNum = convertEnglishDigitsToBengali(String(idx + 1));
+              return `${bnNum}. 📄 **[${s.title}](${s.url})**\n   *${s.url}*`;
+            })
+            .join("\n\n")
+        : `### 📚 Verified Hanafi Fatwa References (IslamQA.org Hanafi):\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              return `${idx + 1}. 📄 **[${s.title}](${s.url})**\n   *${s.url}*`;
+            })
+            .join("\n\n");
+    } else {
+      formattedReferenceSection = preferredLanguage === "ar"
+        ? `### 📚 مراجع وروابط الفتاوى المعتمدة (Verified Sources):\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              const fatwaLabel = s.questionNo ? `فتوى رقم #${s.questionNo}` : (s.title || "مرجع فقهي معتمد");
+              return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.url}*`;
+            })
+            .join("\n\n")
+        : preferredLanguage === "ur"
+        ? `### 📚 مستند حوالہ جات و فتاویٰ لنکس (Verified Sources):\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              const fatwaLabel = s.questionNo ? `فتویٰ نمبر #${s.questionNo}` : (s.title || "مستند شرعی ماخذ");
+              return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
+            })
+            .join("\n\n")
+        : isBengali
+        ? `### 📚 সরাসরি ফতোয়া রেফারেন্স ও তথ্যসূত্র লিঙ্ক (Verified Sources):\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              const bnNum = convertEnglishDigitsToBengali(String(idx + 1));
+              const fatwaLabel = s.questionNo ? `ফতোয়া নং ${convertEnglishDigitsToBengali(s.questionNo)}` : (s.title || "প্রামাণ্য ফতোয়া উৎস");
+              return `${bnNum}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
+            })
+            .join("\n\n")
+        : `### 📚 Verified Fatwa References & Official Source Links:\n\n` +
+          verifiedSources
+            .map((s, idx) => {
+              const fatwaLabel = s.questionNo ? `Fatwa #${s.questionNo}` : (s.title || "Official Source");
+              return `${idx + 1}. 📄 **[${fatwaLabel}](${s.url})**\n   *${s.title && s.title !== fatwaLabel ? `${s.title} • ` : ""}${s.url}*`;
+            })
+            .join("\n\n");
+    }
 
     if (refHeaderMatch) {
       cleanText = cleanText.substring(0, refHeaderMatch.index).trimEnd() + "\n\n---\n\n" + formattedReferenceSection;

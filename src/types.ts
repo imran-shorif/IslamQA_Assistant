@@ -36,10 +36,19 @@ export interface MadhhabDefinition {
 
 const HANAFI_PORTALS: BrainPortal[] = [
   {
+    title: "IslamQA.org (Hanafi Fiqh Archive)",
+    url: "https://islamqa.org/category/hanafi/",
+    descriptionBn: "আন্তর্জাতিক চার মাযহাবের ডেডিকেটেড হানাফী ফতোয়া ও প্রামাণ্য রিসার্চ আর্কাইভ (প্রধান উৎস)",
+    descriptionEn: "International Hanafi fatwa & scholarly archive across verified research centers (Primary Source)",
+    descriptionAr: "الأرشيف العالمي لفتاوى وأبحاث المذهب الحنفي (المصدر الرئيسي)",
+    descriptionUr: "اسلام کیو اے ڈاٹ او آر جی کا حنفی فتاویٰ و تحقیقی پورٹل (بنیادی ماخذ)",
+    badge: "Primary Source (প্রধান উৎস)",
+  },
+  {
     title: "Darul Uloom Deoband Darul Ifta",
     url: "https://darulifta-deoband.com/en",
-    descriptionBn: "দারুল উলূম দেওবন্দের অফিসিয়াল অনলাইন দারুল ইফতা পোর্টাল",
-    descriptionEn: "Official online Darul Ifta of Darul Uloom Deoband",
+    descriptionBn: "দারুল উলূম দেওবন্দের অফিসিয়াল অনলাইন দারুল ইফতা পোর্টাল (সহায়ক উৎস)",
+    descriptionEn: "Official online Darul Ifta of Darul Uloom Deoband (Supporting Source)",
     descriptionAr: "دار الإفتاء لدار العلوم ديوبند",
     descriptionUr: "دار العلوم دیوبند کا سرکاری آن لائن دار الافتاء",
     badge: "Official Deoband",
@@ -47,8 +56,8 @@ const HANAFI_PORTALS: BrainPortal[] = [
   {
     title: "Hanafi Fiqh BD",
     url: "https://alpha.hanafifiqh.net/",
-    descriptionBn: "বাংলাদেশে প্রচলিত হানাফী ফিকহের প্রামাণ্য বাংলা ফতোয়া ডাটাবেজ",
-    descriptionEn: "Authentic Bengali Hanafi jurisprudence & legal opinions archive",
+    descriptionBn: "বাংলাদেশে প্রচলিত হানাফী ফিকহের প্রামাণ্য বাংলা ফতোয়া ডাটাবেজ (সহায়ক উৎস)",
+    descriptionEn: "Authentic Bengali Hanafi jurisprudence & legal opinions archive (Supporting Source)",
     descriptionAr: "قاعدة بيانات الفقه الحنفي المعتمدة باللغة البنغالية",
     descriptionUr: "بنگلہ دیش کا مستند فقہ حنفی فتاویٰ ڈیٹا بیس",
     badge: "Hanafi BD",
@@ -56,8 +65,8 @@ const HANAFI_PORTALS: BrainPortal[] = [
   {
     title: "Darul Uloom Banuri Town Darul Ifta",
     url: "https://www.banuri.edu.pk/darulifta",
-    descriptionBn: "বিশ্বখ্যাত জামিয়া উলূমুল ইসলামিয়া আল্লামা বিন্নুরী টাউন দারুল ইফতা",
-    descriptionEn: "Official Darul Ifta of Jamia Uloom-e-Islamia Banuri Town Karachi",
+    descriptionBn: "বিশ্বখ্যাত জামিয়া উলূমুল ইসলামিয়া আল্লামা বিন্নুরী টাউন দারুল ইফতা (সহায়ক উৎস)",
+    descriptionEn: "Official Darul Ifta of Jamia Uloom-e-Islamia Banuri Town Karachi (Supporting Source)",
     descriptionAr: "دار الإفتاء بجامعة العلوم الإسلامية بنوري تاون كراتشي",
     descriptionUr: "جامعہ علوم اسلامیہ علامہ بنوری ٹاؤن کراچی کا دار الافتاء",
     badge: "Banuri Town",
@@ -65,20 +74,11 @@ const HANAFI_PORTALS: BrainPortal[] = [
   {
     title: "IQA (As-Sunnah Foundation)",
     url: "https://www.iqa.info/",
-    descriptionBn: "শায়খ আহমাদুল্লাহ পরিচালিত প্রামাণ্য ইসলামিক প্রশ্নোত্তর পোর্টাল",
-    descriptionEn: "Authentic Islamic Q&A portal founded by Sheikh Ahmadullah",
+    descriptionBn: "শায়খ আহমাদুল্লাহ পরিচালিত প্রামাণ্য ইসলামিক প্রশ্নোত্তর পোর্টাল (সহায়ক উৎস)",
+    descriptionEn: "Authentic Islamic Q&A portal founded by Sheikh Ahmadullah (Supporting Source)",
     descriptionAr: "بوابة الأسئلة والأجوبة الإسلامية للشيخ أحمد الله",
     descriptionUr: "شیخ احمد اللہ کا مستند اسلامی سوال و جواب پورٹل",
     badge: "IQA Ahmadullah",
-  },
-  {
-    title: "IslamQA.org (Hanafi)",
-    url: "https://islamqa.org/category/hanafi/",
-    descriptionBn: "আন্তর্জাতিক চার মাযহাবের ডেডিকেটেড হানাফী ফতোয়া আর্কাইভ",
-    descriptionEn: "International multi-madhhab database (Hanafi division)",
-    descriptionAr: "الأرشيف العالمي لفتاوى المذهب الحنفي",
-    descriptionUr: "اسلام کیو اے ڈاٹ او آر جی کا حنفی فتاویٰ سیکشن",
-    badge: "IslamQA.org",
   },
 ];
 

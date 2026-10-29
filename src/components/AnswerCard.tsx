@@ -12,6 +12,7 @@ import {
   ZoomOut,
   ChevronDown,
   Smartphone,
+  Sparkles,
 } from "lucide-react";
 import {
   WhatsAppIcon,
@@ -196,6 +197,30 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ data, language = "bn" })
                 : "Search Fatwa যাচাইকৃত সমাধান"}
             </span>
           </span>
+
+          {data.model && (
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border ${
+                data.model.includes("gemini-4-argon")
+                  ? "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border-purple-200/70 dark:border-purple-800/70"
+                  : data.model.includes("gemini-3.8-flash")
+                  ? "text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/70 border-teal-200/70 dark:border-teal-800/70"
+                  : "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 border-blue-200/70 dark:border-blue-800/70"
+              }`}
+              title="উত্তর তৈরিতে ব্যবহৃত এআই মডেল"
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                {data.model.includes("gemini-4-argon")
+                  ? "Gemini 4 Argon (গভীর বিশ্লেষণ)"
+                  : data.model.includes("gemini-3.8-flash")
+                  ? "Gemini 3.8 Flash (ভারসাম্যপূর্ণ)"
+                  : data.model.includes("gemini-3.1-flash-lite")
+                  ? "Gemini 3.1 Flash Lite (দ্রুত)"
+                  : data.model}
+              </span>
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">

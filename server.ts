@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import { findMatchingFatwa } from "./server/fatwaDatabase";
+import { findTopicalHanafiFatwas } from "./server/hanafiFatwaArchive";
 import {
   sanitizeAndVerifyAllLinks,
   verifyIslamQAUrl,
@@ -57,20 +58,27 @@ ${portalBullets}
 
 CRITICAL RULES:
 1. STRICT ADHERENCE TO SELECTED SCHOOL(S) / PORTALS:
-   - If Hanafi is selected, synthesize strictly according to the Hanafi school of jurisprudence using Darul Uloom Deoband (darulifta-deoband.com), Hanafi Fiqh BD (alpha.hanafifiqh.net), Jamia Banuri Town (banuri.edu.pk), IQA Ahmadullah (iqa.info), and IslamQA.org (Hanafi section).
-   - If Shafi'i is selected, synthesize according to the Shafi'i school using Jordan General Department of Iftaa (aliftaa.jo), ShafiiFiqh.org, and IslamQA.org (Shafi'i section).
-   - If Maliki is selected, synthesize according to the Maliki school using BinBayyah.net, Maliki Fiqh Q&A (malikifiqhqa.com), Maliki Madhab (malikimadhab.org), and IslamQA.org (Maliki section).
-   - If Hanbali is selected, synthesize according to the Hanbali school using Saudi Presidency of Scholarly Research and Ifta (alifta.gov.sa), Kuwait Ministry of Awqaf (awqaf.gov.kw), Hanbali Fiqh Q&A (hanbalifiqhqa.com), and IslamQA.info.
-   - If Salafi is selected, synthesize according to Quran & authentic Sunnah via IslamQA.info, Saudi Al-Ifta, and Islamweb.
-   - If Bibidh (Contemporary) is selected, synthesize from IQA (Sheikh Ahmadullah - iqa.info) and Egypt's Dar Al-Ifta (dar-alifta.org - Al-Azhar tradition).
-   - If Shia is selected, synthesize according to Shia jurisprudence including classical and primary Zaydi sources: Al-Urwah al-Wuthqa al-Zaydiyyah (alorwahalwuthqa.com), Imam Zaid bin Ali Cultural Foundation (hmml.org/stories/zaydi-manuscripts), and Al-Islam.org digital library.
-   - If All is selected, provide a multi-school synthesis explaining the positions of the four Sunni madhhabs (Hanafi, Shafi'i, Maliki, Hanbali) and recognized scholarly sources with citations to their respective portals.
+   - If Hanafi is selected:
+     * PRIMARY AUTHORITY & MAIN ARCHIVE: IslamQA.org Hanafi Section (https://islamqa.org/category/hanafi/).
+     * You MUST primarily derive and ground your ruling from IslamQA.org's dedicated Hanafi archive.
+     * You MUST cite and hyperlink the EXACT WEBPAGE article URL on https://islamqa.org/hanafi/... (e.g. [IslamQA.org Hanafi Fatwa](https://islamqa.org/hanafi/councilofulama/242247/toothpaste-while-fasting/) or [IslamQA.org](https://islamqa.org/hanafi/fatwacentre/270625/using-an-inhaler-whilst-fasting-2/)).
+     * Do NOT give generic category links like https://islamqa.org/category/hanafi/ when an exact fatwa article exists.
+     * Supporting secondary sources: Darul Uloom Deoband (darulifta-deoband.com), Hanafi Fiqh BD (alpha.hanafifiqh.net), Jamia Banuri Town (banuri.edu.pk), and IQA Ahmadullah (iqa.info) serve as supporting reference sources with secondary weight.
+   - If Hanbali is selected:
+     * PRIMARY AUTHORITY & MAIN ARCHIVE: IslamQA.info (supervised by Shaykh Muhammad Saalih al-Munajjid).
+     * Synthesize rulings strictly from authentic IslamQA.info fatwas with specific fatwa numbers (e.g. Fatwa #37761) and exact links (https://islamqa.info/answers/...).
+   - If Shafi'i is selected: synthesize according to the Shafi'i school using Jordan General Department of Iftaa (aliftaa.jo), ShafiiFiqh.org, and IslamQA.org (Shafi'i section).
+   - If Maliki is selected: synthesize according to the Maliki school using BinBayyah.net, Maliki Fiqh Q&A (malikifiqhqa.com), Maliki Madhab (malikimadhab.org), and IslamQA.org (Maliki section).
+   - If Salafi is selected: synthesize according to Quran & authentic Sunnah via IslamQA.info, Saudi Al-Ifta, and Islamweb.
+   - If Bibidh (Contemporary) is selected: synthesize from IQA (Sheikh Ahmadullah - iqa.info) and Egypt's Dar Al-Ifta (dar-alifta.org - Al-Azhar tradition).
+   - If Shia is selected: synthesize according to Shia jurisprudence including classical and primary Zaydi sources: Al-Urwah al-Wuthqa al-Zaydiyyah (alorwahalwuthqa.com), Imam Zaid bin Ali Cultural Foundation (hmml.org/stories/zaydi-manuscripts), and Al-Islam.org digital library.
+   - If All is selected: provide a multi-school synthesis explaining the positions of the four Sunni madhhabs (Hanafi, Shafi'i, Maliki, Hanbali) and recognized scholarly sources with citations to their respective portals.
 
 2. MANDATORY SOURCE CITATION & HYPERLINKING IN ANSWER BODY:
    - In the opening or synthesis of your answer, explicitly cite which institution/portal and webpage this ruling is derived from with an active markdown hyperlink.
-     Example in Bengali:
-     "এই উত্তরটি **[দারুল উলূম দেওবন্দ দারুল ইফতা](https://darulifta-deoband.com/en)** এবং **[হানাফী ফিকহ বিডি](https://alpha.hanafifiqh.net/)**-এর প্রামাণ্য ফতোয়া ও দলিলের আলোকে সংকলন করা হয়েছে।"
-     Or for IslamQA:
+     Example for Hanafi:
+     "এই উত্তরটি **[ইসলামকিউএ হানাফী আর্কাইভ](https://islamqa.org/hanafi/councilofulama/242247/toothpaste-while-fasting/)**-এর প্রামাণ্য ফতোয়ার আলোকে সংকলন করা হয়েছে।"
+     Or for IslamQA.info:
      "এই উত্তরটি **[IslamQA.info](https://islamqa.info)**-এর ফতোয়া নং [৩৭৭৬১](https://islamqa.info/bn/answers/37761)-এর আলোকে প্রস্তুত করা হয়েছে।"
 
 3. ZERO TOLERANCE FOR HALLUCINATION & REAL WEBPAGE URL REQUIREMENT:
@@ -86,8 +94,7 @@ CRITICAL RULES:
 5. CLICKABLE REFERENCES SECTION AT THE END:
    - Conclude every response with a dedicated references section containing live hyperlinks:
      ### তথ্যসূত্র ও ফতোয়া রেফারেন্স লিঙ্ক (Verified Sources):
-     - [🔗 দারুল উলূম দেওবন্দ দারুল ইফতা](https://darulifta-deoband.com/en)
-     - [🔗 হানাফী ফিকহ বিডি](https://alpha.hanafifiqh.net/)
+     - [🔗 ইসলামকিউএ হানাফী ফতোয়া](https://islamqa.org/hanafi/...)
 
 6. LANGUAGE & TONE:
    - Answer in the user's requested language (Bengali if queried in Bengali, English if in English, Arabic if in Arabic, Urdu if in Urdu).
@@ -134,21 +141,42 @@ app.post("/api/ask", async (req, res) => {
       .map((p) => `${p.name}: ${p.url}`)
       .join(", ");
 
+    // Candidate sources initialized with the authorized portals or exact Hanafi articles
+    let candidateSources: SourceItem[] = [];
+
+    let hanafiPromptGuidance = "";
+    if (selectedSources.includes("hanafi")) {
+      const hanafiFatwas = findTopicalHanafiFatwas(question, language as any);
+      for (const h of hanafiFatwas) {
+        candidateSources.push({
+          title: h.title,
+          url: h.url,
+          questionNo: h.questionNo,
+          snippet: "IslamQA.org Hanafi Archive Exact Webpage",
+        });
+      }
+      hanafiPromptGuidance = `\nCRITICAL MANDATE FOR HANAFI SCHOOL INQUIRY:
+The user selected the HANAFI school. The primary, authoritative source is IslamQA.org (https://islamqa.org/category/hanafi/).
+Here are the exact matching verified Hanafi fatwa webpages from IslamQA.org for this inquiry:
+${hanafiFatwas.map((f) => `- [${f.title}](${f.url}) -> Exact live URL: ${f.url}`).join("\n")}
+You MUST ground your response primarily in the Hanafi position from IslamQA.org and explicitly cite and hyperlink these exact live article URLs in your text. Do NOT cite the general category homepage. Supporting Hanafi sources (Deoband, Banuri, Hanafi Fiqh BD, IQA) have secondary weight.`;
+    } else {
+      candidateSources = portals.map((p) => ({
+        title: p.name,
+        url: p.url,
+        snippet: p.descriptionBn,
+      }));
+    }
+
     const userPrompt = `User Islamic Question:
 "${question.trim()}"
 ${languageInstruction}
 
 Selected Madhhabs / Source Schools: [${selectedSources.join(", ")}]
 Authorized Portals to consult & cite: ${portalsListForPrompt}
+${hanafiPromptGuidance}
 
 Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks from the authorized portals, and conclude with a clickable References section.`;
-
-    // Candidate sources initialized with the authorized portals for the selected school
-    const candidateSources: SourceItem[] = portals.map((p) => ({
-      title: p.name,
-      url: p.url,
-      snippet: p.descriptionBn,
-    }));
 
     // Try available models in order of quota resilience
     const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
@@ -214,7 +242,8 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
           [...candidateSources, ...matchingFallback.sources],
           [],
           isEnglish ? "en" : "bn",
-          question.trim()
+          question.trim(),
+          selectedSources
         );
 
         res.json({
@@ -251,7 +280,18 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       }
     }
 
-    // Also extract any IslamQA URLs mentioned in text
+    // Extract any IslamQA.org Hanafi URLs mentioned in text
+    const hanafiUrlRegex = /https?:\/\/(?:www\.)?islamqa\.org\/hanafi\/[a-zA-Z0-9\-_%/]+/gi;
+    let hMatch: RegExpExecArray | null;
+    while ((hMatch = hanafiUrlRegex.exec(rawAnswerText)) !== null) {
+      const portalInfo = getApprovedPortalInfo(hMatch[0], language);
+      candidateSources.push({
+        title: portalInfo ? portalInfo.name : "IslamQA.org Hanafi Fatwa",
+        url: hMatch[0],
+      });
+    }
+
+    // Also extract any IslamQA.info URLs mentioned in text
     const urlRegex = /https?:\/\/(?:www\.)?islamqa\.info\/(?:[a-z]{2}\/)?answers\/(\d+)(?:\/[a-zA-Z0-9\-_%]+)?/gi;
     let urlMatch: RegExpExecArray | null;
     while ((urlMatch = urlRegex.exec(rawAnswerText)) !== null) {
@@ -264,7 +304,7 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
 
     // Also extract any other approved portal URLs mentioned in text
     for (const domain of APPROVED_DOMAINS) {
-      if (domain === "islamqa.info") continue;
+      if (domain === "islamqa.info" || domain === "islamqa.org") continue;
       const domainRegex = new RegExp(`https?:\\/\\/(?:[a-zA-Z0-9-_.]+\\.)?${domain.replace(".", "\\.")}[a-zA-Z0-9\\-_/%#?&=.]*`, "gi");
       let dMatch: RegExpExecArray | null;
       while ((dMatch = domainRegex.exec(rawAnswerText)) !== null) {
@@ -295,7 +335,8 @@ Provide a well-structured, clear synthesis with detailed evidences, rulings, and
       candidateSources,
       fallbackSources,
       language,
-      question.trim()
+      question.trim(),
+      selectedSources
     );
 
     res.json({
