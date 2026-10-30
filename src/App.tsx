@@ -14,7 +14,6 @@ import {
   QnAResponse,
   ChatHistoryItem,
   MadhhabCategory,
-  AIModelId,
 } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { translations, Language } from "./data/translations";
@@ -39,7 +38,6 @@ import {
 const STORAGE_KEY = "islamqa_ai_history_v1";
 const LANG_STORAGE_KEY = "islamqa_language_pref";
 const PREV_LANG_STORAGE_KEY = "islamqa_prev_resolved_language";
-const MODEL_STORAGE_KEY = "islamqa_selected_model";
 
 export default function App() {
   const { currentUser } = useAuth();
@@ -57,24 +55,6 @@ export default function App() {
   });
   const [question, setQuestion] = useState("");
   const [selectedSources, setSelectedSources] = useState<MadhhabCategory[]>(["all"]);
-  const [selectedModel, setSelectedModel] = useState<AIModelId>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(MODEL_STORAGE_KEY);
-      if (saved === "gemini-4-argon" || saved === "gemini-3.8-flash" || saved === "gemini-3.1-flash-lite") {
-        return saved as AIModelId;
-      }
-    }
-    return "gemini-3.8-flash";
-  });
-
-  const handleModelChange = (newModel: AIModelId) => {
-    setSelectedModel(newModel);
-    try {
-      localStorage.setItem(MODEL_STORAGE_KEY, newModel);
-    } catch (e) {
-      console.warn("Could not save model to localStorage:", e);
-    }
-  };
 
   // Language setting: bn | en | ar | ur
   const [language, setLanguage] = useState<Language>(() => {
@@ -282,7 +262,6 @@ export default function App() {
           question: q,
           language: resolvedLanguage,
           sources: selectedSources,
-          model: selectedModel,
         }),
       });
 
@@ -502,8 +481,6 @@ export default function App() {
                 language={resolvedLanguage}
                 selectedSources={selectedSources}
                 onSourcesChange={setSelectedSources}
-                selectedModel={selectedModel}
-                onModelChange={handleModelChange}
               />
             </div>
 

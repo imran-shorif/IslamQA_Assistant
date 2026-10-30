@@ -8,17 +8,12 @@ import {
   Shuffle,
   Compass,
   Check,
-  Cpu,
-  Zap,
-  Award,
 } from "lucide-react";
 import { getRandomIslamicQuestion } from "../data/sampleQuestions";
 import { translations, Language } from "../data/translations";
 import {
   MADHHAB_CHRONOLOGY,
   MadhhabCategory,
-  AIModelId,
-  AVAILABLE_AI_MODELS,
 } from "../types";
 
 interface QuestionInputProps {
@@ -30,8 +25,6 @@ interface QuestionInputProps {
   language: Language;
   selectedSources: MadhhabCategory[];
   onSourcesChange: (sources: MadhhabCategory[]) => void;
-  selectedModel: AIModelId;
-  onModelChange: (model: AIModelId) => void;
 }
 
 export const QuestionInput: React.FC<QuestionInputProps> = ({
@@ -43,8 +36,6 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
   language,
   selectedSources,
   onSourcesChange,
-  selectedModel,
-  onModelChange,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const t = translations[language] || translations.bn;
@@ -107,31 +98,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
     }
   };
 
-  const getModelBadge = (model: (typeof AVAILABLE_AI_MODELS)[number]) => {
-    switch (language) {
-      case "en":
-        return model.badgeEn;
-      case "ar":
-        return model.badgeAr;
-      case "ur":
-        return model.badgeUr;
-      default:
-        return model.badgeBn;
-    }
-  };
 
-  const getModelDesc = (model: (typeof AVAILABLE_AI_MODELS)[number]) => {
-    switch (language) {
-      case "en":
-        return model.descEn;
-      case "ar":
-        return model.descAr;
-      case "ur":
-        return model.descUr;
-      default:
-        return model.descBn;
-    }
-  };
 
   return (
     <form
@@ -186,106 +153,7 @@ export const QuestionInput: React.FC<QuestionInputProps> = ({
         </div>
       </div>
 
-      {/* AI Model Selection Section */}
-      <div className="mb-3.5 pb-3 border-b border-stone-100 dark:border-stone-800">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-          <label className="text-xs sm:text-sm font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>
-              {language === "en"
-                ? "AI Engine & Model Selection"
-                : language === "ar"
-                ? "نموذج الذكاء الاصطناعي وجودة البحث"
-                : language === "ur"
-                ? "اے آئی ماڈل اور معیار کا انتخاب"
-                : "এআই মডেল নির্বাচন (AI Model Selection)"}
-            </span>
-          </label>
-          <span className="text-[11px] text-stone-500 dark:text-stone-400">
-            {language === "en"
-              ? "Select a higher model for deeper, richer jurisprudential output"
-              : language === "ar"
-              ? "اختر نموذجاً أقوى لتحليل أعمق واستشهادات أدق"
-              : language === "ur"
-              ? "بہتر ماڈل منتخب کر کے مزید مفصل و مستند فتویٰ حاصل کریں"
-              : "উন্নত মডেল নির্বাচন করলে আরো গভীর ও প্রামাণ্য বিশ্লেষণ পাবেন"}
-          </span>
-        </div>
 
-        {/* 3 Model Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {AVAILABLE_AI_MODELS.map((m) => {
-            const isSelected = selectedModel === m.id;
-            return (
-              <button
-                type="button"
-                key={m.id}
-                onClick={() => onModelChange(m.id)}
-                className={`p-2.5 rounded-xl text-left transition-all border cursor-pointer relative group flex flex-col justify-between ${
-                  isSelected
-                    ? m.id === "gemini-4-argon"
-                      ? "bg-purple-50/90 dark:bg-purple-950/40 border-purple-400 dark:border-purple-600 ring-2 ring-purple-400/30 shadow-xs"
-                      : m.id === "gemini-3.8-flash"
-                      ? "bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-500 dark:border-emerald-600 ring-2 ring-emerald-500/25 shadow-xs"
-                      : "bg-blue-50/90 dark:bg-blue-950/40 border-blue-400 dark:border-blue-600 ring-2 ring-blue-400/25 shadow-xs"
-                    : "bg-stone-50 dark:bg-stone-850 hover:bg-stone-100 dark:hover:bg-stone-800 border-stone-200 dark:border-stone-750"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-1 mb-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      {m.id === "gemini-4-argon" ? (
-                        <Award className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-purple-600 dark:text-purple-400" : "text-stone-400"}`} />
-                      ) : m.id === "gemini-3.8-flash" ? (
-                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-emerald-600 dark:text-emerald-400" : "text-stone-400"}`} />
-                      ) : (
-                        <Zap className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-blue-600 dark:text-blue-400" : "text-stone-400"}`} />
-                      )}
-                      <span className={`text-xs font-bold truncate ${isSelected ? "text-stone-900 dark:text-white" : "text-stone-700 dark:text-stone-300"}`}>
-                        {m.name}
-                      </span>
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md shrink-0 ${
-                        isSelected
-                          ? m.id === "gemini-4-argon"
-                            ? "bg-purple-200/80 dark:bg-purple-900/80 text-purple-800 dark:text-purple-200"
-                            : m.id === "gemini-3.8-flash"
-                            ? "bg-emerald-200/80 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200"
-                            : "bg-blue-200/80 dark:bg-blue-900/80 text-blue-800 dark:text-blue-200"
-                          : "bg-stone-200/60 dark:bg-stone-800 text-stone-600 dark:text-stone-400"
-                      }`}
-                    >
-                      {getModelBadge(m)}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-snug line-clamp-2">
-                    {getModelDesc(m)}
-                  </p>
-                </div>
-
-                <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-stone-200/40 dark:border-stone-800">
-                  <span className="text-[10px] text-stone-400 font-medium">
-                    {m.quality === "highest"
-                      ? "★★★★★ Reasoning"
-                      : m.quality === "balanced"
-                      ? "★★★★☆ Balanced"
-                      : "★★★☆☆ Fast"}
-                  </span>
-                  {isSelected && (
-                    <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                      <Check className="w-3 h-3 stroke-[3]" />
-                      <span>সক্রিয়</span>
-                    </span>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Input Row */}
       <div className="flex items-start gap-2.5">

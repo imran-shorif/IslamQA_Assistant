@@ -178,11 +178,11 @@ ${hanafiPromptGuidance}
 
 Provide a well-structured, clear synthesis with detailed evidences, rulings, and cite authentic fatwa references with hyperlinks from the authorized portals, and conclude with a clickable References section.`;
 
-    // Try available models in order of quota resilience
-    const modelsToTry = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+    // Always use the optimal AI model version with quota fallback
+    const modelsToTry = ["gemini-3.1-flash-lite", "gemini-3.8-flash", "gemini-flash-latest"];
     let response: any = null;
     let lastError: any = null;
-    let usedModel = "gemini-3.1-flash-lite";
+    let usedModel = modelsToTry[0];
 
     // 1. First attempt: with Google Search grounding tool to find live citations
     for (const model of modelsToTry) {
